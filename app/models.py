@@ -31,11 +31,15 @@ class RestaurantFinance(models.Model):
     expenditures = models.IntegerField()
     sales = models.IntegerField()
 
-    def isProfitable(self):
+    @property
+    def is_profitable(self):
         if self.income > self.expenditures:
-            return 'Profitable'
+            revenue = self.income - self.expenditures
+            print(f"Its profitable with a profit of {revenue}. ")
         else:
-            return 'Non Profitable'
+            loss = self.income - self.expenditures
+            print(f"Its not profitable with a loss of {loss}")
+
 
 class Review(models.Model):
     customer_name = models.CharField(max_length=100)
