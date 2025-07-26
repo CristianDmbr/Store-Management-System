@@ -52,7 +52,7 @@ class Review(models.Model):
 
     customer_name = models.CharField(max_length=100)
     comment = models.TextField(blank = True)
-    review_type = models.CharField(max_length = 100, choices = ReviewType.choices)
+    review_type = models.CharField(max_length = 100, choices = ReviewType.choices, default = ReviewType.FEEDBACK)
     created_at = models.DateTimeField(auto_now_add = True)
     rating = models.IntegerField(
         validators = [MinValueValidator(1),MaxValueValidator(5)]
