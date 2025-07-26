@@ -17,8 +17,8 @@ class Restaurants(models.Model):
         FASTFOOD = 'fast_food', 'Fast Food'
 
     name = models.CharField(max_length = 20)
-    dateOpened = models.DateField(default = timezone.now)
-    restaurantType = models.CharField(max_length = 100,choices = RestaurantTypes.choices)
+    date_opened = models.DateField(default = timezone.now)
+    restaurant_type = models.CharField(max_length = 100,choices = RestaurantTypes.choices)
     nick_name = models.CharField(max_length = 100, blank = True)
     capacity = models.IntegerField( null = True)
 
@@ -52,7 +52,7 @@ class Review(models.Model):
 
     customer_name = models.CharField(max_length=100)
     comment = models.TextField(blank = True)
-    review_type = models.CharField(max_legnth = 100, choices = ReviewType.choices)
+    review_type = models.CharField(max_length = 100, choices = ReviewType.choices)
     created_at = models.DateTimeField(auto_now_add = True)
     rating = models.IntegerField(
         validators = [MinValueValidator(1),MaxValueValidator(5)]
@@ -85,7 +85,7 @@ class Inventory(models.Model):
     quantity = models.PositiveIntegerField()
     unit = models.CharField(max_length = 100, choices = Units.choices)
 
-class CostusmerOrder(models.Model):
+class CostumerOrder(models.Model):
     restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
     items = models.ManyToManyField(Menu)
     order_price = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -105,7 +105,7 @@ class Staff(models.Model):
     date_of_birth = models.DateField()
     role = models.CharField(max_length = 100, choices = Roles.choices)
 
-class ShiftManager(models.Models):
+class ShiftManager(models.Model):
     staff = models.ForeignKey(Staff, on_delete = models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
