@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -12,101 +11,122 @@ class Restaurants(models.Model):
         ITALIAN = 'italian', 'Italian'
         CHINESE = 'chinese', 'Chinese'
         INDIAN = 'indian', 'Indian'
-        EASTER_EUROPEAN = 'eastern_european', 'Eastern European'
-        FRENCH = 'french','French'
+        EASTERN_EUROPEAN = 'eastern_european', 'Eastern European'
+        FRENCH = 'french', 'French'
         FASTFOOD = 'fast_food', 'Fast Food'
 
-    name = models.CharField(max_length = 20)
-    date_opened = models.DateField(default = timezone.now)
-    restaurant_type = models.CharField(max_length = 100,choices = RestaurantTypes.choices)
-    nick_name = models.CharField(max_length = 100, blank = True)
-    capacity = models.IntegerField( null = True)
+    name = models.CharField(max_length=20)
+    date_opened = models.DateField(default=timezone.now)
+    restaurant_type = models.CharField(max_length=100, choices=RestaurantTypes.choices)
+    nick_name = models.CharField(max_length=100, blank=True)
+    capacity = models.IntegerField(null=True)
 
     def __str__(self):
         return self.name
 
+
 class RestaurantFinance(models.Model):
-    restaurant = models.ForeignKey(Restaurants,on_delete = models.CASCADE)
+    restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
     income = models.IntegerField()
     expenditures = models.IntegerField()
     sales = models.IntegerField()
 
     @property
-    def is_profitable(self):
+    def is_profitable_print_amount(self):
         if self.income > self.expenditures:
             revenue = self.income - self.expenditures
-            print(f"Its profitable with a profit of {revenue}. ")
+            print(f"Profitable with a profit of {revenue}.")
         else:
             loss = self.income - self.expenditures
-            print(f"Its not profitable with a loss of {loss}")
-    
+            print(f"Not profitable, loss of {loss}.")
+
+    @property
+    def is_profitable_bool(self):
+        return self.income > self.expenditures
+
     def __str__(self):
-        return f"{self.restaurant}'s finances."
+        return f"{self.restaurant.name}'s Finances"
 
 
 class Review(models.Model):
 
     class ReviewType(models.TextChoices):
-        COMPLAINT = 'complaint','Complaint'
+        COMPLAINT = 'complaint', 'Complaint'
         FEEDBACK = 'feedback', 'Feedback'
 
     customer_name = models.CharField(max_length=100)
-    comment = models.TextField(blank = True)
-    review_type = models.CharField(max_length = 100, choices = ReviewType.choices, default = ReviewType.FEEDBACK)
-    created_at = models.DateTimeField(auto_now_add = True)
-    rating = models.IntegerField(
-        validators = [MinValueValidator(1),MaxValueValidator(5)]
-    )
+    comment = models.TextField(blank=True)
+    review_type = models.CharField(max_length=100, choices=ReviewType.choices, default=ReviewType.FEEDBACK)
+    created_at = models.DateTimeField(auto_now_add=True)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
 
     # Generic Foreign Key
-    content_type = models.ForeignKey(ContentType, on_delete = models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    review_target = GenericForeignKey('content_type','object_id')
+    review_target = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
-        return f"{self.customer_name} has reviewed {self.content_type} a {self.rating}/5." 
+        return f"{self.customer_name} rated {self.review_target} {self.rating}/5"
+
 
 class Inventory(models.Model):
 
     class Units(models.TextChoices):
-        KG = 'kg','Kg',
-        LITERES = 'L', 'L',
+        KG = 'kg', 'Kg'
+        LITERS = 'L', 'Liters'
         PACKS = 'packs', 'Packs'
 
-    restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
-    name = models.CharField(max_length = 100)
+    restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     quantity = models.PositiveIntegerField()
-    unit = models.CharField(max_length = 100, choices = Units.choices)
+    unit = models.CharField(max_length=100, choices=Units.choices)
+
+    def __str__(self):
+        return f"{self.name} - {self.quantity} {self.unit}"
+
 
 class Menu(models.Model):
-    restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
-    name = models.ForeignKey(Inventory, on_delete = models.CASCADE, max_length = 100)
-    description = models.TextField(blank = True)
-    price = models.DecimalField(max_digits = 6, decimal_places = 2)
-    is_available = models.BooleanField(default = True)
+    restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
+    inventory_item = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    is_available = models.BooleanField(default=True)
 
-class CostumerOrder(models.Model):
-    restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
+    def __str__(self):
+        return f"{self.inventory_item.name} - {self.price}€"
+
+
+class CustomerOrder(models.Model):  # Renamed from CostumerOrder
+    restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
     items = models.ManyToManyField(Menu)
-    order_price = models.DecimalField(max_digits = 8, decimal_places = 2)
-    customer_name = models.CharField(max_length = 100)
+    order_price = models.DecimalField(max_digits=8, decimal_places=2)
+    customer_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Order by {self.customer_name} at {self.restaurant.name}"
 
 
 class Staff(models.Model):
 
     class Roles(models.TextChoices):
-        SERVENT = 'servent', 'Servent'
-        CHIEF = 'chief', 'Chief'
+        SERVER = 'server', 'Server'
+        CHEF = 'chef', 'Chef'
         HOST = 'host', 'Host'
-        MANAGEER = 'manager', 'Manager'
+        MANAGER = 'manager', 'Manager'
 
-
-    name = models.CharField(max_length = 100)
-    surname = models.CharField(max_length = 100)
+    name = models.CharField(max_length=100)
+    surname = models.CharField(max_length=100)
     date_of_birth = models.DateField()
-    role = models.CharField(max_length = 100, choices = Roles.choices)
+    role = models.CharField(max_length=100, choices=Roles.choices)
+
+    def __str__(self):
+        return f"{self.name} {self.surname} - {self.role}"
+
 
 class ShiftManager(models.Model):
-    staff = models.ForeignKey(Staff, on_delete = models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.staff} | {self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')}"

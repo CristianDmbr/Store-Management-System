@@ -4,7 +4,7 @@ from app.models import ( Restaurants,
                         Review, 
                         Menu, 
                         Inventory, 
-                        CostumerOrder, 
+                        CustomerOrder, 
                         Staff, 
                         ShiftManager )
 
@@ -67,16 +67,16 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):
     list_display = ('restaurant',
-                    'name',
+                    'inventory_item',  
                     'price',
                     'is_available',
                     )
-    search_fields = ('name','restaurant',)
-    list_filter = ('restaurant','price','is_available',)
+    search_fields = ('inventory_item__name', 'restaurant',)
+    list_filter = ('restaurant', 'price', 'is_available',)
 
     def is_available(self, obj):
-        inventory = Inventory.objects.filter(name = obj.name).first()
-        return True if inventory.quantity > 0 else False
+        inventory = Inventory.objects.filter(name=obj.inventory_item.name).first()
+        return True if inventory and inventory.quantity > 0 else False
     is_available.short_description = 'available'
 
 @admin.register(Inventory)
@@ -92,9 +92,52 @@ class InventoryAdmin(admin.ModelAdmin):
         return True if obj.quantity > 0 else False
     in_stock.short_description = 'available'
     
-@admin.register(CostumerOrder)
-class 
+@admin.register(CustomerOrder)
+class CustomerOrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'restaurant',
+        'customer_name',
+        'order_price',
+        'item_list',
+        'item_count',
+    )
+    search_fields = ('restaurant__name', 'customer_name',)
+    list_filter = ('restaurant', 'order_price', 'customer_name',)
 
-admin.site.register(CostumerOrder)
-admin.site.register(Staff)
-admin.site.register(ShiftManager)
+    def item_list(self, obj):
+        return ", ".join([item.inventory_item.name for item in obj.items.all()])
+    item_list.short_description = 'Items in Order'
+
+    def item_count(self, obj):
+        return obj.items.count()
+    item_count.short_description = 'Total Items'
+
+@admin.register(Staff)
+class StaffAdmin(admin.ModelAdmin):
+    list_display = ('full_name',
+                    'role',
+                    )
+    search_fields = ('name','surname',)
+    list_filter = ('name','role',)
+
+    def full_name(self, obj):
+        return f"{obj.name} {obj.surname}"
+    full_name.short_description = 'Full Name'
+
+
+@admin.register(ShiftManager)
+class ShiftManagerAdmin(admin.ModelAdmin):
+    list_display = ('staff',
+                    'role',
+                    'shift_duration',
+                    )
+    search_fields = ('staff',)
+    list_filter = ('staff',)
+
+    def role(self, obj):
+        return obj.staff.role
+    
+    
+    def shift_duration(self, obj):
+        return (obj.end_time - obj.start_time).total_seconds() / 3600
+    shift_duration.short_description = 'Duration'
