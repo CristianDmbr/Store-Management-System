@@ -66,13 +66,6 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.customer_name} has reviewed {self.content_type} a {self.rating}/5." 
 
-class Menu(models.Model):
-    restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
-    name = models.CharField(max_length = 100)
-    description = models.TextField(blank = True)
-    price = models.DecimalField(max_digits = 6, decimal_places = 2)
-    is_available = models.BooleanField(default = True)
-
 class Inventory(models.Model):
 
     class Units(models.TextChoices):
@@ -85,11 +78,19 @@ class Inventory(models.Model):
     quantity = models.PositiveIntegerField()
     unit = models.CharField(max_length = 100, choices = Units.choices)
 
+class Menu(models.Model):
+    restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
+    name = models.ForeignKey(Inventory, on_delete = models.CASCADE, max_length = 100)
+    description = models.TextField(blank = True)
+    price = models.DecimalField(max_digits = 6, decimal_places = 2)
+    is_available = models.BooleanField(default = True)
+
 class CostumerOrder(models.Model):
     restaurant = models.ForeignKey(Restaurants, on_delete = models.CASCADE)
     items = models.ManyToManyField(Menu)
     order_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     customer_name = models.CharField(max_length = 100)
+
 
 class Staff(models.Model):
 
