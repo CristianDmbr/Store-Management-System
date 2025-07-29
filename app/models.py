@@ -21,6 +21,9 @@ class Restaurants(models.Model):
     nick_name = models.CharField(max_length=100, blank=True)
     capacity = models.IntegerField(null=True)
 
+    class Meta:
+        ordering = ['capacity']
+
     def __str__(self):
         return self.name
 

@@ -9,10 +9,11 @@ from .models import ( Restaurants,
                         ShiftManager )
 
 from .forms import (RestaurantForm,
-                    StaffForm,)
+                    StaffForm,
+                    InventoryForm)
 
 
-
+# Restaurant Related
 def restaurant_list(request):
     restaurants = Restaurants.objects.all()
     return render (request, 'restaurant/restaurant_list.html', {'restaurants' : restaurants})
@@ -28,13 +29,12 @@ def add_restaurant(request):
         
     return render(request, 'restaurant/add_restaurant.html', {'form' : form})
 
-
-
+# Staff Related 
 def staff_list(request):
     all_staff = Staff.objects.all()
-    return render(request, 'staff/staff_list.html', {'staff' : all_staff})
+    return render(request, 'staff/staff_list.html', {'all_staff' : all_staff})
 
-def add_restaurant(request):
+def add_staff(request):
     if request.method == 'POST':
         form = StaffForm(request.POST)
         if form.is_valid():
@@ -44,3 +44,20 @@ def add_restaurant(request):
         form = StaffForm()
     
     return render(request, 'staff/add_staff.html',{'form' : form})
+
+
+# Inventory Related
+def inventory_list(request):
+    all_inventory = Inventory.objects.all()
+    return render(request, 'inventory/inventory_list.html', {'all_inventory' : all_inventory})
+
+def add_inventory(request):
+    if request.method == 'POST':
+        form = InventoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('inventory_list')
+    else:
+        form = InventoryForm()
+    
+    return render(request, 'inventory/add_inventory.html', {'form' : form})

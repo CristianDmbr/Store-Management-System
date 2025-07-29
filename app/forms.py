@@ -17,3 +17,8 @@ class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
         fields = ['name','surname','date_of_birth','role']
+    
+class InventoryForm(forms.ModelForm):
+    class Meta:
+        model = Inventory
+        fields = ['restaurant','name','quantity','unit']
