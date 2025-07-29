@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><titl>Restaurant Lists</titl></head>
+<body>
+    <h1>All Restaurants</h1>
+    <a href = "{% url 'add_restaurant' %}"> Add New Restaurant</a>
+    <ul>w
+        {% for r in restaurants %}
+            <li>{{r.name}} - {{ r.restaurant_type}} (Capacity : {{r.capacity}}) </li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
