@@ -45,6 +45,10 @@ def add_staff(request):
     
     return render(request, 'staff/add_staff.html',{'form' : form})
 
+    ##############
+#### Add a shift manager plan which adds shifts and looks if the staff memeber exists and ifts possibel for them ot work at that time
+    ##############
+
 
 # Inventory Related
 def inventory_list(request):
