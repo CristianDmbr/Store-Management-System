@@ -15,12 +15,12 @@ class RestaurantsAdmin(admin.ModelAdmin):
                       'restaurant_type',
                       'nick_name',
                       'capacity',
-                      'get_income', 'get_expenditure', 'sales') # Custom methods  
+                      'get_income', 'get_expenditure', 'sales') # Custom methods created underneath
     search_fields = ('name', 'nick_name') # Adds a search box for these fields
     list_filter = ('restaurant_type','capacity') # Filter
 
     def get_income(self, obj):
-        finanace = RestaurantFinance.objects.filter(restaurant = obj).first()
+        finanace = RestaurantFinance.objects.filter(restaurant = obj)
         return finanace.income if finanace else 'N/A'
     get_income.short_description = 'Income'
 
