@@ -20,13 +20,4 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Restaurant related paths
-    path('restaurants/', views.restaurant_list, name ='restaurant_list'),
-    path('restaurants/add/', views.add_restaurant, name = 'add_restaurant'),
-    # Staff Related paths
-    path('staff/', views.staff_list, name = 'staff_list'),
-    path('staff/add/', views.add_staff, name = 'add_staff'),
-    # Inventory related paths
-    path('inventory/', views.inventory_list, name = 'inventory_list'),
-    path('inventory/add/', views.add_inventory, name = 'add_inventory'),
 ]
