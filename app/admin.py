@@ -10,30 +10,20 @@ from app.models import ( Restaurants,
 
 @admin.register(Restaurants)
 class RestaurantsAdmin(admin.ModelAdmin):
-    list_display = ('name', # Columns shown in the list view of Admin
-                     'date_opened',
-                      'restaurant_type',
-                      'nick_name',
-                      'capacity',
-                      'get_income', 'get_expenditure', 'sales') # Custom methods created underneath
-    search_fields = ('name', 'nick_name') # Adds a search box for these fields
-    list_filter = ('restaurant_type','capacity') # Filter
-
-    def get_income(self, obj):
-        finanace = RestaurantFinance.objects.filter(restaurant = obj)
-        return finanace.income if finanace else 'N/A'
-    get_income.short_description = 'Income'
-
-    def get_expenditure(self, obj):
+    list_display = (
+                    'name',
+                    'date_opened',
+                    'capacity',
+                    'nick_name',
+                    'profitable'
+    )
+    
+    def profitable(self, obj):
         finance = RestaurantFinance.objects.filter(restaurant = obj).first()
-        return finance.expenditures if finance else 'N/A'
-    get_expenditure.short_description = 'Expenditures'
-
-    def sales(self, obj): # Self represents the admin instance, obj represents the model row instance
-        finance = RestaurantFinance.objects.filter(restaurant = obj).first()
-        return finance.sales if finance else 'N/A'
-    sales.short_description = 'Sales'
-
+        if finance:
+            return finance.is_profitable_bool
+        return False
+    profitable.short_description = 'Profitable ?'
 
 @admin.register(RestaurantFinance)
 class RestaurantFinanceAdmin(admin.ModelAdmin):

@@ -27,7 +27,6 @@ class Restaurants(models.Model):
     def __str__(self):
         return self.name
 
-
 class RestaurantFinance(models.Model):
     restaurant = models.ForeignKey(Restaurants, on_delete=models.CASCADE)
     income = models.IntegerField()
