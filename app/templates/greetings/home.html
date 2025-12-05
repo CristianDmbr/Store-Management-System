@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Greetings Page</title>
+</head>
+<body>
+    <h1>Enter your name:</h1>
+    <form method = "POST">
+        {% csrf_token %}
+        <input type = "text" name = "name" placeholder="Your Name">
+        <button type = "submit">Submit</button>
+    </form>
+    
+    {% if name %}
+        <h2> Hello, {{name}}!</h2>
+    {% endif %}
+</body>
+</html>
