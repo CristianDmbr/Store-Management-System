@@ -4,10 +4,11 @@ def home(request):
     context = {"submitted": False}  # initially nothing submitted
 
     if request.method == "POST":
-        context["name"] = request.POST.get("name")
-        context["surname"] = request.POST.get("surname")
-        context["age"] = request.POST.get("age")
-        context["country"] = request.POST.get("country")
+        context["username"] = request.POST.get("username")
+        context["real_name"] = request.POST.get("real_name")
+        context["email_adress"] = request.POST.get("email_adress")
+        context["number"] = request.POST.get("number")
+        context["time"] = request.POST.get("time")
         context["submitted"] = True
 
     return render(request, "greetings/home.html", context)
