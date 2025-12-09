@@ -1,31 +1,18 @@
 <!DOCTYPE html>
 <head>
-    <title>Hello User</title>
+    <title>Welcome Page</title>
 </head>
 <body>
-    <h1>Enter Your Information</h1>
+    <h1>Enter your details : </h1>
     <form method="POST">
         {% csrf_token %}
-        
-        <div><input type="text" name = "username" placeholder="Username">
-            <input type="text" name = "real_name" placeholder = "Your real name" >
-            <input type="email" name = "email_adress" placeholder="Email">   
-            <input type="tel" name = "number" placeholder="Phone Number">
-            <input type="time" name = "time" placeholder="Time">
+        <div>
+            <input type="text" name = "name" placeholder="Enter your name">
+            <input type="text" name = "surname" placeholder = "Enter your surname">
+            <button type="submit"> Submit </button>
         </div>
-        
-        <button type="submit">Submit</button>
     </form>
-
-    <div>
-        {% if submitted %}
-        <h2>Your details</h2>
-        <p> Username : {{username}}</p>
-        <p> Real name : {{real_name}}</p>
-        <p>Email : {{email_adress}}</p>
-        <p>Telephone : {{ number }}</p>
-        <p>Time : {{time}}</p>
-        {% endif %}
-    </div>
-
+    {% if submitted %}
+    <p> Full Name : {{name}} {{surname}}</p>
+    {% endif %}
 </body>
