@@ -5,26 +5,35 @@
     </head>
     <body>
         <h1>My To Do List</h1>
+
+        <!-- Updated Form with Status Dropdown -->
         <form method="POST">
             {% csrf_token %}
-            <input type = "text" name = "title" placeholder="Add a task">
-            <button type = "submit">Add</button>
+            <input type="text" name="title" placeholder="Task title">
+            
+            <label for="status">Status:</label>
+            <select name="status">
+                <option value="not_started">Not Started</option>
+                <option value="in_progress">In Progress</option>
+                <option value="almost_done">Almost Done</option>
+            </select>
+            
+            <button type="submit">Add Task</button>
         </form>
         
         <ul>
             {% for task in tasks %}
             <li>
                 {% if task.completed %}
-                    <s>{{task.title}}</s>
+                    <s>{{ task.title }}</s> - {{ task.get_status_display }}
                 {% else %}
-                    {{task.title}}
-                    <a href="{% url 'complete_task' task.id %}"> Complete</a>
+                    {{ task.title }} - {{ task.get_status_display }}
+                    <a href="{% url 'complete_task' task.id %}">Complete</a>
                 {% endif %}
                 <a href="{% url 'delete_task' task.id %}">Delete</a>
             </li>
             {% endfor %}
         </ul>
-
 
     </body>
 </html>
