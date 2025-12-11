@@ -12,6 +12,9 @@ class Task(models.Model):
     ]
     title = models.CharField(max_length=200)
     completed = models.BooleanField(default = False)
+    assistance = models.CharField(max_length = 200, null = True, blank = True)
+    date_created = models.DateTimeField(default = timezone.now)
+    due_date = models.DateTimeField(null = True, blank = True)
     status = models.CharField(
         max_length = 20,
         choices = STATUS_CHOICES,
