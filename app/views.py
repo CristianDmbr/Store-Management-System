@@ -26,3 +26,7 @@ def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     task.delete()
     return redirect("task_list")
+
+def all_tasks(request):
+    tasks = Task.objects.all().order_by("-id")
+    return render(request, "tasks/all_tasks.html", {"tasks" : tasks})
