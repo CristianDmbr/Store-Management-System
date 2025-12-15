@@ -123,3 +123,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# URL to redirect unauthenticated users to login
+LOGIN_URL = '/login/'
+
+# URL to redirect users after successful login
+LOGIN_REDIRECT_URL = '/'
