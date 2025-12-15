@@ -2,17 +2,13 @@ from django.shortcuts import render,redirect, get_object_or_404
 from .models import Task
 from .forms import TaskForm
 
+
 def task_list(request):
     if request.method == "POST":
         form = TaskForm(request.POST)
 
         if form.is_valid():
-            Task.objects.create(
-                title = form.cleaned_data['title'],
-                status = form.cleaned_data['status'],
-                assistance = form.cleaned_data['assistance'],
-                due_date = form.cleaned_data['due_date'],
-            )
+            form.save()
             return redirect("task_list")
     else:
         form = TaskForm()
@@ -22,9 +18,6 @@ def task_list(request):
         "tasks":tasks,
         "form" : form,
     })
-
-
-
 
         #title = request.POST.get("title")
         #status = request.POST.get("status")

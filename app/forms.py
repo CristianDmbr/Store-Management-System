@@ -1,12 +1,14 @@
+from django.forms import ModelForm
+from .models import Task
 from django import forms
 
-class TaskForm(forms.Form):
-    title = forms.CharField(max_length = 200)
-    status = forms.ChoiceField( choices = [
-        ('not_started', 'Not Started'),
-        ('in_progress', 'In Progress'),
-        ('almost_done', 'Almost Done')
-    ])
-    assistance = forms.CharField(max_length=200, required = False)
-    due_date = forms.DateTimeField(required = False)
-
+class TaskForm(ModelForm):
+    class Meta:
+        model = Task
+        fields = ['title','status','assistance','due_date']
+    
+    def clean_title(self):
+        title = self.cleaned_data['title']
+        if "bad" in title:
+            raise forms.ValidationError("Tittle Cannot contain 'bad'")
+        return title
