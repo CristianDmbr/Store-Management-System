@@ -11,12 +11,14 @@ def task_list(request):
         form = TaskForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            task = form.save(commit=False)
+            task.user = request.user  # 🔥 THIS LINE
+            task.save()
             return redirect("task_list")
     else:
         form = TaskForm()
 
-    tasks = Task.objects.all().order_by("-id")
+    tasks = Task.objects.filter(user=request.user)
     return render(request, "tasks/task_list.html",{
         "tasks":tasks,
         "form" : form,

@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
 
 class Task(models.Model):
     STATUS_CHOICES = [
@@ -10,6 +11,13 @@ class Task(models.Model):
         ('in_progress', 'In Progress'),
         ('almost_done', 'Almost Done')
     ]
+
+    user = models.ForeignKey(
+        User, 
+        on_delete = models.CASCADE,
+        related_name = "tasks"
+    )
+
     title = models.CharField(max_length=200)
     completed = models.BooleanField(default = False)
     assistance = models.CharField(max_length = 200, null = True, blank = True)
