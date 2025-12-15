@@ -1,18 +1,41 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from .models import Task
+from .forms import TaskForm
 
 def task_list(request):
     if request.method == "POST":
-        title = request.POST.get("title")
-        status = request.POST.get("status")
-        assistance = request.POST.get("assistance")
-        due_date = request.POST.get("due_date")
-        if title :
-            Task.objects.create(title = title, status = status, assistance = assistance, due_date = due_date) 
-        return redirect("task_list")
-    
+        form = TaskForm(request.POST)
+
+        if form.is_valid():
+            Task.objects.create(
+                title = form.cleaned_data['title'],
+                status = form.cleaned_data['status'],
+                assistance = form.cleaned_data['assistance'],
+                due_date = form.cleaned_data['due_date'],
+            )
+            return redirect("task_list")
+    else:
+        form = TaskForm()
+
     tasks = Task.objects.all().order_by("-id")
-    return render(request, "tasks/task_list.html",{"tasks" : tasks})
+    return render(request, "tasks/task_list.html",{
+        "tasks":tasks,
+        "form" : form,
+    })
+
+
+
+
+        #title = request.POST.get("title")
+        #status = request.POST.get("status")
+        #assistance = request.POST.get("assistance")
+        #due_date = request.POST.get("due_date")
+        #if title :
+            #Task.objects.create(title = title, status = status, assistance = assistance, due_date = due_date) 
+        #return redirect("task_list")
+    
+    #tasks = Task.objects.all().order_by("-id")
+    #return render(request, "tasks/task_list.html",{"tasks" : tasks})
 
 def complete_task(request, task_id):
     task = Task.objects.get(id = task_id)
