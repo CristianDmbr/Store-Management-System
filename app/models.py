@@ -4,110 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
+from datetime import date
 
-class Task(models.Model):
-    STATUS_CHOICES = [
-        ('not_started', 'Not Started'),
-        ('in_progress', 'In Progress'),
-        ('almost_done', 'Almost Done')
-    ]
-
-    user = models.ForeignKey(
-        User, 
-        on_delete = models.CASCADE,
-        related_name = "tasks"
-    )
-
-    title = models.CharField(max_length=200)
-    completed = models.BooleanField(default = False)
-    assistance = models.CharField(max_length = 200, null = True, blank = True)
-    date_created = models.DateTimeField(default = timezone.now)
-    due_date = models.DateTimeField(null = True, blank = True)
-    status = models.CharField(
-        max_length = 20,
-        choices = STATUS_CHOICES,
-        default = 'not_started'
-    )
-
-    def __str__(self):
-        return self.title
-
-from django.shortcuts import render,redirect, get_object_or_404
-from .models import Task
-from .forms import TaskForm, RegisterForm
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-
-
-@login_required
-def task_list(request):
-    if request.method == "POST":
-        form = TaskForm(request.POST)
-
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.user = request.user  # 🔥 THIS LINE
-            task.save()
-            return redirect("task_list")
-    else:
-        form = TaskForm()
-
-    tasks = Task.objects.filter(user=request.user)
-    return render(request, "tasks/task_list.html",{
-        "tasks":tasks,
-        "form" : form,
-    })
-
-def complete_task(request, task_id):
-    task = Task.objects.get(id = task_id)
-    task.completed = True
-    task.save()
-    return redirect("task_list")
-
-
-def delete_task(request, task_id):
-    # Safely get the task or return a 404 page if it doesn't exist
-    task = get_object_or_404(Task, id=task_id)
-    task.delete()
-    return redirect("task_list")
-
-def all_tasks(request):
-    tasks = Task.objects.all().order_by("-id")
-    return render(request, "tasks/all_tasks.html", {"tasks" : tasks})
-
-def register_view(request):
-    if request.method == "POST":
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit = False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            return redirect("login")
-    else:
-        form = RegisterForm()
-    return render(request, "auth/register.html",{"form": form})
-
-def login_view(request):
-    if request.method == "POST":
-        user = authenticate(
-            request,
-            username = request.POST["username"],
-            password = request.POST["password"]
-        )
-
-        if user:
-            login(request, user)
-            return redirect("task_list")
-        else:
-            error = "Invalid username or password"
-            return render(request, "auth/login.html",{"error" : error})
-    return render(request, "auth/login.html")
-
-def logout_view(request):
-    logout(request)
-    return redirect("login")
-
-############################################################
 
 class Restaurant(models.Model):
 
@@ -141,7 +39,8 @@ class Restaurant(models.Model):
     capacity = models.IntegerField()
 
     def __str__(self):
-        return self.owner
+        return f"{self.restaurant_name} - {self.owner.username}"
+
     
 class Staff(models.Model):
 
@@ -173,13 +72,45 @@ class Staff(models.Model):
     name = models.CharField(max_length = 200, null = False, blank = False)
     surname = models.CharField(max_length = 200, null = False, blank = False)
     date_of_birth = models.DateField()
-    age = models.IntegerField(default = date_of_birth - timezone.now)
     date_employed = models.DateTimeField(default = timezone.now)
     work_right = models.CharField(max_length = 200, choices = WORK_STATUS)
     position = models.CharField(max_length = 200, choices = ROLES, default = "waiter")
+    pay_per_hour = models.DecimalField(
+        max_digits = 6,
+        decimal_places = 2,
+        default = 10.00
+    )
+
+    @property
+    def age(self):
+        today = date.today()
+        return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)) 
 
     def __str__(self):
         return f"{self.name} {self.surname}"
+
+
+class Shift(models.Model):
+    employee = models.ForeignKey(
+        Staff,
+        on_delete = models.CASCADE,
+        related_name = "shifts"
+    )
+    start_time = models.DateTimeField(default = timezone.now)
+    end_time = models.DateTimeField()
+
+    @property
+    def duration(self):
+        return self.end_time - self.start_time
+    
+    @property
+    def duration_hours(self):
+        return self.duration.total_seconds() / 3600
+    
+    @property
+    def earnings(self):
+        return self.duration_hours * float(self.employee.pay_per_hour)
+
 
 class MenuItem(models.Model):
 
@@ -205,3 +136,34 @@ class MenuItem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.restaurant})"
+
+
+class Ingredience(models.Model):
+
+    UNITS = [
+        ("kg","Kilograms"),
+        ("mg","Miligrams"),
+        ("g","Grams"),
+        ("l","Liters"),
+        ]
+
+    food = models.ForeignKey(
+        MenuItem,
+        on_delete = models.CASCADE,
+        related_name = "ingrediences"
+    )
+    name = models.CharField(max_length=200)
+    quantity_in_stock = models.IntegerField()
+    units = models.CharField(max_length = 5,choices = UNITS, null = False, blank = False)
+
+    def __str__(self):
+        return f"{self.name} Available : {self.quantity_in_stock}, Units : {self.units}"
+
+
+class Recipe(models.Model):
+    item = models.ForeignKey(
+        MenuItem,
+        on_delete = models.CASCADE,
+        related_name="recipe"
+    )
+    ingredience = models.ManyToManyField(Ingredience)

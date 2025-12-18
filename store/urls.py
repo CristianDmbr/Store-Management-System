@@ -20,12 +20,5 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", views.task_list, name="task_list"),
-    path("complete/<int:task_id>/", views.complete_task, name="complete_task"),
-    path("delete/<int:task_id>/", views.delete_task, name="delete_task"),
-    path("all-tasks/", views.all_tasks, name = "all_tasks"),
-
-    path('register/', views.register_view, name='register'),  # User registration
-    path('login/', views.login_view, name='login'),          # User login
-    path('logout/', views.logout_view, name='logout'), 
+    path("restaurants/", views.restaurant_list, name = "restaurant_list"),
 ]

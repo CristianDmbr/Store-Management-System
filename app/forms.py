@@ -1,22 +1,10 @@
 from django.forms import ModelForm
-from .models import Task
 from django import forms
-from django.contrib.auth.models import User
+from .models import Restaurant
 
-class TaskForm(ModelForm):
+class RestaurantForm(forms.ModelForm):
     class Meta:
-        model = Task
-        fields = ['title','status','assistance','due_date']
-    
-    def clean_title(self):
-        title = self.cleaned_data['title']
-        if "bad" in title:
-            raise forms.ValidationError("Tittle Cannot contain 'bad'")
-        return title 
-    
-class RegisterForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    class Meta:
-        model = User
-        fields = ['username','email','password']
-        
+        model = Restaurant
+        fields = ["owner","restaurant_name","date_opened","location","restaurant_cuisine","size","capacity"]
+        widgets = {
+            "date_opened": forms.DateInput(attrs={"type": "date"})}
