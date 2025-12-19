@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
-from .forms import RestaurantForm
+from .forms import RestaurantForm, MenuItemForm
+
+def home(request):
+    return render(request, "home.html",{})
 
 def restaurant_list(request):
     if request.method == "POST":
@@ -9,9 +12,19 @@ def restaurant_list(request):
             form.save()
             return redirect("restaurant_list")
     else:
-        form = RestaurantForm
+        form = RestaurantForm()
     
     restaurants = Restaurant.objects.all()
-    return render(request, "restaurant_list.html", {"form":form, "restaurants":
-    restaurants})
+    return render(request, "restaurant_list.html", {"form":form, "restaurants": restaurants})
 
+def menu_list(request):
+    if request.method == "POST":
+        form = MenuItemForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("menu_list")
+    else:
+        form = MenuItemForm()
+    
+    menu_items = MenuItem.objects.all()
+    return render(request, "menu_list.html",{"form" : form, "menu_items" : menu_items})

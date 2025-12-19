@@ -39,7 +39,7 @@ class Restaurant(models.Model):
     capacity = models.IntegerField()
 
     def __str__(self):
-        return f"{self.restaurant_name} - {self.owner.username}"
+        return f"{self.restaurant_name}"
 
     
 class Staff(models.Model):

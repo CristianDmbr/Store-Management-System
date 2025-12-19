@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Restaurant List</title>
+        <title>Menu List</title>
     </head>
     <body>
-        <h1>Restaurants</h1>
-        <h2>Add new restaurant</h2>
+        <h1>Menu List</h1>
         <form method="POST">
             {% csrf_token %}
             {{form.as_p}}
             <button type = "submit">Submit</button>
         </form>
-        <a href="% url 'menu_list' %">Menu Submission</a>
+        <a href="{% url 'restaurant_list' %}">Restaurant Submission</a>
     </body>
 </html>
