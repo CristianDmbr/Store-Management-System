@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combined Form</title>
+</head>
+<body>
+    <h1>Add Restaurant and Menu Item</h1>
+
+    <h2>Restaurant Form</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ restaurant_form.as_p }}
+        <button type="submit">Submit Restaurant</button>
+    </form>
+
+    <h2>Menu Item Form</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ menu_form.as_p }}
+        <button type="submit">Submit Menu Item</button>
+    </form>
+</body>
+</html>

@@ -28,3 +28,25 @@ def menu_list(request):
     
     menu_items = MenuItem.objects.all()
     return render(request, "menu_list.html",{"form" : form, "menu_items" : menu_items})
+
+def combine_form_view(request):
+    if request.method == "POST":
+        restaurant_form = RestaurantForm(request.POST, prefix = "restaurant")
+        menu_form = MenuItemForm(request.POST, prefix = "menu")
+
+        if restaurant_form.is_valid():
+            restaurant_form.save()
+            return redirect("combined_form")
+        
+        if menu_form.is_valid():
+            menu_form.save()
+            return redirect("combined_form")
+        
+    else:
+        restaurant_form = RestaurantForm()
+        menu_form = MenuItemForm()
+
+    return render(request, "combined_form.html",{
+        "restaurant_form" : restaurant_form,
+        "menu_form" : menu_form,
+    })

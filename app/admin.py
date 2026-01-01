@@ -30,3 +30,17 @@ class MenuItemAdmin(admin.ModelAdmin):
         "availability",
         "date_added",
     )
+
+@admin.register(Staff)
+class StaffAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "surname",
+        "date_of_birth",
+        "date_employed",
+        "work_right",
+        "position",
+        "pay_per_hour",
+        "manager",
+        "restaurant",
+    )

@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Restaurant, MenuItem
+from .models import Restaurant, MenuItem, Staff
 
 class RestaurantForm(forms.ModelForm):
     class Meta:
@@ -13,3 +13,8 @@ class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
         fields = ["restaurant","name","description","price","category","availability"]
+
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Staff
+        fields = ["name","surname","date_of_birth","date_employed","position","manager","restaurant"]
