@@ -1,11 +1,28 @@
 from django.contrib import admin
-
 from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
 
-admin.site.register(Staff)
-admin.site.register(Shift)
-admin.site.register(Ingredience)
-admin.site.register(Recipe)
+@admin.register(Shift)
+class ShiftAdmin(admin.ModelAdmin):
+    list_display = (
+        "employee",
+        "start_time",
+        "end_time",
+    )
+
+@admin.register(Ingredience)
+class IngredienceAdmin(admin.ModelAdmin):
+    list_display = (
+        "food",
+        "name",
+        "quantity_in_stock",
+        "units",
+    )
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = (
+        "item",
+    )
 
 @admin.register(Restaurant)
 class RestaurantAdmin(admin.ModelAdmin):

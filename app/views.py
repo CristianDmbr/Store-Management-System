@@ -11,6 +11,8 @@ def restaurant_list(request):
         if form.is_valid():
             form.save()
             return redirect("restaurant_list")
+        elif not form.is_valid():
+            print(form.errors)
     else:
         form = RestaurantForm()
     
@@ -37,7 +39,9 @@ def combine_form_view(request):
         if restaurant_form.is_valid():
             restaurant_form.save()
             return redirect("combined_form")
-        
+        elif not restaurant_form.is_valid():
+            print(restaurant_form.errors)
+
         if menu_form.is_valid():
             menu_form.save()
             return redirect("combined_form")
