@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from datetime import date
-
+from django.core.exceptions import ValidationError
 
 class Restaurant(models.Model):
 
@@ -106,6 +106,10 @@ class Shift(models.Model):
     )
     start_time = models.DateTimeField(default = timezone.now)
     end_time = models.DateTimeField()
+
+    def clean(self):
+        if self.end_time <= self.start_time:
+            raise ValidationError("End time must be after start time")
 
     @property
     def duration(self):

@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from django import forms
 from .models import Restaurant, MenuItem, Staff
+from django.core.exceptions import ValidationError
 
 class RestaurantForm(forms.ModelForm):
 
@@ -14,9 +15,6 @@ class RestaurantForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "Capacity must be greater than or equal to size"
                 )
-
-        return cleaned_data
-
     class Meta:
         model = Restaurant
         fields = [
@@ -41,3 +39,5 @@ class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Staff
         fields = ["name","surname","date_of_birth","date_employed","position","manager","restaurant"]
+
+# Create def clean validators for the data in both forms and models
