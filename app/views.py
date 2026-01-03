@@ -53,4 +53,4 @@ def combine_form_view(request):
     return render(request, "combined_form.html",{
         "restaurant_form" : restaurant_form,
         "menu_form" : menu_form,
-    })
+    })  

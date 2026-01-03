@@ -38,6 +38,14 @@ class Restaurant(models.Model):
     size = models.IntegerField()
     capacity = models.IntegerField()
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check = models.Q(capacity__gte = models.F("size")),
+                name = "capacity_gte_size"
+            )
+        ]
+
     def __str__(self):
         return f"{self.restaurant_name}"
 
@@ -127,12 +135,21 @@ class MenuItem(models.Model):
         on_delete = models.CASCADE,
         related_name = "menu_items"
     )
+
     name = models.CharField(max_length = 200)
     description = models.TextField(blank=True, null = True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     category = models.CharField(max_length=50, choices = CATEGORY_CHOICES, default = "main")
     availability = models.BooleanField(default=True)
     date_added = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["restaurant","name"],
+                name = "unique_menu_item_per_restaurant"
+            )
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.restaurant})"
