@@ -26,4 +26,5 @@ urlpatterns = [
     path("combined/", views.combine_form_view, name = "combined_form"),
     path("staff/",views.staff_form_view, name = "staff_view"),
     path("shift/", views.shift_view, name = "shift_view"),
+    path("menu/",views.menu_view, name = "menu_add"),
 ]

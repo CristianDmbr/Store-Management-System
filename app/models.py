@@ -99,7 +99,7 @@ class Shift(models.Model):
         related_name = "shifts"
     )
     start_time = models.DateTimeField(default = timezone.now)
-    end_time = models.DateTimeField()
+    end_time = models.DateTimeField(null = False, blank = False)
 
     def clean(self):
         if self.end_time <= self.start_time:
@@ -134,7 +134,7 @@ class MenuItem(models.Model):
         related_name = "menu_items"
     )
 
-    name = models.CharField(max_length = 200)
+    name = models.CharField(max_length = 200, blank = False, null = False)
     description = models.TextField(blank=True, null = True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     category = models.CharField(max_length=50, choices = CATEGORY_CHOICES, default = "main")

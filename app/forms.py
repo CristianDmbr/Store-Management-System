@@ -88,12 +88,30 @@ class ShiftForm(forms.ModelForm):
             "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
+    
+    def clean(self):
+        cleaned_data = super().clean()
 
+        start_date = cleaned_data.get("start_time")
+        end_date = cleaned_data.get("end_time")
+
+        if start_date and end_date:
+            if end_date > start_date:
+                raise forms.ValidationError("Cant have end before start.")
 
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["restaurant","name","description","price","category","availability"]
+        fields = ["restaurant", "name", "description", "price", "category", "availability"]
 
-            
-# Create def clean validators for the data in both forms and models
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
+        restaurant = self.cleaned_data.get("restaurant")
+        if name and restaurant:
+            qs = MenuItem.objects.filter(name=name, restaurant=restaurant)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError(f"{name} is already on the {restaurant} menu")
+        return name
+
