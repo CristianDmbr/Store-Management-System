@@ -1,20 +1,10 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, ValidationError
 from django import forms
 from .models import Restaurant, MenuItem, Staff
 from django.core.exceptions import ValidationError
 
 class RestaurantForm(forms.ModelForm):
 
-    def clean(self):
-        cleaned_data = super().clean()
-        size = cleaned_data.get("size")
-        capacity = cleaned_data.get("capacity")
-
-        if size is not None and capacity is not None:
-            if capacity < size:
-                raise forms.ValidationError(
-                    "Capacity must be greater than or equal to size"
-                )
     class Meta:
         model = Restaurant
         fields = [
@@ -29,7 +19,16 @@ class RestaurantForm(forms.ModelForm):
         widgets = {
             "date_opened": forms.DateInput(attrs={"type": "date"})
         }
-    
+
+    def clean(self):
+            clean_date = super().clean()
+            cleaned_size = clean_date.get("size")
+            cleaned_capacity = clean_date.get("capacity")
+
+            if cleaned_size and cleaned_capacity:
+                if cleaned_size > cleaned_capacity:
+                    raise forms.ValidationError("Can't have a size bigger than the capacity :(")
+
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem

@@ -17,6 +17,7 @@ class Restaurant(models.Model):
     ]
 
     RESTAURANT_CUISINES = [
+        ("fast_food","Fast Food"),
         ("italian", "Italian"),
         ("indian", "Indian"),
         ("british", "British"),
@@ -38,14 +39,14 @@ class Restaurant(models.Model):
     size = models.IntegerField()
     capacity = models.IntegerField()
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check = models.Q(capacity__gte = models.F("size")),
-                name = "capacity_gte_size"
-            )
-        ]
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_size = cleaned_data.get("size")
+        cleaned_capacity = cleaned_data.get("capacity")
 
+        if cleaned_size > cleaned_capacity:
+            raise ValidationError("Size is bigger than capacity")
+    
     def __str__(self):
         return f"{self.restaurant_name}"
 
