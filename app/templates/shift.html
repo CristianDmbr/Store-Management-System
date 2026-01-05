@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Shift</title>
+    </head>
+    <body>
+        <h1>Add a New Shift</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ shift_form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+
+        <br>
+        <a href="{% url 'staff_view' %}">Back to Staff List</a>
+        <a href="{% url 'restaurant_list' %}">Back to Restaurants</a>
+    </body>
+</html>

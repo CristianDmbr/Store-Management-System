@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
 
+
 class Restaurant(models.Model):
 
     LOCATIONS_CHOICES = [
