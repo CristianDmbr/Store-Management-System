@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Staff</title>
+    </head>
+    <body>
+        <h1>Add a New Staff Member</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ staff_form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+        <a href="{% url 'restaurant_list' %}">Back to Restaurants</a>
+        <a href="{% url 'menu_list' %}">Menu Submission</a>
+    </body>
+</html>

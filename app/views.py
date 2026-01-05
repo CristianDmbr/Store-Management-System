@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
-from .forms import RestaurantForm, MenuItemForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm
 
 def home(request):
     return render(request, "home.html",{})
@@ -53,4 +53,19 @@ def combine_form_view(request):
     return render(request, "combined_form.html",{
         "restaurant_form" : restaurant_form,
         "menu_form" : menu_form,
-    })  
+    })
+
+def staff_form_view(request):
+    if request.method == "POST":
+        staff_form = StaffForm(request.POST, prefix = "staff")
+
+        if staff_form.is_valid():
+            staff_form.save()
+            return redirect("staff_view")
+        else:
+            print(staff_form.errors)
+    else:
+        staff_form = StaffForm()
+
+    
+    return render(request, "staff_add.html",{"staff_form" : staff_form})

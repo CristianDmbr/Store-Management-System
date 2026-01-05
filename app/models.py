@@ -39,14 +39,6 @@ class Restaurant(models.Model):
     size = models.IntegerField()
     capacity = models.IntegerField()
 
-    def clean(self):
-        cleaned_data = super().clean()
-        cleaned_size = cleaned_data.get("size")
-        cleaned_capacity = cleaned_data.get("capacity")
-
-        if cleaned_size > cleaned_capacity:
-            raise ValidationError("Size is bigger than capacity")
-    
     def __str__(self):
         return f"{self.restaurant_name}"
 

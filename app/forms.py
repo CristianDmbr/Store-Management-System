@@ -21,13 +21,48 @@ class RestaurantForm(forms.ModelForm):
         }
 
     def clean(self):
-            clean_date = super().clean()
-            cleaned_size = clean_date.get("size")
-            cleaned_capacity = clean_date.get("capacity")
+        cleaned_data = super().clean()
 
-            if cleaned_size and cleaned_capacity:
-                if cleaned_size > cleaned_capacity:
-                    raise forms.ValidationError("Can't have a size bigger than the capacity :(")
+        size = cleaned_data.get("size")
+        capacity = cleaned_data.get("capacity")
+
+        if size and capacity:
+            if size > capacity:
+                raise forms.ValidationError(f"Size : {size} cannot be bigger than the restaurant capacity : {capacity}")
+
+        name = cleaned_data.get("restaurant_name")
+
+        banned_words = [
+            "illegal",
+            "banned",
+            "fake",
+            "spam",
+            "scam",
+            "virus",
+            "hate",
+            "terror",
+            "bomb",
+            "drugs",
+            "xxx",
+            "nsfw",
+            "fraud",
+            "pirate"
+        ]
+
+        if name:
+            qs = Restaurant.objects.filter( restaurant_name = name)
+            if self.instance.pk:
+                qs = qs.exclude( pk = self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("Name already exists")
+    
+        if name and name.lower() in [word.lower() for word in banned_words]:
+            raise forms.ValidationError(f"Cannot utilise the word {name}")
+
+class StaffForm(forms.ModelForm):
+    class Meta:
+        model = Staff
+        fields = ["name","surname","date_of_birth","date_employed","work_right","position","pay_per_hour"]
 
 class MenuItemForm(forms.ModelForm):
     class Meta:
