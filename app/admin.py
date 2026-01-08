@@ -22,8 +22,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         "menu_item",
         "ingredience",
-        "quantity",
-        "unit"
+        "description"
     )
 
 @admin.register(Restaurant)

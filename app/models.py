@@ -144,6 +144,9 @@ class MenuItem(models.Model):
         max_digits = 6,
         decimal_places = 2
     )
+
+    # Through allows to have the M2M relationship table be represented in the Recipe model table.
+    # So the ingrediences field doesn't show in the MenuItem table.
     ingrediences = models.ManyToManyField(
         "Ingredience",
         through = "Recipe",
@@ -182,15 +185,6 @@ class Ingredience(models.Model):
 
 class Recipe(models.Model):
 
-    UNITS = [
-        ("kg","Kilograms"),
-        ("mg","Miligrams"),
-        ("g","Grams"),
-        ("l","Liters"),
-        ("ml","Mililiters"),
-    ]
     menu_item = models.ForeignKey(MenuItem, on_delete = models.CASCADE)
     ingredience = models.ForeignKey(Ingredience, on_delete = models.CASCADE)
-
-    quantity = models.DecimalField(max_digits = 6, decimal_places = 2)
-    unit = models.CharField(max_length = 10, choices = UNITS , null = False, blank = False)
+    description = models.TextField(max_length = 200, blank = False, null = False)

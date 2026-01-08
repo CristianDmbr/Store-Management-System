@@ -1,4 +1,3 @@
-from django.forms import ValidationError
 from django import forms
 from .models import Restaurant, MenuItem, Staff, Shift, Ingredience
 from django.core.exceptions import ValidationError
@@ -52,7 +51,7 @@ class RestaurantForm(forms.ModelForm):
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
-        fields = ["name","surname","date_of_birth","date_employed","position","manager","restaurant","manager","restaurant"]
+        fields = ["name","surname","date_of_birth","date_employed","position","manager","restaurant"]
 
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})
@@ -68,7 +67,7 @@ class StaffForm(forms.ModelForm):
             qs = Staff.objects.filter(name = name, surname = surname)
             if self.instance.pk:
                 qs = qs.exclude( pk = self.instance.pk)
-            if qs:
+            if qs.exists():
                 raise forms.ValidationError(f" {name} {surname} already works here.")
         
         dob = cleaned_data.get("date_of_birth")
@@ -96,8 +95,8 @@ class ShiftForm(forms.ModelForm):
         end_date = cleaned_data.get("end_time")
 
         if start_date and end_date:
-            if end_date > start_date:
-                raise forms.ValidationError("Cant have end before start.")
+            if end_date <= start_date:
+                raise forms.ValidationError("End time must be after start time.")
 
 class MenuItemForm(forms.ModelForm):
     class Meta:
@@ -107,18 +106,21 @@ class MenuItemForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         name = cleaned_data.get("name")
+        restaurant = cleaned_data.get("restaurant")
 
-        if name:
-            qs = MenuItem.objects.filter(name = name)
+        if restaurant and name:
+            qs = MenuItem.objects.filter("name","restaurant")
             if self.instance.pk:
                 qs = qs.exclude(pk = self.instance.pk)
-            if qs:
-                return forms.ValidationError(f"Menu item {name} is already on the menu.")
+            if qs.exists():
+                raise forms.ValidationError(f"{name} is already in the {restaurant}'s menu")
+        
         
         calories = cleaned_data.get("calories")
 
-        if calories > 1000:
-            return forms.ValidationError("Recommended calories for a meal should be less than 1000.")
+        if calories:
+            if calories > 1000:
+                raise forms.ValidationError("Recommended calories for a meal should be less than 1000.")
 
 class IngredienceForm(forms.ModelForm):
     class Meta:
