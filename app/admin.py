@@ -12,7 +12,6 @@ class ShiftAdmin(admin.ModelAdmin):
 @admin.register(Ingredience)
 class IngredienceAdmin(admin.ModelAdmin):
     list_display = (
-        "food",
         "name",
         "quantity_in_stock",
         "units",
@@ -21,7 +20,10 @@ class IngredienceAdmin(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
-        "item",
+        "menu_item",
+        "ingredience",
+        "quantity",
+        "unit"
     )
 
 @admin.register(Restaurant)

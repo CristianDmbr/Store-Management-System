@@ -140,6 +140,15 @@ class MenuItem(models.Model):
     category = models.CharField(max_length=50, choices = CATEGORY_CHOICES, default = "main")
     availability = models.BooleanField(default=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    calories = models.DecimalField(
+        max_digits = 6,
+        decimal_places = 2
+    )
+    ingrediences = models.ManyToManyField(
+        "Ingredience",
+        through = "Recipe",
+        related_name = "menu_items"
+    )
 
     class Meta:
         constraints = [
@@ -160,13 +169,9 @@ class Ingredience(models.Model):
         ("mg","Miligrams"),
         ("g","Grams"),
         ("l","Liters"),
+        ("ml","mililiters"),
         ]
 
-    food = models.ForeignKey(
-        MenuItem,
-        on_delete = models.CASCADE,
-        related_name = "ingrediences"
-    )
     name = models.CharField(max_length=200)
     quantity_in_stock = models.IntegerField()
     units = models.CharField(max_length = 5,choices = UNITS, null = False, blank = False)
@@ -176,9 +181,16 @@ class Ingredience(models.Model):
 
 
 class Recipe(models.Model):
-    item = models.ForeignKey(
-        MenuItem,
-        on_delete = models.CASCADE,
-        related_name="recipe"
-    )
-    ingredience = models.ManyToManyField(Ingredience)
+
+    UNITS = [
+        ("kg","Kilograms"),
+        ("mg","Miligrams"),
+        ("g","Grams"),
+        ("l","Liters"),
+        ("ml","Mililiters"),
+    ]
+    menu_item = models.ForeignKey(MenuItem, on_delete = models.CASCADE)
+    ingredience = models.ForeignKey(Ingredience, on_delete = models.CASCADE)
+
+    quantity = models.DecimalField(max_digits = 6, decimal_places = 2)
+    unit = models.CharField(max_length = 10, choices = UNITS , null = False, blank = False)

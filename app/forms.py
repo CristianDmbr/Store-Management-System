@@ -1,6 +1,6 @@
 from django.forms import ValidationError
 from django import forms
-from .models import Restaurant, MenuItem, Staff, Shift
+from .models import Restaurant, MenuItem, Staff, Shift, Ingredience
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -102,16 +102,25 @@ class ShiftForm(forms.ModelForm):
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["restaurant", "name", "description", "price", "category", "availability"]
+        fields = ["restaurant", "name", "description", "price", "category","calories","availability"]
 
-    def clean_name(self):
-        name = self.cleaned_data.get("name")
-        restaurant = self.cleaned_data.get("restaurant")
-        if name and restaurant:
-            qs = MenuItem.objects.filter(name=name, restaurant=restaurant)
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get("name")
+
+        if name:
+            qs = MenuItem.objects.filter(name = name)
             if self.instance.pk:
-                qs = qs.exclude(pk=self.instance.pk)
-            if qs.exists():
-                raise forms.ValidationError(f"{name} is already on the {restaurant} menu")
-        return name
+                qs = qs.exclude(pk = self.instance.pk)
+            if qs:
+                return forms.ValidationError(f"Menu item {name} is already on the menu.")
+        
+        calories = cleaned_data.get("calories")
 
+        if calories > 1000:
+            return forms.ValidationError("Recommended calories for a meal should be less than 1000.")
+
+class IngredienceForm(forms.ModelForm):
+    class Meta:
+        model = Ingredience
+        fields = ["name","quantity_in_stock","units"]
