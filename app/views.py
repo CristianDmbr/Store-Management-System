@@ -2,9 +2,23 @@ from django.shortcuts import render, redirect
 from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm
 
+
 def home(request):
     return render(request, "home.html",{})
 
+# Class Based View (CBV)
+class RestaurantListView(ListView, CreateView):
+    model = Restaurant
+    form_class = RestaurantForm
+    template_name = "restaurant_list.html"
+    success_url = reverse_lazy("restaurant_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.get_form()
+        return context
+
+# Function Based View (FBV)
 def restaurant_list(request):
     if request.method == "POST":
         form = RestaurantForm(request.POST)
@@ -99,4 +113,3 @@ def menu_view(request):
         menu_form = MenuItemForm()
     
     return render(request, "menu_list.html", {"menu_form":menu_form})
-    
