@@ -13,10 +13,13 @@ class RestaurantListView(ListView, CreateView):
     template_name = "restaurant_list.html"
     success_url = reverse_lazy("restaurant_list")
 
+    ##################################################
+    # Analyse this 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = self.get_form()
         return context
+    ##################################################
 
 # Function Based View (FBV)
 def restaurant_list(request):
