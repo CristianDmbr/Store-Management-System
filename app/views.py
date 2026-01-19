@@ -17,6 +17,39 @@ class RestaurantListView(ListView, CreateView):
         context["form"] = self.get_form()
         return context
     
+class MenuListView(ListView, CreateView):
+    model = MenuItem
+    form_class = MenuItemForm
+    template_name = "menu_list.html"
+    success_url = reverse_lazy("menu_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.get_form()
+        return context
+
+class StaffFormView(ListView, CreateView):
+    model = Staff
+    form_class = StaffForm
+    template_name = "staff_add.html"
+    success_url = reverse_lazy("staff_view")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.get_form()
+        return context
+
+class ShiftView(ListView, CreateView):
+    model = Shift
+    form_class = ShiftForm
+    template_name = "shift.html"
+    success_url = reverse_lazy("shift_view")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.get_form()
+        return context
+
 #def restaurant_list(request):
 #    if request.method == "POST":
 #        form = RestaurantForm(request.POST)
@@ -31,17 +64,46 @@ class RestaurantListView(ListView, CreateView):
 #    restaurants = Restaurant.objects.all()
 #   return render(request, "restaurant_list.html", {"form":form, "restaurants": restaurants})
 
-def menu_list(request):
+#def menu_list(request):
+#    if request.method == "POST":
+#        form = MenuItemForm(request.POST)
+#        if form.is_valid():
+#            form.save()
+#            return redirect("menu_list")
+#    else:
+#        form = MenuItemForm()
+#    
+#    menu_items = MenuItem.objects.all()
+#    return render(request, "menu_list.html",{"form" : form, "menu_items" : menu_items})
+
+#def staff_form_view(request):
+#    if request.method == "POST":
+#        staff_form = StaffForm(request.POST)
+#
+#        if staff_form.is_valid():
+#            staff_form.save()
+#            return redirect("staff_view")
+#        else:
+#            print(staff_form.errors)
+#    else:
+#        staff_form = StaffForm()    
+#   return render(request, "staff_add.html",{"staff_form" : staff_form})
+
+def shift_view(request):
+
     if request.method == "POST":
-        form = MenuItemForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("menu_list")
+        shift_form = ShiftForm(request.POST)
+        
+        if shift_form.is_valid():
+            shift_form.save()
+            return redirect("shift_view")
+        else:
+            print(shift_form.errors)
     else:
-        form = MenuItemForm()
+        shift_form = ShiftForm()
+
     
-    menu_items = MenuItem.objects.all()
-    return render(request, "menu_list.html",{"form" : form, "menu_items" : menu_items})
+    return render(request, "shift.html",{"shift_form" : shift_form})
 
 def combine_form_view(request):
     if request.method == "POST":
@@ -67,36 +129,6 @@ def combine_form_view(request):
         "menu_form" : menu_form,
     })
 
-def staff_form_view(request):
-    if request.method == "POST":
-        staff_form = StaffForm(request.POST)
-
-        if staff_form.is_valid():
-            staff_form.save()
-            return redirect("staff_view")
-        else:
-            print(staff_form.errors)
-    else:
-        staff_form = StaffForm()
-
-    
-    return render(request, "staff_add.html",{"staff_form" : staff_form})
-
-def shift_view(request):
-
-    if request.method == "POST":
-        shift_form = ShiftForm(request.POST)
-        
-        if shift_form.is_valid():
-            shift_form.save()
-            return redirect("shift_view")
-        else:
-            print(shift_form.errors)
-    else:
-        shift_form = ShiftForm()
-
-    
-    return render(request, "shift.html",{"shift_form" : shift_form})
 
 def menu_view(request):
 

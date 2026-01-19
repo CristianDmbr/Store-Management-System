@@ -21,7 +21,7 @@ from app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = "home_page"),
-    path("restaurants/", views.restaurant_list, name = "restaurant_list"),
+    path("restaurants/", views.RestaurantListView.as_view(), name = "restaurant_list"),
     path("menu/", views.menu_list, name = "menu_list"),
     path("combined/", views.combine_form_view, name = "combined_form"),
     path("staff/",views.staff_form_view, name = "staff_view"),
