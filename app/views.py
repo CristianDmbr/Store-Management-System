@@ -1,40 +1,35 @@
 from django.shortcuts import render, redirect
 from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm
-
+from django.views.generic import ListView,CreateView
+from django.urls import reverse_lazy
 
 def home(request):
     return render(request, "home.html",{})
 
-# Class Based View (CBV)
 class RestaurantListView(ListView, CreateView):
     model = Restaurant
     form_class = RestaurantForm
     template_name = "restaurant_list.html"
     success_url = reverse_lazy("restaurant_list")
-
-    ##################################################
-    # Analyse this 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = self.get_form()
         return context
-    ##################################################
-
-# Function Based View (FBV)
-def restaurant_list(request):
-    if request.method == "POST":
-        form = RestaurantForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("restaurant_list")
-        elif not form.is_valid():
-            print(form.errors)
-    else:
-        form = RestaurantForm()
     
-    restaurants = Restaurant.objects.all()
-    return render(request, "restaurant_list.html", {"form":form, "restaurants": restaurants})
+#def restaurant_list(request):
+#    if request.method == "POST":
+#        form = RestaurantForm(request.POST)
+#        if form.is_valid():
+#            form.save()
+#            return redirect("restaurant_list")
+#        elif not form.is_valid():
+#            print(form.errors)
+#    else:
+#        form = RestaurantForm()
+#    
+#    restaurants = Restaurant.objects.all()
+#   return render(request, "restaurant_list.html", {"form":form, "restaurants": restaurants})
 
 def menu_list(request):
     if request.method == "POST":
