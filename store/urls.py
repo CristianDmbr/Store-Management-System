@@ -22,9 +22,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = "home_page"),
     path("restaurants/", views.RestaurantListView.as_view(), name = "restaurant_list"),
-    path("menu/", views.menu_list, name = "menu_list"),
+    path("menu/", views.MenuListView.as_view(), name = "menu_list"),
+    path("staff/",views.StaffView.as_view(), name = "staff_view"),
+    path("shift/", views.ShiftView.as_view(), name = "shift_view"),
+
     path("combined/", views.combine_form_view, name = "combined_form"),
-    path("staff/",views.staff_form_view, name = "staff_view"),
-    path("shift/", views.shift_view, name = "shift_view"),
-    path("menu/",views.menu_view, name = "menu_add"),
 ]

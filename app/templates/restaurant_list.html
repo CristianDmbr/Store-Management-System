@@ -5,12 +5,27 @@
     </head>
     <body>
         <h1>Restaurants</h1>
+
+        <!-- Form to add a new restaurant -->
         <h2>Add new restaurant</h2>
         <form method="POST">
             {% csrf_token %}
-            {{form.as_p}}
-            <button type = "submit">Submit</button>
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
         </form>
-        <a href="% url 'menu_list' %">Menu Submission</a>
+
+        <!-- Display all restaurants -->
+        <h2>All Restaurants</h2>
+        <ul>
+            {% for restaurant in object_list %}
+                <li>
+                    {{ restaurant.restaurant_name }} - {{ restaurant.restaurant_cuisine }} - {{ restaurant.location }}
+                </li>
+            {% empty %}
+                <li>No restaurants yet.</li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'menu_list' %}">Menu Submission</a>
     </body>
 </html>
