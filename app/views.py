@@ -26,7 +26,6 @@ class RestaurantListView(FormMixin, ListView):
             return redirect(self.success_url)
         return self.get(request, *args, **kwargs)
     
-
 class MenuListView(FormMixin, ListView):
     model = MenuItem
     form_class = MenuItemForm
@@ -45,16 +44,12 @@ class MenuListView(FormMixin, ListView):
             return redirect(self.success_url)
         return self.get(request, *args, **kwargs)
 
-class StaffView(ListView, CreateView):
+
+class StaffView(CreateView):
     model = Staff
     form_class = StaffForm
     template_name = "staff_add.html"
     success_url = reverse_lazy("staff_view")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form"] = self.get_form()
-        return context
 
 class ShiftView(ListView, CreateView):
     model = Shift
