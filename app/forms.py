@@ -109,7 +109,7 @@ class MenuItemForm(forms.ModelForm):
         restaurant = cleaned_data.get("restaurant")
 
         if restaurant and name:
-            qs = MenuItem.objects.filter("name","restaurant")
+            qs = MenuItem.objects.filter(name = name , restaurant = restaurant)
             if self.instance.pk:
                 qs = qs.exclude(pk = self.instance.pk)
             if qs.exists():
@@ -121,6 +121,8 @@ class MenuItemForm(forms.ModelForm):
         if calories:
             if calories > 1000:
                 raise forms.ValidationError("Recommended calories for a meal should be less than 1000.")
+        
+        return cleaned_data
 
 class IngredienceForm(forms.ModelForm):
     class Meta:

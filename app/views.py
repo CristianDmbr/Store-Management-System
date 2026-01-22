@@ -26,7 +26,8 @@ class RestaurantListView(FormMixin, ListView):
             return redirect(self.success_url)
         return self.get(request, *args, **kwargs)
     
-class MenuListView(ListView, CreateView):
+
+class MenuListView(FormMixin, ListView):
     model = MenuItem
     form_class = MenuItemForm
     template_name = "menu_list.html"
@@ -36,6 +37,13 @@ class MenuListView(ListView, CreateView):
         context = super().get_context_data(**kwargs)
         context["form"] = self.get_form()
         return context
+    
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.save()
+            return redirect(self.success_url)
+        return self.get(request, *args, **kwargs)
 
 class StaffView(ListView, CreateView):
     model = Staff
