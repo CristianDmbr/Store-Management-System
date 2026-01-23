@@ -26,6 +26,8 @@ urlpatterns = [
 
     path("restaurants/", views.RestaurantList.as_view(), name = "restaurant_list"),
     path("restaurants_add",views.RestaurantCreate.as_view(), name = "restaurant_create"),
+    path("restaurant/<int:pk>/edit",views.RestaurantUpdate.as_view(), name = "restaurant_edit"),
+    path("restaurant/<int:pk>/delete",views.RestaurantDelete.as_view(),name = "restaurant_delete"),
 
     path("staff/",views.StaffView.as_view(), name = "staff_view"),  
     path("staff_list/",views.StaffList.as_view(),name = "staff_list"),

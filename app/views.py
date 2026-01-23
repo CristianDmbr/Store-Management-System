@@ -17,6 +17,18 @@ class RestaurantCreate(CreateView):
     form_class = RestaurantForm
     template_name = "restaurant_add.html"
     success_url = reverse_lazy("restaurant_list")
+
+class RestaurantUpdate(UpdateView):
+    model = Restaurant
+    form_class = RestaurantForm
+    template_name = "restaurant_update.html"
+    success_url = reverse_lazy("restaurant_list")
+
+class RestaurantDelete(DeleteView):
+    model = Restaurant
+    template_name = "restaurant_delete.html"
+    success_url = reverse_lazy("restaurant_list")
+
     
 class MenuListView(FormMixin, ListView):
     model = MenuItem

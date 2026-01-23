@@ -11,6 +11,8 @@
             {% for restaurant in object_list %}
                 <li>
                     {{ restaurant.restaurant_name }} - {{ restaurant.restaurant_cuisine }} - {{ restaurant.location }}
+                    <a href="{% url 'restaurant_edit' restaurant.pk %}">Edit</a>
+                    <a href="{% url 'restaurant_delete' restaurant.pk %}">Delete</a>
                 </li>
             {% empty %}
                 <li>No restaurants yet.</li>
