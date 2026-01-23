@@ -21,10 +21,16 @@ from app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = "home_page"),
-    path("restaurants/", views.RestaurantListView.as_view(), name = "restaurant_list"),
     path("menu/", views.MenuListView.as_view(), name = "menu_list"),
-    path("staff/",views.StaffView.as_view(), name = "staff_view"),
     path("shift/", views.ShiftView.as_view(), name = "shift_view"),
+
+    path("restaurants/", views.RestaurantList.as_view(), name = "restaurant_list"),
+    path("restaurants_add",views.RestaurantCreate.as_view(), name = "restaurant_create"),
+
+    path("staff/",views.StaffView.as_view(), name = "staff_view"),  
+    path("staff_list/",views.StaffList.as_view(),name = "staff_list"),
+    path("staff/<int:pk>/edit",views.StaffUpdateView.as_view(), name = "staff_update"),
+    path("staff/<int:pk>/delete", views.StaffDelete.as_view(), name = "staff_delete"),
 
     path("combined/", views.combine_form_view, name = "combined_form"),
 ]

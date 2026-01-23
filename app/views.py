@@ -1,30 +1,22 @@
 from django.shortcuts import render, redirect
 from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm
-from django.views.generic import ListView,CreateView
+from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
 def home(request):
     return render(request, "home.html",{})
 
-class RestaurantListView(FormMixin, ListView):
+class RestaurantList(ListView):
+    model = Restaurant
+    template_name = "restaurant_list.html"
+
+class RestaurantCreate(CreateView):
     model = Restaurant
     form_class = RestaurantForm
-    template_name = "restaurant_list.html"
+    template_name = "restaurant_add.html"
     success_url = reverse_lazy("restaurant_list")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form"] = self.get_form()
-        return context
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            form.save()
-            return redirect(self.success_url)
-        return self.get(request, *args, **kwargs)
     
 class MenuListView(FormMixin, ListView):
     model = MenuItem
@@ -44,12 +36,26 @@ class MenuListView(FormMixin, ListView):
             return redirect(self.success_url)
         return self.get(request, *args, **kwargs)
 
-
 class StaffView(CreateView):
     model = Staff
     form_class = StaffForm
     template_name = "staff_add.html"
     success_url = reverse_lazy("staff_view")
+
+class StaffList(ListView):
+    model = Staff
+    template_name = "staff_list.html"
+
+class StaffUpdateView(UpdateView):
+    model = Staff
+    form_class = StaffForm
+    template_name = "staff_update.html"
+    success_url = reverse_lazy("staff_list")
+
+class StaffDelete(DeleteView):
+    model = Staff
+    template_name = "staff_delete.html"
+    success_url = reverse_lazy("staff_list")
 
 class ShiftView(ListView, CreateView):
     model = Shift

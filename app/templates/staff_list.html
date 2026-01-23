@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff List</title>
+</head>
+<body>
+    <h1>All Staff Members</h1>
+
+    <ul>
+        {% for staff in staff_list %}
+            <li>
+                <strong>{{ staff.name }} {{ staff.surname }}</strong><br>
+                Role: {{ staff.position }}<br>
+                Restaurant: {{ staff.restaurant }}<br>
+                Manager: {{ staff.manager }}<br>
+                Age: {{ staff.age }}<br>
+                Pay/hour: £{{ staff.pay_per_hour }}
+                <a href="{% url 'staff_update' staff.pk %}">Edit</a>
+                <a href="{% url 'staff_delete' staff.pk %}">Delete</a>
+            </li>
+            <hr>
+        {% empty %}
+            <li>No staff members found.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'staff_view' %}">Add Staff</a>
+</body>
+</html>

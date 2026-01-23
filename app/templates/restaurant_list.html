@@ -5,15 +5,6 @@
     </head>
     <body>
         <h1>Restaurants</h1>
-
-        <!-- Form to add a new restaurant -->
-        <h2>Add new restaurant</h2>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Submit</button>
-        </form>
-
         <!-- Display all restaurants -->
         <h2>All Restaurants</h2>
         <ul>
@@ -28,5 +19,6 @@
 
         <a href="{% url 'menu_list' %}">Menu Submission</a>
         <a href="{% url 'home_page' %}">Home Page</a>
+        <a href="{% url 'restaurant_create' %}">Add Restaurant</a>
     </body>
 </html>
