@@ -3,7 +3,6 @@ from .models import Restaurant, MenuItem, Staff, Shift, Ingredience, Recipe
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-
 class RestaurantForm(forms.ModelForm):
 
     class Meta:
@@ -21,31 +20,42 @@ class RestaurantForm(forms.ModelForm):
             "date_opened": forms.DateInput(attrs={"type": "date"})
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
 
-        size = cleaned_data.get("size")
-        capacity = cleaned_data.get("capacity")
+    ### Before there was a general def clean() for all of the fields inside one form validation form.
+    ### Practice using single field rules def clean_<field>
 
-        if size and capacity:
-            if size > capacity:
-                raise forms.ValidationError(f"Size : {size} cannot be bigger than the restaurant capacity : {capacity}")
-
-        name = cleaned_data.get("restaurant_name")
+    def clean_restaurant_name(self):
+        name = self.cleaned_data.get("restaurant_name")
 
         banned_words = [
-            "illegal", "banned", "fake", "spam", "scam", "virus", "hate", "terror", "bomb", "drugs", "xxx", "nsfw", "fraud", "pirate"
+            "illegal", "banned", "fake", "spam", "scam", "virus",
+            "hate", "terror", "bomb", "drugs", "xxx", "nsfw",
+            "fraud", "pirate"
         ]
 
+        if name and name.lower() in banned_words:
+            raise ValidationError(f"Cannot use the word {name}!")
+        
         if name:
-            qs = Restaurant.objects.filter( restaurant_name = name)
+            qs = Restaurant.objects.filter(restaurant_name = name)
             if self.instance.pk:
-                qs = qs.exclude( pk = self.instance.pk)
+                qs = qs.exclude(pk = self.instance.pk)
             if qs.exists():
-                raise forms.ValidationError("Name already exists")
+                raise ValidationError(f"Name : {name} already exists")
+        return name
     
-        if name and name.lower() in [word.lower() for word in banned_words]:
-            raise forms.ValidationError(f"Cannot utilise the word {name}")
+    def clean(self):
+        clean_data = super().clean()
+
+        size = clean_data.get("size")
+        capacity = clean_data.get("capacity")
+
+        if size and capacity and size > capacity:
+            raise ValidationError(
+                "Size cannot be bigger than capacity"
+            )
+        return clean_data
+
 
 
 class StaffForm(forms.ModelForm):
@@ -60,6 +70,7 @@ class StaffForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
+        # Cannot have a def clean_name_surname() function because djago wont recognise it so use regular def clean()
         name = cleaned_data.get("name")
         surname = cleaned_data.get("surname")
 
@@ -76,7 +87,7 @@ class StaffForm(forms.ModelForm):
             today = timezone.localdate()
             if today < dob:
                 raise ValidationError(f"Can't be born before {today}")
-
+        
 
 class ShiftForm(forms.ModelForm):
     class Meta:
