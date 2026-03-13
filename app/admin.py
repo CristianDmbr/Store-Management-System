@@ -61,4 +61,5 @@ class StaffAdmin(admin.ModelAdmin):
         "pay_per_hour",
         "manager",
         "restaurant",
+        "age",
     )

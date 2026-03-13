@@ -12,7 +12,7 @@ class Restaurant(models.Model):
 
     LOCATIONS_CHOICES = [
         ("east_london", "East London"),
-        ("south_london", "South London"),
+        ("south_london", "South Lo ndon"),
         ("north_london", "North London"),
         ("west_london", "West London")
     ]
@@ -86,7 +86,7 @@ class Staff(models.Model):
     @property
     def age(self):
         today = date.today()
-        return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)) 
+        return (today - self.date_of_birth).days // 365
 
     def __str__(self):
         return f"{self.name} {self.surname}"

@@ -4,11 +4,11 @@
         <title>Restaurant List</title>
     </head>
     <body>
-        <h1>Restaurants</h1>
+        <h1>{{page_title}}</h1>
         <!-- Display all restaurants -->
         <h2>All Restaurants</h2>
         <ul>
-            {% for restaurant in object_list %}
+            {% for restaurant in restaurants %}
                 <li>
                     {{ restaurant.restaurant_name }} - {{ restaurant.restaurant_cuisine }} - {{ restaurant.location }}
                     <a href="{% url 'restaurant_edit' restaurant.pk %}">Edit</a>

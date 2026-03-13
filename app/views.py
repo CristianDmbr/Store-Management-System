@@ -11,6 +11,16 @@ def home(request):
 class RestaurantList(ListView):
     model = Restaurant
     template_name = "restaurant_list.html"
+    context_object_name = "restaurants"
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "( List of all restaurant sorted by date openened )"
+        return context
+
+    def get_queryset(self):
+        return Restaurant.objects.order_by("-date_opened")
 
 class RestaurantCreate(CreateView):
     model = Restaurant

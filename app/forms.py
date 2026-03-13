@@ -20,7 +20,6 @@ class RestaurantForm(forms.ModelForm):
             "date_opened": forms.DateInput(attrs={"type": "date"})
         }
 
-
     ### Before there was a general def clean() for all of the fields inside one form validation form.
     ### Practice using single field rules def clean_<field>
 
@@ -57,7 +56,6 @@ class RestaurantForm(forms.ModelForm):
         return clean_data
 
 
-
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
@@ -69,8 +67,6 @@ class StaffForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-
-        # Cannot have a def clean_name_surname() function because djago wont recognise it so use regular def clean()
         name = cleaned_data.get("name")
         surname = cleaned_data.get("surname")
 
@@ -87,6 +83,8 @@ class StaffForm(forms.ModelForm):
             today = timezone.localdate()
             if today < dob:
                 raise ValidationError(f"Can't be born before {today}")
+        
+        return cleaned_data
         
 
 class ShiftForm(forms.ModelForm):
@@ -129,23 +127,26 @@ class MenuItemForm(forms.ModelForm):
         
         calories = cleaned_data.get("calories")
 
-        if calories:
-            if calories > 1000:
-                raise forms.ValidationError("Recommended calories for a meal should be less than 1000.")
+    def clean_calories(self):
+        cals = self.cleaned_data.get("calories")
+
+        if cals is not None and cals > 1000:
+            raise forms.ValidationError(f"Cannot have a item more than 1000kcal, this item has {cals}kcal.")
         
-        return cleaned_data
+        return cals
+    
+    
 
 class IngredienceForm(forms.ModelForm):
     class Meta:
         model = Ingredience
         fields = ["name","quantity_in_stock","units"]
     
-    def clean(self):
-        clean_data = super().clean()
-        name = clean_data.get("name")
+    def clean_name(self):
+        name = self.cleaned_data.get("name")
 
         if name:
-            qs = Ingredience.objects.filter(name = name)
+            qs = Ingredience.objects.get(name = name)
             if self.instance.pk:
                 qs = qs.exclude(pk = self.instance.pk)
             if qs.exists():
@@ -156,7 +157,7 @@ class RecipeForm(forms.ModelForm):
         model = Recipe
         fields = ["menu_item","ingredience","description"]
     
-    def clean(self):
+    def clean_description(self):
         clean_data = super().clean()
         description = clean_data.get("description","")
         description_list = description.split()
