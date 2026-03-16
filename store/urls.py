@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from app import views
 
+# The URL patterns with passed keyworkds doesn't matter.
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = "home_page"),

@@ -13,21 +13,31 @@ class RestaurantList(ListView):
     template_name = "restaurant_list.html"
     context_object_name = "restaurants"
 
-
+    # get_context_data is a prebuilt Django function which builds the context dictionary sent to the template.
+    # Here we just added more info about the page.
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "( List of all restaurant sorted by date openened )"
+        context["page_title"] = "List of all restaurant sorted by date openened."
         return context
 
+    # get_queryset is a prebuilt Django function which determines what data should be retrieved from the database or
+    # how to retreive that data.
     def get_queryset(self):
         return Restaurant.objects.order_by("-date_opened")
 
+    # When accessing URL : 1. Creates an empty RestaurantForm. 2. Adds form to the template context. 3. Render the context to the template_name.
+    # When submitting the form : 1. Create form with submitted data. 2. Run the validation. 3. If valid we save to DB. 4. Redirect to sucess_url
 class RestaurantCreate(CreateView):
     model = Restaurant
     form_class = RestaurantForm
     template_name = "restaurant_add.html"
+    # reverse() converts a URL name into an actual URL. 
+    # regular reverse() resolves the url name immediatelly when file loads, at that moment the url might not exist so Django will throw error.
+    # reverse_lazy doesnt resolve it immediatelly but instead it waits until URL is needed.
     success_url = reverse_lazy("restaurant_list")
 
+
+    # UpdateView uses a get_object to get the pk and filter the exact row and then it passes it through the form.
 class RestaurantUpdate(UpdateView):
     model = Restaurant
     form_class = RestaurantForm
