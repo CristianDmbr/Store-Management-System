@@ -1,9 +1,22 @@
 from django.shortcuts import render, redirect
-from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
+from .models import Restaurant, Staff, Shift, MenuItem
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
+
+# Rules for hybrid CBV
+# Order matters since python uses method resolution order (MRO) where first mixin on the left gets priority.
+# e.g. class MenuListView(FormMixing,ListView): FormMixing goes first.
+# When mixing you will need to override methods like post() because CBV doesnt know of post by default or modify the get_context_data,
+# to add more variables to the template to generate.
+# Mixing should be compatable, you cannot have two different post implementations without overriding. 
+# Common Rule : have one main view (ListView,CreateView,UpdateView,DeleteView) and add optional mixins.
+# Example of where mixing does not work:
+# e.g. class ShiftView(ListView, CreateView)
+# It will crash with the POST method because we call the CBV as a view using the .as_view() and what <as_view()> does is that it check if a method is
+# inside of the say very last view (ListView in this case is the base class) it doesnt have a POST method so when django looks into the class for the POST
+# it will crash and make an error. Even though the POST method is inside of the CreateView it wont get to it and will crash.
 
 # Understanding GET and POST
 # GET : "give me data" and POST : "send/change data"
@@ -20,9 +33,11 @@ from django.urls import reverse_lazy
 # 2.POST is for changes
 # Inside of the templates you have <form method = "POST"> which indicates when submited browser will send a POST request to the server.
 
+######################################################____Home____######################################################
 def home(request):
     return render(request, "home.html",{})
 
+######################################################____Restaurant___######################################################
 class RestaurantList(ListView):
     model = Restaurant
     template_name = "restaurant_list.html"
@@ -83,24 +98,39 @@ class RestaurantDelete(DeleteView):
     template_name = "restaurant_delete.html"
     success_url = reverse_lazy("restaurant_list")
 
+######################################################___Menu List ___######################################################
     
+    #Hybrid CBV
+    # The ListView allows to get all of the rows from the MenuItem.
+    # FormMixing gives the ability to handle a form in the same view because normally a ListView doesnt handle forms and CreateView doesnt 
+    # show a list.
+    # So here we want to display all menu items and allow adding a new menu item on the same page.
 class MenuListView(FormMixin, ListView):
     model = MenuItem
     form_class = MenuItemForm
     template_name = "menu_list.html"
     success_url = reverse_lazy("menu_list")
+    context_object_name = "menu_items"
 
+    # Normally a ListView only passes the object_list (All MenuItem rows, but we also want to add a form on the same page,
+    # so manually add it to the context.
+    # <get_form>, <form_class> and <form_valid> is from the FormMixing.
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = self.get_form()
         return context
     
+    # ListView by itself only handles GET requests so it can't process a submitted form.
+    # FormMixing offers the tools to make a POST, you then wrote your own post method because ListView is a GET - only so now 
+    # because of the form method = "POST" it now calls your post method we just created.
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
             form.save()
             return redirect(self.success_url)
         return self.get(request, *args, **kwargs)
+
+######################################################___Staff___######################################################
 
 class StaffView(CreateView):
     model = Staff
@@ -111,6 +141,8 @@ class StaffView(CreateView):
 class StaffList(ListView):
     model = Staff
     template_name = "staff_list.html"
+    context_object_name = "memebers_of_staff"
+
 
 class StaffUpdateView(UpdateView):
     model = Staff
@@ -123,17 +155,29 @@ class StaffDelete(DeleteView):
     template_name = "staff_delete.html"
     success_url = reverse_lazy("staff_list")
 
-class ShiftView(ListView, CreateView):
+######################################################___Shift___######################################################
+
+class ShiftView(CreateView):
     model = Shift
     form_class = ShiftForm
     template_name = "shift.html"
-    success_url = reverse_lazy("shift_view")
+    success_url = reverse_lazy("shift_lits")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = self.get_form()
+        context["shift_form"] = self.get_form()
         return context
 
+######################################################___Other___######################################################
+
+
+    # We are using a FBV because a CBV usually expects to work on mostly one model else it requires to modify it, so its much simpler to use a 
+    # FBV to fully give us the flexibility.
+    # The Purpose of this whole FBV is to allow to have two different forms of two different models under the same page and view.
+    # The main problem that could occur is the fact that say when we submit the form for restaurant it sends the data inserted by user to the validation
+    # and it would pass but that same data would be sent to the menu form as well for validation and because menu doesnt have the same fields
+    # as the restaurant it will fail validation and no row will be saved to both models. 
+    # We use prefix to ensure we indicate which form its for. The name of the prefix doesnt matter because the model is known from the form.
 
 def combine_form_view(request):
     if request.method == "POST":
@@ -149,10 +193,12 @@ def combine_form_view(request):
         if menu_form.is_valid():
             menu_form.save()
             return redirect("combined_form")
+        elif not menu_form.is_valid():
+            print(menu_form.errors)
         
     else:
-        restaurant_form = RestaurantForm()
-        menu_form = MenuItemForm()
+        restaurant_form = RestaurantForm(prefix = "restaurant")
+        menu_form = MenuItemForm(prefix = "menu")
 
     return render(request, "combined_form.html",{
         "restaurant_form" : restaurant_form,

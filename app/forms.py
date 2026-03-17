@@ -1,5 +1,5 @@
 from django import forms
-from .models import Restaurant, MenuItem, Staff, Shift, Ingredience, Recipe
+from .models import Restaurant, MenuItem, Staff, Shift
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -135,41 +135,3 @@ class MenuItemForm(forms.ModelForm):
         
         return cals
     
-    
-
-class IngredienceForm(forms.ModelForm):
-    class Meta:
-        model = Ingredience
-        fields = ["name","quantity_in_stock","units"]
-    
-    def clean_name(self):
-        name = self.cleaned_data.get("name")
-
-        if name:
-            qs = Ingredience.objects.get(name = name)
-            if self.instance.pk:
-                qs = qs.exclude(pk = self.instance.pk)
-            if qs.exists():
-                raise forms.ValidationError(f"{name} already exists.")
-    
-class RecipeForm(forms.ModelForm):
-    class Meta:
-        model = Recipe
-        fields = ["menu_item","ingredience","description"]
-    
-    def clean_description(self):
-        clean_data = super().clean()
-        description = clean_data.get("description","")
-        description_list = description.split()
-
-        banned_words = [
-            "illegal", "banned", "fake", "spam", "scam", "virus", "hate",
-            "terror", "bomb", "drugs", "xxx", "nsfw", "fraud", "pirate",
-            "poison", "danger", "explosive", "attack", "kill", "blood",
-            "offensive", "abuse", "racist", "sex", "weapon", "gun",
-            "knife", "attack", "kill", "horrible", "toxic", "sick"
-            ]
-
-        for word in description_list:
-            if word.lower() in banned_words:
-                raise forms.ValidationError(f"Cannot use the word : {word} in the description.")

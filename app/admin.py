@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Restaurant, Staff, Shift, MenuItem, Ingredience, Recipe
+from .models import Restaurant, Staff, Shift, MenuItem
 
 @admin.register(Shift)
 class ShiftAdmin(admin.ModelAdmin):
@@ -7,22 +7,6 @@ class ShiftAdmin(admin.ModelAdmin):
         "employee",
         "start_time",
         "end_time",
-    )
-
-@admin.register(Ingredience)
-class IngredienceAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "quantity_in_stock",
-        "units",
-    )
-
-@admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    list_display = (
-        "menu_item",
-        "ingredience",
-        "description"
     )
 
 @admin.register(Restaurant)

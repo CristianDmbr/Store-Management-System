@@ -9,27 +9,23 @@
 
     <form method="POST">
         {% csrf_token %}
-
-        {% for field in form %}
-            <div class="field">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <ul class="errorlist">
-                        {% for error in field.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-        {% endfor %}
-
+        {{form.as_p}}
         <button type="submit">Submit</button>
     </form>
 
+    <h2>All Menu Items</h2>
+    <ul>
+        {% for item in  menu_items%}
+            <li>
+                {{item.name}} - {{item.category}} - £{{item.price}}
+            </li>
+        {% empty %}
+            <li>No menu items yet.</li>
+        {% endfor %}
+    </ul>
+
     <br>
     <a href="{% url 'restaurant_list' %}">Back to Restaurants</a>
-    <a href="{% url 'menu_list' %}">Back to Menu List</a>
     <a href="{% url 'home_page' %}">Home Page</a>
 </body>
 </html>
