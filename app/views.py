@@ -5,6 +5,8 @@ from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
+# ORM (Object Relational Mapper) : communicating and updating the DB throught python code.
+
 # Rules for hybrid CBV
 # Order matters since python uses method resolution order (MRO) where first mixin on the left gets priority.
 # e.g. class MenuListView(FormMixing,ListView): FormMixing goes first.
