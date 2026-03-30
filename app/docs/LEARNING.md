@@ -1,5 +1,12 @@
 **You need markdown extension to process and format the markdown text.**
 
+# What is the {% csrf_token %}?
+- Inserts a hidden input input into the HTML form containing a protection of your form from submisions from malicious requests from other websites.
+
+# What are migrations ?
+- Migrations translate Python models into real database tables and fields and keeps database structure in sync with your code.
+- Python @properties to the models do not require any migrations because only exists in the Python Memory and they do not change databse column so when you try to mitigate Django sees nothing to mitigate
+
 (Extension used : Markdown All In One)
 
 # What is a MarkDown? :

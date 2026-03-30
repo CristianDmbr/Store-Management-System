@@ -14,7 +14,7 @@ class Restaurant(models.Model):
         ("east_london", "East London"),
         ("south_london", "South Lo ndon"),
         ("north_london", "North London"),
-        ("west_london", "West London")
+        ("west_london", "West London") 
     ]
 
     RESTAURANT_CUISINES = [
@@ -37,11 +37,33 @@ class Restaurant(models.Model):
     date_opened = models.DateField(null = False, blank = False)
     location = models.CharField( max_length = 200, choices = LOCATIONS_CHOICES)
     restaurant_cuisine = models.CharField( max_length = 200, choices = RESTAURANT_CUISINES )
-    size = models.IntegerField()
     capacity = models.IntegerField()
+
+    # How does self.reservations works? Because we made a Foreing key inside of the Reservation class to the Restaurant,
+    # we automatically have a manager tool / query interface as self.reservation_set (by default). We renamed the reversed relationship
+    # in the reservation to reservation from reservation_set. 
+    @property
+    def current_occupancy(self):
+        return sum(
+            r.number_of_people for r in self.reservations.filter(is_active = True)
+        )
+    
+    @property
+    def remaining_spots(self):
+        return self.capacity - self.current_occupancy
+    
+    @property
+    def is_full(self):
+        return self.current_occupancy >= self.capacity
 
     def __str__(self):
         return f"{self.restaurant_name}"
+    
+class Reservation(models.Model):
+    name_of_reservation = models.CharField(max_length=200, null = False, blank = False)
+    restaurant = models.ForeignKey(Restaurant, on_delete = models.CASCADE, related_name = "reservations")
+    number_of_people = models.IntegerField()
+    is_active = models.BooleanField(default = True)
 
     
 class Staff(models.Model):

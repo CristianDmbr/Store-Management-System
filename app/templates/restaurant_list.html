@@ -11,8 +11,22 @@
             {% for restaurant in restaurants %}
                 <li>
                     {{ restaurant.restaurant_name }} - {{ restaurant.restaurant_cuisine }} - {{ restaurant.location }}
+
+                    <br>
+                    Maximum capacity : {{restaurant.capacity}}
+                    <br>
+                    Current Occupancy : {{restaurant.current_occupancy}}
+                    <br>
+                    {% if restaurant.is_full %}
+                        🔴 Full
+                    {% else %}
+                        🟢 Available {{restaurant.remaining_spots}}
+                    {% endif %}
+                    <br>
+
                     <a href="{% url 'restaurant_edit' restaurant.pk %}">Edit</a>
                     <a href="{% url 'restaurant_delete' restaurant.pk %}">Delete</a>
+                    <a href="{% url 'create_reservation' restaurant.pk %}">Book a reservation</a>
                 </li>
             {% empty %}
                 <li>No restaurants yet.</li>

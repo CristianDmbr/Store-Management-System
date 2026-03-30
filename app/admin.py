@@ -17,7 +17,6 @@ class RestaurantAdmin(admin.ModelAdmin):
         "date_opened",
         "location",
         "restaurant_cuisine",
-        "size",
         "capacity",
     )
 

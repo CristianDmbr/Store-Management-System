@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import Restaurant, Staff, Shift, MenuItem
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm
+from .models import Restaurant, Staff, Shift, MenuItem, Reservation
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
@@ -98,6 +98,12 @@ class RestaurantUpdate(UpdateView):
 class RestaurantDelete(DeleteView):
     model = Restaurant
     template_name = "restaurant_delete.html"
+    success_url = reverse_lazy("restaurant_list")
+
+class ReservationCreateView(CreateView):
+    model = Reservation
+    form_class = ReservationForm
+    template_name = "create_reservation.html"
     success_url = reverse_lazy("restaurant_list")
 
 ######################################################___Menu List ___######################################################

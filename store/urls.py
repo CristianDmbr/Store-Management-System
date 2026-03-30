@@ -46,6 +46,7 @@ urlpatterns = [
     path("restaurants_add",views.RestaurantCreate.as_view(), name = "restaurant_create"),
     path("restaurant/<int:pk>/edit",views.RestaurantUpdate.as_view(), name = "restaurant_edit"),
     path("restaurant/<int:pk>/delete",views.RestaurantDelete.as_view(),name = "restaurant_delete"),
+    path("reservation/<int:restaurant_id>/create",views.ReservationCreateView.as_view(), name = "create_reservation"),
 
     path("staff/",views.StaffView.as_view(), name = "staff_view"),  
     path("staff_list/",views.StaffList.as_view(),name = "staff_list"),

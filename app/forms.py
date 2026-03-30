@@ -1,5 +1,5 @@
 from django import forms
-from .models import Restaurant, MenuItem, Staff, Shift
+from .models import Restaurant, MenuItem, Staff, Shift, Reservation
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -13,7 +13,6 @@ class RestaurantForm(forms.ModelForm):
             "date_opened",
             "location",
             "restaurant_cuisine",
-            "size",
             "capacity",
         ]
         widgets = {
@@ -43,18 +42,10 @@ class RestaurantForm(forms.ModelForm):
                 raise ValidationError(f"Name : {name} already exists")
         return name
     
-    def clean(self):
-        clean_data = super().clean()
-
-        size = clean_data.get("size")
-        capacity = clean_data.get("capacity")
-
-        if size and capacity and size > capacity:
-            raise ValidationError(
-                "Size cannot be bigger than capacity"
-            )
-        return clean_data
-
+class ReservationForm(forms.ModelForm):
+    class Meta:
+        model = Reservation
+        fields = ["name_of_reservation","restaurant","number_of_people"]
 
 class StaffForm(forms.ModelForm):
     class Meta:
