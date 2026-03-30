@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django import forms
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
@@ -100,13 +101,31 @@ class RestaurantDelete(DeleteView):
     template_name = "restaurant_delete.html"
     success_url = reverse_lazy("restaurant_list")
 
+######################################################___Reservations___######################################################
+
 class ReservationCreateView(CreateView):
     model = Reservation
     form_class = ReservationForm
     template_name = "create_reservation.html"
     success_url = reverse_lazy("restaurant_list")
 
-######################################################___Menu List ___######################################################
+    def get_initial(self):
+        """Pre-fill the restaurant field based on URL."""
+        initial = super().get_initial()
+        restaurant_id = self.kwargs.get("restaurant_id")
+        if restaurant_id:
+            initial["restaurant"] = get_object_or_404(Restaurant, pk=restaurant_id)
+        return initial
+
+    def get_form(self, form_class=None):
+        """Hide the restaurant field if it is pre-filled."""
+        form = super().get_form(form_class)
+        if self.kwargs.get("restaurant_id"):
+            form.fields["restaurant"].widget = forms.HiddenInput()
+        return form
+
+
+######################################################___Menu List___######################################################
     
     #Hybrid CBV
     # The ListView allows to get all of the rows from the MenuItem.
