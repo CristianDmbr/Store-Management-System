@@ -8,6 +8,9 @@ from django.urls import reverse_lazy
 
 # ORM (Object Relational Mapper) : communicating and updating the DB throught python code.
 
+# super() calls the original version of a method from parent class so you dont have to rewrite everything, so we can 
+# add own extra logic or modify results.
+
 # Rules for hybrid CBV
 # Order matters since python uses method resolution order (MRO) where first mixin on the left gets priority.
 # e.g. class MenuListView(FormMixing,ListView): FormMixing goes first.
@@ -109,18 +112,36 @@ class ReservationCreateView(CreateView):
     template_name = "create_reservation.html"
     success_url = reverse_lazy("restaurant_list")
 
+    # Most CBV have a get_context_data
+    # We want to display the name of the Restaurant inside the template
+    # We sent the exact row of the Restaurant.
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["restaurant"] = get_object_or_404(Restaurant, pk = self.kwargs.get("restaurant_id"))
+        return context
+
+    # Purpose of get_initial (Comes from CreateView) is to provide default values to form before its shown.
+    # Here we just say prefill the restaurant field with this specific restaurant.
+    # super(). gets me the original version of this method from parent class.
     def get_initial(self):
         """Pre-fill the restaurant field based on URL."""
         initial = super().get_initial()
         restaurant_id = self.kwargs.get("restaurant_id")
         if restaurant_id:
+            # 404 means not "Not Found" and it will show a page instead of crashing.
             initial["restaurant"] = get_object_or_404(Restaurant, pk=restaurant_id)
         return initial
 
+    # get_form (comes from CreateView) is job is to build and return the form instance
+    # Why not just remove the restaurant field from the reservation form? Because its a required field and without it it will 
+    # create error.
     def get_form(self, form_class=None):
         """Hide the restaurant field if it is pre-filled."""
         form = super().get_form(form_class)
+        # Checks if URL include the restaurant_id
         if self.kwargs.get("restaurant_id"):
+            # Widget is how the field is displayed in HTML
+            # forms.HiddenInput() user does not see the field but it still gets submitted to DB because of previous get_initial.
             form.fields["restaurant"].widget = forms.HiddenInput()
         return form
 

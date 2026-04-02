@@ -4,7 +4,8 @@
         <title>Create Reservation</title>
     </head>
     <body>
-        <h1>Make a reservation at </h1>
+        <!-- the restaurant name was passed throught the get_context by the CreateView -->
+        <h1>Make a reservation at {{restaurant.restaurant_name}} </h1>
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
