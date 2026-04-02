@@ -117,27 +117,45 @@ class Staff(models.Model):
 class Shift(models.Model):
     employee = models.ForeignKey(
         Staff,
-        on_delete = models.CASCADE,
-        related_name = "shifts"
+        on_delete=models.CASCADE,
+        related_name="shifts"
     )
-    start_time = models.DateTimeField(default = timezone.now)
-    end_time = models.DateTimeField(null = False, blank = False)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    duration_hours = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    earnings = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
+    STATUS_CHOICES = [
+        ("planned", "Planned"),
+        ("active", "Active"),
+        ("completed", "Completed")
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="planned")
+
+    # def clean is also recognised inside of the models and is used in the background when form validation is calling all
+    # field validation.
     def clean(self):
         if self.end_time <= self.start_time:
             raise ValidationError("End time must be after start time")
 
-    @property
-    def duration(self):
-        return self.end_time - self.start_time
-    
-    @property
-    def duration_hours(self):
-        return self.duration.total_seconds() / 3600
-    
-    @property
-    def earnings(self):
-        return self.duration_hours * float(self.employee.pay_per_hour)
+        # Check overlapping shifts
+        overlapping = Shift.objects.filter(
+            employee=self.employee,
+            start_time__lt=self.end_time,
+            end_time__gt=self.start_time
+        ).exclude(pk=self.pk)
+        if overlapping.exists():
+            raise ValidationError("This shift overlaps with another shift for this employee")
+
+    def save(self, *args, **kwargs):
+        # Calculate duration and earnings automatically
+        delta = self.end_time - self.start_time
+        self.duration_hours = delta.total_seconds() / 3600
+        self.earnings = self.duration_hours * float(self.employee.pay_per_hour)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.employee} | {self.start_time} - {self.end_time}"
 
 
 class MenuItem(models.Model):
