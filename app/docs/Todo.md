@@ -1,7 +1,7 @@
 # TODO
 
 ## Backend:
-- [ ] Change the Shift Class logic because it makes no sense.
+- [ ] Add a shift table for all employees then a shift table for individual one
 
 ## Learning:
 - [ ] Learn the new Reservation CBV and the idea of importing forms from django.
@@ -11,4 +11,5 @@
 
 ## Architecture:
 - [ ] Add age range (kids adults) to reservation people
-- [ ] Create a graph to represent the database.
+- [ ] Create a graph to represent the database and everything connecting
+- [ ] 

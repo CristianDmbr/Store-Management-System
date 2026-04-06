@@ -7,6 +7,14 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
 
+# DataTimeField and DateField
+# DateTime Field : date + time 2026 - 04 - 06 14:30
+# DateField Field : only the date 2026 - 06 - 06
+# Todays date > yesterday
+
+# def clean() works in models while def clean_specifc field doesnt.
+# By having validation in the model we have data protection everywhere whereas forms validation protects data inserted throught 
+# forms.
 
 class Restaurant(models.Model):
 
@@ -122,6 +130,7 @@ class Shift(models.Model):
     )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    # Why duration and earnings are null? We calculate it at the end
     duration_hours = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     earnings = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
@@ -138,10 +147,12 @@ class Shift(models.Model):
         if self.end_time <= self.start_time:
             raise ValidationError("End time must be after start time")
 
-        # Check overlapping shifts
+        # Check overlapping shifts by filtering all of the shifts of the current employee where the 
         overlapping = Shift.objects.filter(
             employee=self.employee,
+            # Give me all the shifts where the start time is less than end time
             start_time__lt=self.end_time,
+            # Gime me all the shifts where the end time is greater than start time
             end_time__gt=self.start_time
         ).exclude(pk=self.pk)
         if overlapping.exists():

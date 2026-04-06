@@ -52,6 +52,7 @@ urlpatterns = [
     path("staff_list/",views.StaffList.as_view(), name = "staff_list"),
     path("staff/<int:pk>/edit",views.StaffUpdateView.as_view(), name = "staff_update"),
     path("staff/<int:pk>/delete", views.StaffDelete.as_view(), name = "staff_delete"),
+    path("staff/<int:pk>/shifts",views.IndividualShiftView.as_view(), name = "individual_shifts"),
 
     path("combined/", views.combine_form_view, name = "combined_form"),
 ]

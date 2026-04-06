@@ -184,12 +184,12 @@ class StaffView(CreateView):
     model = Staff
     form_class = StaffForm
     template_name = "staff_add.html"
-    success_url = reverse_lazy("staff_view")
+    success_url = reverse_lazy("staff_list")
 
 class StaffList(ListView):
     model = Staff
     template_name = "staff_list.html"
-    context_object_name = "memebers_of_staff"
+    context_object_name = "members_of_staff"
 
 
 class StaffUpdateView(UpdateView):
@@ -205,6 +205,9 @@ class StaffDelete(DeleteView):
 
 ######################################################___Shift___######################################################
 
+
+
+
 class ShiftView(CreateView):
     model = Shift
     form_class = ShiftForm
@@ -214,6 +217,22 @@ class ShiftView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["shift_form"] = self.get_form()
+        return context
+
+# JUST ADDED THIS WITH NO TEMPLATE OR CONNECTIONS SO FAR
+
+class IndividualShiftView(ListView):
+    model = Shift
+    template_name = "individual_shifts.html"
+    context_object_name = "individual_user_shifts"
+
+    def get_queryset(self):
+        self.employee = get_object_or_404(Staff, pk = self.kwargs['pk'])
+        return Shift.objects.filter(employee = self.employee).order_by("start_time")
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["employee"] = self.employee
         return context
 
 ######################################################___Other___######################################################
