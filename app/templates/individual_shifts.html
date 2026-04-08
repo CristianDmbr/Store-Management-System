@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Individual Shifts</title>
+    </head>
+    <body>
+        <h1>All of {{employee.name}}'s shifts</h1>
+        <ul>
+            {% for shift in individual_user_shifts %}
+            <li>
+                {{shift.start_time}} - {{shift.end_time}}
+            </li>
+            {% empty %}
+            <li>No Shifts scheduled.</li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

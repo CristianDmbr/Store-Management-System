@@ -219,7 +219,7 @@ class ShiftView(CreateView):
         context["shift_form"] = self.get_form()
         return context
 
-# JUST ADDED THIS WITH NO TEMPLATE OR CONNECTIONS SO FAR
+# JUST ADDED THIS WITH NO TEMPLATE OR CONNECTIONS SO FAR <--------------------------------------------------------
 
 class IndividualShiftView(ListView):
     model = Shift
