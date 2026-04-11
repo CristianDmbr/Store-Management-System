@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add individual Shift</title>
+    </head>
+    <body>
+        <h1>Add a new shift for {{ employee.name }} </h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>

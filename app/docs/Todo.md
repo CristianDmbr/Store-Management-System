@@ -2,6 +2,7 @@
 
 ## Backend:
 - [ ] Add a shift table for all employees then a shift table for individual one
+- [ ] Add the clean function which checks if the name for the reservation already exists and if the person has an active reservation.
 
 ## Learning:
 - [ ] Learn the new Reservation CBV and the idea of importing forms from django.
@@ -15,4 +16,4 @@
 
 
 ## Leftoff:
-- Individual Shift html, add the button to help curr employee to add a shift (prefilled info)
+- Individual Shift html, add the button to help curr employee to add a shift (prefilled info)  

@@ -1,7 +1,7 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
@@ -205,9 +205,6 @@ class StaffDelete(DeleteView):
 
 ######################################################___Shift___######################################################
 
-
-
-
 class ShiftView(CreateView):
     model = Shift
     form_class = ShiftForm
@@ -234,6 +231,20 @@ class IndividualShiftView(ListView):
         context = super().get_context_data(**kwargs)
         context["employee"] = self.employee
         return context
+    
+class AddIndividualShiftView(CreateView):
+    model = Shift
+    form_class = ShiftForEmployeeForm
+    template_name = "add_individual_shift.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["employee"] = get_object_or_404(Staff, pk=self.kwargs["pk"])
+        return context
+
+    def form_valid(self, form):
+        form.instance.employee = get_object_or_404(Staff, pk=self.kwargs["pk"])
+        return super().form_valid(form)
 
 ######################################################___Other___######################################################
 

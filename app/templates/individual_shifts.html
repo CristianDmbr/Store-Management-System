@@ -14,5 +14,6 @@
             <li>No Shifts scheduled.</li>
             {% endfor %}
         </ul>
+        <a href="{% url 'add_individual_shifts' employee.pk %}">Add shift</a>
     </body>
 </html>
