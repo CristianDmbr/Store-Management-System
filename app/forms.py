@@ -97,12 +97,21 @@ class ShiftForm(forms.ModelForm):
         if start_date and end_date:
             if end_date <= start_date:
                 raise forms.ValidationError("End time must be after start time.")
-            
+        
+
 class ShiftForEmployeeForm(forms.ModelForm):
     class Meta:
         model = Shift
         fields = ["start_time", "end_time", "status"]
 
+        widgets = {
+            "start_time": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}
+            ),
+            "end_time": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}
+            ),
+        }
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem

@@ -158,15 +158,21 @@ class Shift(models.Model):
         if overlapping.exists():
             raise ValidationError("This shift overlaps with another shift for this employee")
 
+    #########    #########    #########    #########    #########    #########    #########    #########
+
     def save(self, *args, **kwargs):
-        # Calculate duration and earnings automatically
-        delta = self.end_time - self.start_time
-        self.duration_hours = delta.total_seconds() / 3600
-        self.earnings = self.duration_hours * float(self.employee.pay_per_hour)
+        if self.start_time and self.end_time and self.employee_id:
+            delta = self.end_time - self.start_time
+            self.duration_hours = delta.total_seconds() / 3600
+
+            pay = float(self.employee.pay_per_hour) if self.employee_id else 0
+            self.earnings = self.duration_hours * pay
+
         super().save(*args, **kwargs)
+    
 
     def __str__(self):
-        return f"{self.employee} | {self.start_time} - {self.end_time}"
+        return f"{self.employee_id} | {self.start_time} - {self.end_time}"
 
 
 class MenuItem(models.Model):

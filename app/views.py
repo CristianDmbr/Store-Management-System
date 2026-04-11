@@ -236,15 +236,17 @@ class AddIndividualShiftView(CreateView):
     model = Shift
     form_class = ShiftForEmployeeForm
     template_name = "add_individual_shift.html"
+    success_url = reverse_lazy("staff_list")
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.instance.employee_id = self.kwargs["pk"]
+        return form
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["employee"] = get_object_or_404(Staff, pk=self.kwargs["pk"])
         return context
-
-    def form_valid(self, form):
-        form.instance.employee = get_object_or_404(Staff, pk=self.kwargs["pk"])
-        return super().form_valid(form)
 
 ######################################################___Other___######################################################
 
