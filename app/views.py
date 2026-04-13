@@ -176,6 +176,7 @@ class MenuListView(FormMixin, ListView):
         if form.is_valid():
             form.save()
             return redirect(self.success_url)
+        # Re render the exact page but with included invalid errors
         return self.get(request, *args, **kwargs)
 
 ######################################################___Staff___######################################################
@@ -216,16 +217,13 @@ class ShiftView(CreateView):
         context["shift_form"] = self.get_form()
         return context
 
-# JUST ADDED THIS WITH NO TEMPLATE OR CONNECTIONS SO FAR <--------------------------------------------------------
-
 class IndividualShiftView(ListView):
     model = Shift
     template_name = "individual_shifts.html"
     context_object_name = "individual_user_shifts"
 
     def get_queryset(self):
-        self.employee = get_object_or_404(Staff, pk = self.kwargs['pk'])
-        return Shift.objects.filter(employee = self.employee).order_by("start_time")
+        return Shift.objects.filter(employee = get_object_or_404(Staff, pk = self.kwargs['pk'])).order_by("start_time")
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -237,9 +235,10 @@ class AddIndividualShiftView(CreateView):
     form_class = ShiftForEmployeeForm
     template_name = "add_individual_shift.html"
     success_url = reverse_lazy("staff_list")
-
+    
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
+        # Instance is the current form we want to save inside of the model.
         form.instance.employee_id = self.kwargs["pk"]
         return form
 
