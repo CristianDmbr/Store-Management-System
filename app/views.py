@@ -124,7 +124,6 @@ class ReservationCreateView(CreateView):
     # Here we just say prefill the restaurant field with this specific restaurant.
     # super(). gets me the original version of this method from parent class.
     def get_initial(self):
-        """Pre-fill the restaurant field based on URL."""
         initial = super().get_initial()
         restaurant_id = self.kwargs.get("restaurant_id")
         if restaurant_id:
@@ -137,7 +136,7 @@ class ReservationCreateView(CreateView):
     # create error.
     def get_form(self, form_class=None):
         """Hide the restaurant field if it is pre-filled."""
-        form = super().get_form(form_class)
+        form = super().get_form()
         # Checks if URL include the restaurant_id
         if self.kwargs.get("restaurant_id"):
             # Widget is how the field is displayed in HTML
@@ -163,6 +162,7 @@ class MenuListView(FormMixin, ListView):
     # Normally a ListView only passes the object_list (All MenuItem rows, but we also want to add a form on the same page,
     # so manually add it to the context.
     # <get_form>, <form_class> and <form_valid> is from the FormMixing.
+    # kwargs is the extra contex from everywhere else
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"] = self.get_form()
@@ -236,9 +236,12 @@ class AddIndividualShiftView(CreateView):
     template_name = "add_individual_shift.html"
     success_url = reverse_lazy("staff_list")
     
+        # Employee id is not present in the form.
+        # This is a Shift method where you exclude field and set it in the background
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         # Instance is the current form we want to save inside of the model.
+        # This shift belongs to employee with pk from kwargs
         form.instance.employee_id = self.kwargs["pk"]
         return form
 

@@ -1,6 +1,8 @@
 # TODO
 
 ## Backend:
+- [ ] Why shift doesn’t fetch the row while reservation does
+- [ ] Why the two types of individual shift and individual reservatio
 - [ ] Add the clean function which checks if the name for the reservation already exists and if the person has an active reservation.
 
 ## Learning:
