@@ -12,6 +12,32 @@ from django.core.exceptions import ValidationError
 # DateField Field : only the date 2026 - 06 - 06
 # Todays date > yesterday
 
+# Contraints and Validation on the database level
+# Database validation are rules which are enforced directly by the database meaning they cannot be bypassed, dont rely on django and
+# work even outside of Django.
+# Types of contraints :
+# 1. Field Validation : come from model fields (name = models.CharField(null = False)) 
+# 2. Custom constraints :
+# class Meta:
+#   constraints = [
+#       models.UniqueConstraint(
+#            fields=["restaurant", "name"],
+#            name="unique_menu_item_per_restaurant"
+#           )
+#       models.CheckConstraint(
+#           check=Q(end_time__gt=F("start_time")),
+#           name="end_after_start"
+#       )
+# ]
+# Things like clean() are not db level and are python only.
+
+# Constraints VS Validation
+# Constrains : rules enforced by databse itself, cannot be bypassed and always run even outside of Django (models.CheckConstraints, models.Unique)
+#   Error messages are not user friendly, and have limited logic so no complex queries
+# Validation : rules enforced by Django (Python code) (e.g. clean(), clean_<field> and form_is_valid())
+#   Runs in Django, user friendly and can handle complex logic. THEY CAN BE BYPASSED e.g. (objects.create())
+# Best Practice is to use both where Constraints is for safety net and Validation is for logic and user experience
+
 # def clean() works in models while def clean_specifc field doesnt.
 # By having validation in the model we have data protection everywhere whereas forms validation protects data inserted throught 
 # forms.

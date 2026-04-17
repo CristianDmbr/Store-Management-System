@@ -39,6 +39,23 @@ from django.urls import reverse_lazy
 # 2.POST is for changes
 # Inside of the templates you have <form method = "POST"> which indicates when submited browser will send a POST request to the server.
 
+# Difference between assinging foreign keys fields e.g. form.instance.employee = staff_object and form.instance.employee_id = 3
+# In restaurant reservation we have the restaurant mentioned in the field while for the shift individual we dont have the employee id
+# So we prefill the data here diff. In the assigning instace (form.instance.employee = staff_object) You pass actual object and django has 
+# full object in memory more object oriented.
+# < form.instance.employee_id = 3 > just pass the ID and django does not need the full object and its more direct and a bit 
+# more efficent.
+# A ForeignKey field stores only the ID (pk) in the database, but Django lets you either use a model instance or a raw primary key.
+#  initial["restaurant"] = get_object_or_404(Restaurant, pk=restaurant_id) You are giving Django the Restaurant object and it
+# converts it to .id when saving (Assigning a related object)
+#  form.instance.employee_id = self.kwargs["pk"] assigning a raw foreign key value and Django does not have to fetch the staff object
+# (Assigning a foreign key via primary key)
+
+# For the Shift Case:
+# Form does not have the employee field but you know the employee ID from url and PK is assigned is clear and efficient.
+# For the Individual Reservation Case:
+# The form had the restaurant field and you want a readable object in context so fetching object is useful
+
 ######################################################____Home____######################################################
 def home(request):
     return render(request, "home.html",{})
@@ -122,7 +139,7 @@ class ReservationCreateView(CreateView):
 
     # Purpose of get_initial (Comes from CreateView) is to provide default values to form before its shown.
     # Here we just say prefill the restaurant field with this specific restaurant.
-    # super(). gets me the original version of this method from parent class.
+    # super(). gets me the original version of this method from parent class. 
     def get_initial(self):
         initial = super().get_initial()
         restaurant_id = self.kwargs.get("restaurant_id")
