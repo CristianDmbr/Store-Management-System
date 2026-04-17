@@ -3,6 +3,14 @@ from .models import Restaurant, MenuItem, Staff, Shift, Reservation
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+# Semantic contract of clean and clean_<Field name>
+# I have seen a def clean_<field> which extracts two different fields from the cleaned_data and it worked.
+# Python technically allows it but its best practice to use clean for multiple fields and its a more professional design.
+
+# Difference between extracting name = self.cleaned_data["name_of_reservation"] and restaurant = self.cleaned_data.get("restaurant")
+# The name is required and if its missing then it crashes early because something is wrong.
+# The restaurant is not as important or might not be temporarily available
+
 class RestaurantForm(forms.ModelForm):
 
     class Meta:
@@ -46,6 +54,24 @@ class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
         fields = ["name_of_reservation","restaurant","number_of_people"]
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        name = cleaned_data.get("name_of_reservation")
+        restaurant = cleaned_data.get("restaurant")
+
+        if name and restaurant:
+            if Reservation.objects.filter(
+                name_of_reservation = name,
+                restaurant = restaurant
+            ).exists():
+                raise forms.ValidationError(
+                    "This reservation already exists for this restaurant."
+                )
+        return cleaned_data
+
 
 class StaffForm(forms.ModelForm):
     class Meta:

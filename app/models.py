@@ -99,6 +99,16 @@ class Reservation(models.Model):
     number_of_people = models.IntegerField()
     is_active = models.BooleanField(default = True)
 
+    # DB level of constraints
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields = ["restaurant","name_of_reservation"],
+                name = "unique_reservation_per_restaurant"
+                # This name comes up when errors come up or when we want to migrate the DB to other systems
+            )
+        ]
+
     
 class Staff(models.Model):
 

@@ -1,7 +1,7 @@
 # TODO
 
 ## Backend:
-- [ ] Add the clean function which checks if the name for the reservation already exists and if the person has an active reservation.
+- [ ] Add the function to add how many peple can be added to the reservation and whats the age bracket (kids, teens, adults)
 
 ## Learning:
 - [ ] Learn the new Reservation CBV and the idea of importing forms from django.
