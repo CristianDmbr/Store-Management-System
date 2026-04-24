@@ -11,6 +11,29 @@ from django.utils import timezone
 # The name is required and if its missing then it crashes early because something is wrong.
 # The restaurant is not as important or might not be temporarily available
 
+# The validation logic of either filtering out or getting the queryset and excluding the current instance.
+# I have two different types of validation to check for repetition :
+"""# The validation logic of either filtering out or getting the queryset and excluding the current instance.
+# I have two different types of validation to check for repetition :
+        if name:
+            if Restaurant.objects.filter(
+                restaurant_name = name
+            ).exists():
+                raise forms.ValidationError(f"The name {name} is already being used.")
+        return name
+    
+        if name:
+            qs = Restaurant.objects.filter(restaurant_name = name)
+            if self.instance.pk:
+                qs = qs.exclude(pk = self.instance.pk)
+            if qs.exists():
+                raise ValidationError(f"Name : {name} already exists")
+        return name"""
+# Both versions are safe to use when creating new objects but when it comes to updating the second version is safer.
+# In a update  CBV Django uses the instance and knows which row we are currently working on to update so we can exclude from validation
+# but with the first version it doesnt know so when we try to update a row it will crash since the row exists and Django doesnt ignore it.
+# (Second is more professional and since it handels both CREATE and UPDATE safer)
+
 class RestaurantForm(forms.ModelForm):
 
     class Meta:
@@ -41,7 +64,7 @@ class RestaurantForm(forms.ModelForm):
 
         if name and name.lower() in banned_words:
             raise ValidationError(f"Cannot use the word {name}!")
-        
+    
         if name:
             qs = Restaurant.objects.filter(restaurant_name = name)
             if self.instance.pk:
@@ -63,13 +86,11 @@ class ReservationForm(forms.ModelForm):
         restaurant = cleaned_data.get("restaurant")
 
         if name and restaurant:
-            if Reservation.objects.filter(
-                name_of_reservation = name,
-                restaurant = restaurant
-            ).exists():
-                raise forms.ValidationError(
-                    "This reservation already exists for this restaurant."
-                )
+            qs = Reservation.objects.filter(name_of_reservation = name, restaurant = restaurant)
+            if self.instance.pk:
+                qs = qs.exclude(pk = self.instance.pk)
+            if qs.exists():
+                raise ValidationError(f"{name} already has a reservation at {restaurant}")
         return cleaned_data
 
 
@@ -145,6 +166,7 @@ class MenuItemForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        
         name = cleaned_data.get("name")
         restaurant = cleaned_data.get("restaurant")
 

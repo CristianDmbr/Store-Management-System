@@ -1,13 +1,5 @@
 from django.contrib import admin
-from .models import Restaurant, Staff, Shift, MenuItem
-
-@admin.register(Shift)
-class ShiftAdmin(admin.ModelAdmin):
-    list_display = (
-        "employee",
-        "start_time",
-        "end_time",
-    )
+from .models import Restaurant, Staff, Shift, MenuItem, Reservation
 
 @admin.register(Restaurant)
 class RestaurantAdmin(admin.ModelAdmin):
@@ -18,18 +10,18 @@ class RestaurantAdmin(admin.ModelAdmin):
         "location",
         "restaurant_cuisine",
         "capacity",
+        "current_occupancy",
+        "remaining_spots",
+        "is_full",
     )
 
-@admin.register(MenuItem)
-class MenuItemAdmin(admin.ModelAdmin):
+@admin.register(Reservation)
+class ReservationReservation(admin.ModelAdmin):
     list_display = (
+        "name_of_reservation",
         "restaurant",
-        "name",
-        "description",
-        "price",
-        "category",
-        "availability",
-        "date_added",
+        "number_of_people",
+        "is_active",
     )
 
 @admin.register(Staff)
@@ -45,4 +37,24 @@ class StaffAdmin(admin.ModelAdmin):
         "manager",
         "restaurant",
         "age",
+    )
+
+@admin.register(Shift)
+class ShiftAdmin(admin.ModelAdmin):
+    list_display = (
+        "employee",
+        "start_time",
+        "end_time",
+    )
+
+@admin.register(MenuItem)
+class MenuItemAdmin(admin.ModelAdmin):
+    list_display = (
+        "restaurant",
+        "name",
+        "description",
+        "price",
+        "category",
+        "availability",
+        "date_added",
     )

@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError
 # Database validation are rules which are enforced directly by the database meaning they cannot be bypassed, dont rely on django and
 # work even outside of Django.
 # Types of contraints :
-# 1. Field Validation : come from model fields (name = models.CharField(null = False)) 
+# 1. Field constraint : come from model fields (name = models.CharField(null = False)) 
 # 2. Custom constraints :
 # class Meta:
 #   constraints = [
@@ -108,7 +108,6 @@ class Reservation(models.Model):
                 # This name comes up when errors come up or when we want to migrate the DB to other systems
             )
         ]
-
     
 class Staff(models.Model):
 
