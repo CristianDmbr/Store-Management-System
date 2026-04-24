@@ -92,7 +92,6 @@ class RestaurantCreate(CreateView):
     # reverse_lazy doesnt resolve it immediatelly but instead it waits until  URL is needed.
     success_url = reverse_lazy("restaurant_list")
 
-
     # UpdateView uses a get_object to get the pk and filter the exact row and then it passes it through the form.
     # GET -> show form (with prefilled data from row), POST -> UPDATE object
 class RestaurantUpdate(UpdateView):
@@ -160,7 +159,6 @@ class ReservationCreateView(CreateView):
             # forms.HiddenInput() user does not see the field but it still gets submitted to DB because of previous get_initial.
             form.fields["restaurant"].widget = forms.HiddenInput()
         return form
-
 
 ######################################################___Menu List___######################################################
     
@@ -244,7 +242,7 @@ class IndividualShiftView(ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["employee"] = self.employee
+        context["employee"] = get_object_or_404(Staff, pk = self.kwargs['pk'])
         return context
     
 class AddIndividualShiftView(CreateView):

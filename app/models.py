@@ -79,7 +79,7 @@ class Restaurant(models.Model):
     @property
     def current_occupancy(self):
         return sum(
-            r.number_of_people for r in self.reservations.filter(is_active = True)
+            r.total_people for r in self.reservations.filter(is_active = True)
         )
     
     @property
@@ -96,8 +96,15 @@ class Restaurant(models.Model):
 class Reservation(models.Model):
     name_of_reservation = models.CharField(max_length=200, null = False, blank = False)
     restaurant = models.ForeignKey(Restaurant, on_delete = models.CASCADE, related_name = "reservations")
-    number_of_people = models.IntegerField()
     is_active = models.BooleanField(default = True)
+
+    kids = models.PositiveIntegerField(default = 0)
+    teens = models.PositiveIntegerField(default = 0)
+    adults = models.PositiveIntegerField(default = 1)
+
+    @property
+    def total_people(self):
+        return self.kids + self.teens + self.adults
 
     # DB level of constraints
     class Meta:

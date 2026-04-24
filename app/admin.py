@@ -20,8 +20,10 @@ class ReservationReservation(admin.ModelAdmin):
     list_display = (
         "name_of_reservation",
         "restaurant",
-        "number_of_people",
         "is_active",
+        "kids",
+        "teens",
+        "adults"
     )
 
 @admin.register(Staff)

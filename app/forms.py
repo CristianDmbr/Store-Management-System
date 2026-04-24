@@ -76,7 +76,7 @@ class RestaurantForm(forms.ModelForm):
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
-        fields = ["name_of_reservation","restaurant","number_of_people"]
+        fields = ["name_of_reservation","restaurant","kids","teens","adults"]
 
     def clean(self):
 
@@ -166,7 +166,7 @@ class MenuItemForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        
+
         name = cleaned_data.get("name")
         restaurant = cleaned_data.get("restaurant")
 
