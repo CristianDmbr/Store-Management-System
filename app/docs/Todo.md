@@ -1,5 +1,5 @@
 # TODO
-- [ ] Fix the fit push error
+- [ ] Understand how you fixed GIT
 - [ ] What is JSON and continue with REST API vid
 - [ ] Plan for the Furure and make a list of things this program shoud do
 - [ ] Fix the home page
