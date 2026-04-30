@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Create Reservation</title>
+    </head>
+    <body>
+        <!-- the restaurant name was passed throught the get_context by the CreateView -->
+        <h1>Make a reservation at {{restaurant.restaurant_name}} </h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>

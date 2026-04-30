@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Restaurant List</title>
+    </head>
+    <body>
+        <h1>{{page_title}}</h1>
+        <!-- Display all restaurants -->
+        <h2>All Restaurants</h2>
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>
+                    {{ restaurant.restaurant_name }} - {{ restaurant.restaurant_cuisine }} - {{ restaurant.location }}
+
+                    <br>
+                    Maximum capacity : {{restaurant.capacity}}
+                    <br>
+                    Current Occupancy : {{restaurant.current_occupancy}}
+                    <br>
+                    {% if restaurant.is_full %}
+                        🔴 Full
+                    {% else %}
+                        🟢 Available {{restaurant.remaining_spots}}
+                    {% endif %}
+                    <br>
+
+                    <a href="{% url 'restaurant_edit' restaurant.pk %}">Edit</a>
+                    <a href="{% url 'restaurant_delete' restaurant.pk %}">Delete</a>
+                    <a href="{% url 'create_reservation' restaurant.pk %}">Book a reservation</a>
+                </li>
+            {% empty %}
+                <li>No restaurants yet.</li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'menu_list' %}">Menu Submission</a>
+        <a href="{% url 'home_page' %}">Home Page</a>
+        <a href="{% url 'restaurant_create' %}">Add Restaurant</a>
+    </body>
+</html>

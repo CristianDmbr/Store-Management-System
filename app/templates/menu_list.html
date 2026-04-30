@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Menu Item</title>
+</head>
+<body>
+    <h1>Add a New Menu Item</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>All Menu Items</h2>
+    <ul>
+        {% for item in  menu_items%}
+            <li>
+                {{item.name}} - {{item.category}} - £{{item.price}}
+            </li>
+        {% empty %}
+            <li>No menu items yet.</li>
+        {% endfor %}
+    </ul>
+
+    <br>
+    <a href="{% url 'restaurant_list' %}">Back to Restaurants</a>
+    <a href="{% url 'home_page' %}">Home Page</a>
+</body>
+</html>
