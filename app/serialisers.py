@@ -19,7 +19,7 @@
 # The templates and Python backend are both inside Django meaning Python Objects are allows, but separate systems like React need a universal format.
 
 from rest_framework import serializers
-from models import Restaurant
+from .models import Restaurant
 
 class RestaurantSerialiser(serializers.ModelSerializer):
   class META:

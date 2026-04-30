@@ -136,7 +136,7 @@ class RestaurantDelete(DeleteView):
     # GET request : 1. Queries all restaurants -> serialises (converts to JSON) -> returns the JSON
     # POST request : 1. Incoming JSON, Serialiser validates it, Creates a Restaurant Object, Saves to DB and returns the JSON response
     # Having a CBV mixed view is more risky than a GET POST DRF ListCreate
-class RestaurantCreate(generics.ListCreateAPIView):
+class RestaurantCreateAPI(generics.ListCreateAPIView):
     # Work with all Restaurants objects from the DB
     queryset = Restaurant.objects.all()
     # Use this serialiser to convert data

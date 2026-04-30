@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from app import views
 
 # What is a URL (Uniform Resource Locator): the address of a page on a website.
@@ -38,6 +38,12 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # When a request matches the patter of api/ 
+    # Include delegates routing to another file, dont handle the rest of the url here go to another URL configuration located at app.url
+    # Why not urls.py? because Python uses module path not file path
+    path("api/",include("app.urls")),
+
     path('', views.home, name = "home_page"),
     path("menu/", views.MenuListView.as_view(), name = "menu_list"),
     path("shift/", views.ShiftView.as_view(), name = "shift_view"),
