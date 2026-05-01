@@ -48,7 +48,7 @@ class Restaurant(models.Model):
 
     LOCATIONS_CHOICES = [
         ("east_london", "East London"),
-        ("south_london", "South Lo ndon"),
+        ("south_london", "South London"),
         ("north_london", "North London"),
         ("west_london", "West London") 
     ]

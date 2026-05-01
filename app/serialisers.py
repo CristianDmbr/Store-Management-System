@@ -22,6 +22,6 @@ from rest_framework import serializers
 from .models import Restaurant
 
 class RestaurantSerialiser(serializers.ModelSerializer):
-  class META:
+  class Meta:
     model = Restaurant
     fields = ["restaurant_name","owner","date_opened","location","restaurant_cuisine","capacity"]

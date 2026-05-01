@@ -17,7 +17,20 @@ from rest_framework import generics
 # DRF (Functions are called serialisers either Manual API or Generic Views) [request -> View -> Serialisation -> JSON]
 # A APIView (manual API) lets you control everything similar to a FBV.
 # A Generic View less code, prebuilt, faster development and similar to a CBV
+# What is an endpoint : a URL that the backend exposes for interaction whether thats for CBV or API, and a URL that your backend responds to
+# What is a resource : data entity in your system (model) e.g. Restaurant, Staff, Reservation. 
+# Django CBV: Each URL is a page for a human where each one offers a different purpose or experience.
+# But for API each URL is a resource, meaning /api/restaurants/ is not show me a page but its, this is the collection of Restaurant data.
+# HTTP GET,POST,PUT,DELETE 
+# Resource endpoint : URL representing a resource.
+# CBV (HTML) is designed for humans (Browser UI) but API (DRF) are designed for systems (frontend,apps etc... or you can still open it on browser for testing)
+# DRF design thinkgs of what data do I expose? not what page do I need?
+# CBV thinking : I need a page to edit a restaurant
+# DRF thinking : This page exposes restaurant data (ALSO one resource endpoint can allow the Frontend to do all GET,POST,PUT,DELETE all using the same URL)
+# But DRF still allows for API methods which do one thing, why ? Because if endpoint is simple then we can combine, if its complex then we can split and work on them seperately
 
+
+# My confusion on why Django CBV separate (ListView, CreateView) but why does DRF combines ListCreateAPI or RetrieveUpdateDestroy
 
 # super() calls the original version of a method from parent class so you dont have to rewrite everything, so we can 
 # add own extra logic or modify results.
@@ -132,7 +145,8 @@ class RestaurantDelete(DeleteView):
     success_url = reverse_lazy("restaurant_list")
 
     ##### API
-    # Create an API view that can LIST and CREATE restaurant (so gets us GET to return all restaurant and POST to create new restaurant)
+    # DRF generic views
+    # Create an API view that can LIST and CREATE restaurant (so gets us GET to returnO all restaurant and POST to create new restaurant)
     # GET request : 1. Queries all restaurants -> serialises (converts to JSON) -> returns the JSON
     # POST request : 1. Incoming JSON, Serialiser validates it, Creates a Restaurant Object, Saves to DB and returns the JSON response
     # Having a CBV mixed view is more risky than a GET POST DRF ListCreate
@@ -141,6 +155,14 @@ class RestaurantCreateAPI(generics.ListCreateAPIView):
     queryset = Restaurant.objects.all()
     # Use this serialiser to convert data
     serializer_class = RestaurantSerialiser
+
+
+class RestaurantRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    # This is just a description of the query not actual data, and its only fetched when needed using .get() .filter() serialization 
+    queryset = Restaurant.objects.all() 
+    serializer_class = RestaurantSerialiser
+    # This pk is used not because of the kwargs from the url, but the pk from the module Field name pk
+    lookup_field = "pk"
 
 ######################################################___Reservations___######################################################
 
