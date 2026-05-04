@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RestaurantCreateAPI, RestaurantRetrieveUpdateDestroyAPI
+from .views import RestaurantCreateAPI, RestaurantRetrieveUpdateDestroyAPI, HelloWorldView, RestaurantSearchView
 
 urlpatterns = [
     # Think of these are not creating two random views, but instead they represent two different levels of the same resource.
@@ -8,4 +8,6 @@ urlpatterns = [
     path("restaurants/",RestaurantCreateAPI.as_view(),name="restaurant_create_api"),
     # Detail endpoint (One specific restaurant, GET : retrieve, PUT : update, DELETE: delete)
     path("restaurant/<int:pk>/", RestaurantRetrieveUpdateDestroyAPI.as_view(), name = "restaurant_retrieve_update_destroy_api"),
+    path("restaurant/hello", HelloWorldView.as_view(),name = "hello"),
+    path("restaurant/search", RestaurantSearchView.as_view(), name = "search_api"),
 ]

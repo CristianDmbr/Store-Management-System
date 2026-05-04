@@ -7,7 +7,10 @@ from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
-from rest_framework import generics
+from rest_framework import generics,status
+from rest_framework.response import Response
+# Create custom API views
+from rest_framework.views import APIView
 
 
 # ORM (Object Relational Mapper) : communicating and updating the DB throught python code.
@@ -156,6 +159,18 @@ class RestaurantCreateAPI(generics.ListCreateAPIView):
     # Use this serialiser to convert data
     serializer_class = RestaurantSerialiser
 
+    # HTTP method handlers in Django
+    # My confusion if this is allows to have a delete function why have different DRF with different purposes?
+    # You can but you shouldn't because of design, clarity and control. Also DRF are designed around resources and endpoints.(Collection, Detail endpoints)
+    # Why does it appear on the Django page? DRF looks at the view and asks what HTTP methods are implemented here so we can show as buttons.
+    # Main buttons to show : [GET,POST,PUT,PATCH,Delete]
+
+    def delete(self, request, *args, **kwargs):
+        Restaurant.objects.all().delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
+    
+    def get_queryset(self):
+        return super().get_queryset().order_by("-date_opened")
 
 class RestaurantRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     # This is just a description of the query not actual data, and its only fetched when needed using .get() .filter() serialization 
@@ -164,6 +179,23 @@ class RestaurantRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     # This pk is used not because of the kwargs from the url, but the pk from the module Field name pk
     lookup_field = "pk"
 
+    # Just returns a JSON
+class HelloWorldView(APIView):
+    def get(self,request):
+        return Response({"message":"Hello World !!!!"})
+    
+# Understand
+class RestaurantSearchView(APIView):
+    def get(self, request):
+        name = request.query_params.get("name","")
+
+        if name:
+            restaurants = Restaurant.objects.filter(restaurant_name__icontains = name)
+        else:
+            restaurants = Restaurant.objects.all()
+        
+        serializer = RestaurantSerialiser(restaurants, many = True)
+        return Response(serializer.data)
 ######################################################___Reservations___######################################################
 
 class ReservationCreateView(CreateView):

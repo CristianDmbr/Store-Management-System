@@ -1,5 +1,5 @@
 # TODO
-- [ ] Understand how you fixed GIT
+- [ ] Understand the difference between the query parameters and url because what is search?name=pizza in http://127.0.0.1:8000/api/restaurant/search?name=pizza and understand the new custom DRF view
 - [ ] What is JSON and continue with REST API vid
 - [ ] Plan for the Furure and make a list of things this program shoud do
 - [ ] Fix the home page
