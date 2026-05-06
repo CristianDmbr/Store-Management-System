@@ -15,6 +15,9 @@ from rest_framework.views import APIView
 
 # ORM (Object Relational Mapper) : communicating and updating the DB throught python code.
 
+# DRF page:
+# Not a HTML and used for debugging, testing and debugging API so not real website URL, not meant for users and you cannot design navigation
+
 # DRF is an extension of Django that lets you build APIs instead of HTML pages.
 # Django (Uses FBV or CBV) [request -> View -> Template -> HTML]
 # DRF (Functions are called serialisers either Manual API or Generic Views) [request -> View -> Serialisation -> JSON]
@@ -31,6 +34,18 @@ from rest_framework.views import APIView
 # CBV thinking : I need a page to edit a restaurant
 # DRF thinking : This page exposes restaurant data (ALSO one resource endpoint can allow the Frontend to do all GET,POST,PUT,DELETE all using the same URL)
 # But DRF still allows for API methods which do one thing, why ? Because if endpoint is simple then we can combine, if its complex then we can split and work on them seperately
+
+# Path param and query param
+# Both are part of HTTP and not just DRF so you can use them in any views not just DRF
+# Path param /api/restaurant/1/ where the 1 is a param in the route restaurant/<int:pk>
+# Query param /api/restaurant/search where its not mentioned in the route
+# In Django say http://127.0.0.1:8000/api/restaurant/search?name=pizza Django only looks until api/restaurant/ and the rest is extra data
+# which can be extracted from request.query_param.get() and it can be used to get more than one object
+# /restaurant/5/ give me this exact object, /search?name=pizza give me objects with this condition
+#     Path params → easy ({% url ... pk %})
+# But how do users send query param without manually typing url
+# <a href="{% url 'search_api' %}?name={{ restaurant.restaurant_name }}"> Search similar </a> (For dynamic and)
+# <a href="{% url 'search_api' %}?name=pizza">Search Pizza</a> (general)
 
 
 # My confusion on why Django CBV separate (ListView, CreateView) but why does DRF combines ListCreateAPI or RetrieveUpdateDestroy
@@ -174,6 +189,8 @@ class RestaurantCreateAPI(generics.ListCreateAPIView):
 
 class RestaurantRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     # This is just a description of the query not actual data, and its only fetched when needed using .get() .filter() serialization 
+    # This is a lazy query that only hits the database when needed, "I am ready to fetch all restaurants but not yet" but query only with pk
+
     queryset = Restaurant.objects.all() 
     serializer_class = RestaurantSerialiser
     # This pk is used not because of the kwargs from the url, but the pk from the module Field name pk
@@ -181,20 +198,31 @@ class RestaurantRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
 
     # Just returns a JSON
 class HelloWorldView(APIView):
+    # How does this get converted into a JSON if its not using serialisation?
+    # Response from from rest_framework.response import Response automatically converts a Python dictionary into JSON without serialisation
+    # GET is automatically activated when we open a API page
     def get(self,request):
         return Response({"message":"Hello World !!!!"})
     
 # Understand
+# Not automatic like generics so it gives full control over logic
+# Inherit from the APIView 
 class RestaurantSearchView(APIView):
+    # Runs when get request, it runs when we open the Rest API page
     def get(self, request):
+        # Did the user send something called a name? if not then not then empthy by default 
         name = request.query_params.get("name","")
 
+        # If user provided a search value then find restaurants where name contains the search value
         if name:
             restaurants = Restaurant.objects.filter(restaurant_name__icontains = name)
+        # Else return everything 
         else:
             restaurants = Restaurant.objects.all()
         
+        # Converts Datao objects -> Python -> JSON-ready
         serializer = RestaurantSerialiser(restaurants, many = True)
+        # Send JSON back to the browser
         return Response(serializer.data)
 ######################################################___Reservations___######################################################
 

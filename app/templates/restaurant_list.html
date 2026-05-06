@@ -27,6 +27,10 @@
                     <a href="{% url 'restaurant_edit' restaurant.pk %}">Edit</a>
                     <a href="{% url 'restaurant_delete' restaurant.pk %}">Delete</a>
                     <a href="{% url 'create_reservation' restaurant.pk %}">Book a reservation</a>
+                    <!-- API query param -->
+                    <a href="{% url 'search_api' %}?name={{ restaurant.restaurant_name }}">
+                        Search similar
+                    </a>
                 </li>
             {% empty %}
                 <li>No restaurants yet.</li>
@@ -36,5 +40,8 @@
         <a href="{% url 'menu_list' %}">Menu Submission</a>
         <a href="{% url 'home_page' %}">Home Page</a>
         <a href="{% url 'restaurant_create' %}">Add Restaurant</a>
+
+        <a href="{% url 'search_api' %}?name=pizza">Search Pizza</a>
+
     </body>
 </html>
