@@ -12,6 +12,7 @@ from rest_framework.response import Response
 # Create custom API views
 from rest_framework.views import APIView
 
+# Client is anything that sends request to a server e.g. Browser, Mobile App
 
 # ORM (Object Relational Mapper) : communicating and updating the DB throught python code.
 
@@ -35,6 +36,17 @@ from rest_framework.views import APIView
 # DRF thinking : This page exposes restaurant data (ALSO one resource endpoint can allow the Frontend to do all GET,POST,PUT,DELETE all using the same URL)
 # But DRF still allows for API methods which do one thing, why ? Because if endpoint is simple then we can combine, if its complex then we can split and work on them seperately
 
+# DRF Pipeline : First query all of the database with model objects we need, serilatiser converts it into a python list of dictionaries (NOT JASON YET),
+# its the Response(serialisation.data) that converts the python doc into a JSON file. (We only see the Response be used in a cutome DRF view, in a generic ints used in the back)
+
+# CBV pipeline : First user makes a HTTP request of GET, the URL routes the request to the CBV, The CBV queries the database, the get_queryset() gets the database data,
+# then the get_context_data puts that data into a context dictionary as a object_list or custom say context_object_name = ""
+# context is the actual dictionary that gets sent to tempalte but get_context_data is what muilds/modifies this template
+
+# Difference between .filter() and .get()
+# .filter() : returns a queryset (collection, even if its only one object)
+# .get() : returns only one single model object
+ 
 # Path param and query param
 # Both are part of HTTP and not just DRF so you can use them in any views not just DRF
 # Path param /api/restaurant/1/ where the 1 is a param in the route restaurant/<int:pk>
@@ -65,6 +77,10 @@ from rest_framework.views import APIView
 # It will crash with the POST method because we call the CBV as a view using the .as_view() and what <as_view()> does is that it check if a method is
 # inside of the say very last view (ListView in this case is the base class) it doesnt have a POST method so when django looks into the class for the POST
 # it will crash and make an error. Even though the POST method is inside of the CreateView it wont get to it and will crash.
+
+# HTTP requests are GET,POST,PUT, PATCH,DELETE
+# HTTP responses consist of Body and status e.g. Body is the actual content that gets sent back to the client(browser) could be "JSON,HTML" 
+# status means 
 
 # Understanding GET and POST
 # GET : "give me data" and POST : "send/change data"
@@ -211,6 +227,8 @@ class RestaurantSearchView(APIView):
     # Runs when get request, it runs when we open the Rest API page
     def get(self, request):
         # Did the user send something called a name? if not then not then empthy by default 
+        # query_params gets us anything after the defined URL so for < /restaurant/search?name=pizza&page=2 > 
+        # restaurant/search used for Django routing and the query params is after ? so name=pizza&page=2
         name = request.query_params.get("name","")
 
         # If user provided a search value then find restaurants where name contains the search value
@@ -220,10 +238,13 @@ class RestaurantSearchView(APIView):
         else:
             restaurants = Restaurant.objects.all()
         
-        # Converts Datao objects -> Python -> JSON-ready
+        # Converts Datao objects -> Python -> JSON-ready (Python dictionary )
+        # My confusion is how does many = True works if we do pass a query_param ? would it not crash since its one instace?
+        # .filter returns a query set (so a list of objects) so even if its just one object many = True works because its a list. 
         serializer = RestaurantSerialiser(restaurants, many = True)
-        # Send JSON back to the browser
-        return Response(serializer.data)
+        # Send JSON back to the browser (Client)
+        # status.HTTP_200_OK tells the client that the request succeeded
+        return Response(serializer.data, status = status.HTTP_200_OK)
 ######################################################___Reservations___######################################################
 
 class ReservationCreateView(CreateView):

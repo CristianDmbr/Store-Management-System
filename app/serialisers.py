@@ -1,6 +1,8 @@
 # Manually made by me
 # Serialisation is converting Python objects into a format that can be sent over to the intervet (usually JSON) (Deserialization)
 # This is needed because say restaurant = Restaurant.objects.first() is not understood by browser and frontend
+# The serialisation doesn't convert into JSON straight away how it works is that the serialisation first takes the DJANGO objects
+# and converts it into a list of Python dictionaries of that object.
 
 # What is JSON
 # A text format used to send structured data between systems.
