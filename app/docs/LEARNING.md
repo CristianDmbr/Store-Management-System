@@ -1,5 +1,7 @@
 **You need markdown extension to process and format the markdown text.**
 
+# Interpreter : A program that read and executes code/commands
+
 # What is the {% csrf_token %}?
 - Inserts a hidden input input into the HTML form containing a protection of your form from submisions from malicious requests from other websites.
 
@@ -37,7 +39,37 @@ Django will return data (JSON) instead which allows for mobile apps, react front
 
 # Deployment:
 Acorn : is a tool/platform for packaging and deploying applications on the cloud. An acord file Acornfile defines how the app runs, 
-servives/databases needed and ports/environment variables. (Deployment Instructions)
+servives/databases needed and ports/environment variables. (Deployment Instructions) Allows to give others our project with the acorn image
+
+DockerFile: Tells Docker how to build and run my Django Project
+
+The flow : 
+Docker will:
+1. Create a mini isolated container/machine
+2. Install Python
+3. Install Dependencies (Requirements.txt)
+4. Copy project files
+5. Run Django server
+
+Inside of the mysite folder I made a db-cript.sh (A shell script)
+What is a shell script? A file containing terminal/Linux commands executed automatically
+Mac terminal commands uses a Linux like system so they share the same commands. (So shell scripts are Linux/macOS oriented)
+
+< 
+#! /bin/bash
+(This means shebang meaning, run this script using Bash (Bash is a Linux/terminal interpreter (Program that reads and executes code/commands) which understand commands))
+(Bash is both a shell language and a command interpreter)
+sleep 10
+(Usually in Docker / deployment you may need time to start the database so the script waits before migrations run)
+
+python3 manage.py makemigrations
+(Make migrations means generate instructions describing database changes)
+python3 manage.py migrate
+(Apply those changes to the actual database) >
+
+Why automate this? In deployment/container startup you want database setup to happend automatically (automatically meaning either executing the shell or when Docker when container starts ) instead of typing everytime. 
+So its more of a startup checklist
+
 Deployment : Putting your app onto a server so other people/devices can acess it.
 Docker : Packages your app and all dependencies into an isolated container and dockerfile is instructions for building and running the container (e.g. install Python, copy project, install requirements, start server)
 
@@ -45,3 +77,56 @@ Docker = Shipping container
 Docketfile = packing instructions
 Deployment = shipping to public server
 Running = turning the machine on 
+
+# Inside my DockerFile
+What problem is Docker solving? 
+- My computer already has Python, pip, dependencies and terminal and the OS configuration but another computer/server may not. So if you move your project to another machine, it may fail because environment differs (e.g. Wrong Python version, missing packages)
+- Docker says : "Lets package the ENTIRE environment"
+- So docker creates isolated mini computers called "containers" and this container contains Python, dependency, your code and startup commands. 
+What is a Dockerfile?
+- A set of instructions for building a container
+- Dockerfile uses a docker confifuration language not Python
+
+- Docker file : Set of instructions of how to create your container
+- Container : contains : Project and all code, Python, libraries etc..
+
+< FROM python:3.12 >
+Start from an existing Docker image (template for containers) that has Python 3.12 installed
+< WORKDIR /app > 
+Use /app as the current working folder (cd /app) 
+< COPY requirements.txt . > 
+Copy the file from my computer to the container. (Docker containers starts empty and you must explicitly copy files into it)
+"." Means copy file from current which is "/app" since we did < WORKDIR /app > 
+< RUN pip install -r requirements.txt >
+Install all dependencies into container, without this Django would not exist inside container
+< COPY . . > 
+Copies the entire Project into container
+< EXPOSE 8000 >
+This container inteds to use port 8000
+< CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] >
+When container starts run this comments meaning python manage.py runserver 0.0.0.0:8000
+
+# Kubernetes
+Docker helps run one containerised application (e.g. Django app container) but real applications become bigger with a lot of elements (Django backend, Database) and managing many containers manually becomes difficult (Restarting crashes, updates )
+Orcherstration : managing many containers automatically
+Django : here are many containers
+Kubernetes : Manage this entire application system (It can automatically start containers, restarts crashed contaiers etc...)
+Without Kubernetes you manually run 10 containers but with it it runs automatically
+
+Enabling Kubernets inside Docker created a local Kubernetes cluster on my machine
+Cluster : group/environment where containers are orchestraed (So mac is now a mini cloud deployment server)
+
+(A project has multiple containers where every container has a responsibility)
+
+# Acorn
+Problem with Kubernetes is that its very complicates with many elements and infrastructure setup. Acorn simplifies this by letting you define your app in a simpler way with [Containers, Servives, Jobs, Images] inside of the AcornFile. Acorn then automatically translates that into Kubernetes infrastructure. 
+So its a developer friendly deployment platform on top of kubernetes, it does not replace docker or kubernetes but it uses them
+AcornFile : deployment configuration file that describes your entire application system.
+Dockerfile describes how to build one container, AcornFile describes how the whole application should run together.
+Acornfile explains : [What containers exist, what database / services, startuporder, env orders]
+
+
+### What does this mean 
+Inside settings.py I added : 
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io","https://*.on-acorn.io"]

@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-_x6_sk3o54e0&r522%lk+f1l^0#hy0-)n=$xh@a(tk%z)m8a=h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io","https://*.on-acorn.io"]
 
 
 # Application definition
@@ -76,10 +78,16 @@ WSGI_APPLICATION = 'store.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv("MARIADB_DATABASE"),
+        'USER': os.getenv("MARIADB_USER"),
+        'PASSWORD': os.getenv("MARIADB_ROOT_PASSWORD"),
+        'HOST': os.getenv("MARIADB_HOST"),
+        'PORT': os.getenv("MARIADB_PORT", 3306),
     }
 }
 
