@@ -42,6 +42,12 @@ urlpatterns = [
     # When a request matches the patter of api/ 
     # Include delegates routing to another file, dont handle the rest of the url here go to another URL configuration located at app.url
     # Why not urls.py? because Python uses module path not file path
+
+    # The URLs are created by the backend / servers.
+    # Clients (browser, mobile app) sends requests to these URLs
+
+    # These are private/local urls.
+    # Public URLs are accessible by anyone on the Internet
     path("api/",include("app.urls")),
 
     path('', views.home, name = "home_page"),

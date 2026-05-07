@@ -34,3 +34,14 @@ Right now: Django views return the HTML templates.
 
 With APIs:
 Django will return data (JSON) instead which allows for mobile apps, react frontends and other systems to use the backend.
+
+# Deployment:
+Acorn : is a tool/platform for packaging and deploying applications on the cloud. An acord file Acornfile defines how the app runs, 
+servives/databases needed and ports/environment variables. (Deployment Instructions)
+Deployment : Putting your app onto a server so other people/devices can acess it.
+Docker : Packages your app and all dependencies into an isolated container and dockerfile is instructions for building and running the container (e.g. install Python, copy project, install requirements, start server)
+
+Docker = Shipping container
+Docketfile = packing instructions
+Deployment = shipping to public server
+Running = turning the machine on 

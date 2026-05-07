@@ -7,8 +7,6 @@ from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
-# Hello
-
 from rest_framework import generics,status
 from rest_framework.response import Response
 # Create custom API views
@@ -82,7 +80,11 @@ from rest_framework.views import APIView
 
 # HTTP requests are GET,POST,PUT, PATCH,DELETE
 # HTTP responses consist of Body and status e.g. Body is the actual content that gets sent back to the client(browser) could be "JSON,HTML" 
-# status means 
+# status means message from the backend or the codes sent by the server to the client the result of the request. (Status comes from the HTTP protocol).
+# In CBV or general vies for DRF these statuses are set automatically but in Custom API, Custom FBV they need to be set manually.
+# Common status codes : Get : 200, Post create 201, Delete 204, Not Found 404
+# Status code groups:
+# 2xx means success, 3xx redirects, 4xx client errors, 5xx server errors
 
 # Understanding GET and POST
 # GET : "give me data" and POST : "send/change data"
