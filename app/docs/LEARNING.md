@@ -1,6 +1,7 @@
 **You need markdown extension to process and format the markdown text.**
 
 # Interpreter : A program that read and executes code/commands
+# Hanging : A process appears to be stuck or unresponsive
 
 # What is the {% csrf_token %}?
 - Inserts a hidden input input into the HTML form containing a protection of your form from submisions from malicious requests from other websites.
@@ -125,8 +126,34 @@ AcornFile : deployment configuration file that describes your entire application
 Dockerfile describes how to build one container, AcornFile describes how the whole application should run together.
 Acornfile explains : [What containers exist, what database / services, startuporder, env orders]
 
+# Deployment commands
+1. Ensure we are in the project which contains the AcornFile, DockerFile, manage.py and requirements.txt < ls >
+2. Make sure that kubernetes works < kubectl get nodes > it should say :
+   (venv) (base) cristiandumbravanu@Mac restaurant_project % kubectl get nodes
+    NAME             STATUS   ROLES           AGE   VERSION
+    docker-desktop   Ready    control-plane   75s   v1.32.2
 
 ### What does this mean 
 Inside settings.py I added : 
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io","https://*.on-acorn.io"]
+
+
+# Stack :
+1. Part 1 (Django + DRF side)
+   - Backend: Models,ORM,APIs,Database
+   - Rest is an architerctural style for structuring APIs/resources and JSON is simply the most common response format.
+   - Serializers converts Django model objects into Python dictionaries into lists and Response() converts them into a JSON body.
+   - REST API page is the developer/testing interface not fronted UI.
+2. Part 2 (Docker)
+   - Docker : platform/tool for runnning and building containers. (Where images are created into containers)
+   - DockerFile : How to build an image/environment
+   - Container : A running isolated environment
+   - DockerFile -> Image Built -> Image started -> Running Container
+3. Part 3 (Kubernetes)
+   - Kubernetes : automates orchestratration of many container, itself run inside cluster env
+   - Cluster : The kubernetes environment
+   - We have containers for every responsibility inside of project
+4. Part 4 (Acorn)
+   - Simplifies the deploying/managing the apps on Kubernetes
+   - AcornFile describes the entire deployment application system 
