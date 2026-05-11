@@ -1,24 +1,8 @@
 # TODO
-- [ ] System flow understanding !!!!!!!
+- [ ] Why cant I deploy and it just hangs
 - [ ] What are the modifications of the settings.py
-- [ ] What is inside of the acornfile and what is acorn
-
-- [ ] understnad my stack :
-Docker
-↓
-creates containers
-
-Kubernetes
-↓
-manages containers
-
-Acorn
-↓
-simplifies deployment on Kubernetes
-
 - [ ] What are the changes of the database and os import
-- [ ] What is JSON and continue with REST API vid
-- [ ] Plan for the Furure and make a list of things this program shoud do
+- [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)
 - [ ] Review that the website all makes sense and make a diagram
