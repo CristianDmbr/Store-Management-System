@@ -1,7 +1,5 @@
 # TODO
-- [ ] Why cant I deploy and it just hangs
-- [ ] What are the modifications of the settings.py
-- [ ] What are the changes of the database and os import
+- [ ] understand < docker run -p 8000:8000 restaurant-app >
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)

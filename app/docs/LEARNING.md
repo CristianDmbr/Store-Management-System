@@ -92,7 +92,11 @@ What is a Dockerfile?
 - Container : contains : Project and all code, Python, libraries etc..
 
 < FROM python:3.12 >
-Start from an existing Docker image (template for containers) that has Python 3.12 installed
+Start from an existing Docker image (template for containers)
+This isnt just the Python language its a prebuild env including linux filesystems, pip, shell.
+This is a library from docker hub (Github for container images)
+
+
 < WORKDIR /app > 
 Use /app as the current working folder (cd /app) 
 < COPY requirements.txt . > 
@@ -103,9 +107,13 @@ Install all dependencies into container, without this Django would not exist ins
 < COPY . . > 
 Copies the entire Project into container
 < EXPOSE 8000 >
-This container inteds to use port 8000
+This container inteds to use port 8000 (This is more documentation and doesnt do anything)
 < CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] >
-When container starts run this comments meaning python manage.py runserver 0.0.0.0:8000
+When container starts run this comments meaning python manage.py runserver 0.0.0.0:8000 meaning this runs Django.
+This is important because containers only live while a process is running, so a container is an isolated running process.
+CMD answers what process should I start when this container launches. 
+Without CMD container starts, nuthing runs so containers exits.
+Container needs one main active process which is the Django development server
 
 # Kubernetes
 Docker helps run one containerised application (e.g. Django app container) but real applications become bigger with a lot of elements (Django backend, Database) and managing many containers manually becomes difficult (Restarting crashes, updates )
@@ -125,6 +133,10 @@ So its a developer friendly deployment platform on top of kubernetes, it does no
 AcornFile : deployment configuration file that describes your entire application system.
 Dockerfile describes how to build one container, AcornFile describes how the whole application should run together.
 Acornfile explains : [What containers exist, what database / services, startuporder, env orders]
+AcornFile sits above DockerFile and the Kubernets, its used to overide them or to simplify them.
+We still need DockerFiles tho.
+Why have Commands in both? In Docker file CMD describes default startup command but in acorns its the kubernet deployment
+The startup command in DockerFile always gets overriden by the acorn startup commands.
 
 # Deployment commands
 1. Ensure we are in the project which contains the AcornFile, DockerFile, manage.py and requirements.txt < ls >
@@ -157,3 +169,54 @@ CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io","https://*.on-acorn.io"]
 4. Part 4 (Acorn)
    - Simplifies the deploying/managing the apps on Kubernetes
    - AcornFile describes the entire deployment application system 
+
+
+# What is a Dockerfile:
+A recipe for building an image and not running the container itself.
+Image is like a frozen template / blueprint.
+Container : live version of an image.
+
+# Acorn File:
+containers: {
+  (Name of the container is web)
+  web: {
+    image: "python:3.12"
+
+    build: {
+      context: "."
+    }
+
+    ports: {
+      publish: "8000:8000/http"
+    }
+
+    env: {
+      DJANGO_SETTINGS_MODULE: "store.settings"
+    }
+
+    command: [
+      "python",
+      "manage.py",
+      "runserver",
+      "0.0.0.0:8000"
+    ]
+  }
+}
+
+# 123.0.0.1 vs 0.0.0.0 
+127 only accepts connections from INSIDE this env
+while 0.0.0.0 accepts connections from ANY netwrk interface including Docker, external requests etc
+
+
+# What is a PORT
+computer = apartment building
+IP adress = Which building
+Port = which apartment/room
+e.g. port gets you to django and the url gets you inside django
+e.g. port is a numbered doorway
+Port gets you to application, URL path handles inside of the application
+
+# Commads : 
+docker ps : which container uses my port
+docker stop c7bc550291c3: stop container
+Run docker run -p 8000:8000 restaurant-app:
