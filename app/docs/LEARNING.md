@@ -98,7 +98,7 @@ This is a library from docker hub (Github for container images)
 
 
 < WORKDIR /app > 
-Use /app as the current working folder (cd /app) 
+Inside of the container create and switch into folder called /app so this creates a folder inside of the container not related to the app folder inside my mac.
 < COPY requirements.txt . > 
 Copy the file from my computer to the container. (Docker containers starts empty and you must explicitly copy files into it)
 "." Means copy file from current which is "/app" since we did < WORKDIR /app > 
@@ -173,10 +173,22 @@ CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io","https://*.on-acorn.io"]
 
 # What is a Dockerfile:
 A recipe for building an image and not running the container itself.
+The commands like : FROM, WORKDIR, COPY, RUN, EXPOSE, CMD are all Dockerfile instructions and belong to the Docker syntax language
 Image is like a frozen template / blueprint.
 Container : live version of an image.
 
+Python:3.12. Is an existing Docker image which already contains Linux,Python 3.12,pip and system tools.
+COPY just means copy requirements.txt from your Mac into container current folder so it now becomes /app/requirements.txt inside the container.
+EXPOSE does not actually open a port, its more for documentation
+CMD command runs when the container starts.
+BUILD PHASE : FROM, COPY, RUN    RUNTIME PHASE : CMD
+CMD is necessary because containers live while their main process lives.
+
 # Acorn File:
+(Sits on top of Docker + Kubernetes)
+- The Python:3.12 is commonly used for Python apps
+
+
 containers: {
   (Name of the container is web)
   web: {
@@ -185,12 +197,17 @@ containers: {
     build: {
       context: "."
     }
+- This means current folder on your computer, files which Docker can access during the build.(Current directory)
 
     ports: {
       publish: "8000:8000/http"
+- My confusion was why not have it as 0.0.0.0.8000? 
+- Acorn has its own port syntax of HOST_PORT : CONTAINER_PORT / PROTOCOL
+- Meaning take the Mac port of (HOST_PORT) forward all the traffic to container port 8000 (CONTAINER PORT) using HTTP
     }
 
     env: {
+- Why not have the requirements.txt mentioned? : requirements are used in the BUILD Time but env is for runrime environment variables (e.g. configuration, passwords or settings)
       DJANGO_SETTINGS_MODULE: "store.settings"
     }
 
