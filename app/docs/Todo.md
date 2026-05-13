@@ -18,4 +18,3 @@
 
 
 ## Leftoff:
-- Individual Shift html, add the button to help curr employee to add a shift (prefilled info)  

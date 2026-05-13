@@ -39,9 +39,6 @@ With APIs:
 Django will return data (JSON) instead which allows for mobile apps, react frontends and other systems to use the backend.
 
 # Deployment:
-Acorn : is a tool/platform for packaging and deploying applications on the cloud. An acord file Acornfile defines how the app runs, 
-servives/databases needed and ports/environment variables. (Deployment Instructions) Allows to give others our project with the acorn image
-
 DockerFile: Tells Docker how to build and run my Django Project
 
 The flow : 
@@ -96,18 +93,22 @@ Start from an existing Docker image (template for containers)
 This isnt just the Python language its a prebuild env including linux filesystems, pip, shell.
 This is a library from docker hub (Github for container images)
 
-
 < WORKDIR /app > 
 Inside of the container create and switch into folder called /app so this creates a folder inside of the container not related to the app folder inside my mac.
+
 < COPY requirements.txt . > 
 Copy the file from my computer to the container. (Docker containers starts empty and you must explicitly copy files into it)
 "." Means copy file from current which is "/app" since we did < WORKDIR /app > 
+
 < RUN pip install -r requirements.txt >
 Install all dependencies into container, without this Django would not exist inside container
+
 < COPY . . > 
 Copies the entire Project into container
+
 < EXPOSE 8000 >
 This container inteds to use port 8000 (This is more documentation and doesnt do anything)
+
 < CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] >
 When container starts run this comments meaning python manage.py runserver 0.0.0.0:8000 meaning this runs Django.
 This is important because containers only live while a process is running, so a container is an isolated running process.
@@ -127,49 +128,23 @@ Cluster : group/environment where containers are orchestraed (So mac is now a mi
 
 (A project has multiple containers where every container has a responsibility)
 
-# Acorn
-Problem with Kubernetes is that its very complicates with many elements and infrastructure setup. Acorn simplifies this by letting you define your app in a simpler way with [Containers, Servives, Jobs, Images] inside of the AcornFile. Acorn then automatically translates that into Kubernetes infrastructure. 
-So its a developer friendly deployment platform on top of kubernetes, it does not replace docker or kubernetes but it uses them
-AcornFile : deployment configuration file that describes your entire application system.
-Dockerfile describes how to build one container, AcornFile describes how the whole application should run together.
-Acornfile explains : [What containers exist, what database / services, startuporder, env orders]
-AcornFile sits above DockerFile and the Kubernets, its used to overide them or to simplify them.
-We still need DockerFiles tho.
-Why have Commands in both? In Docker file CMD describes default startup command but in acorns its the kubernet deployment
-The startup command in DockerFile always gets overriden by the acorn startup commands.
-
-# Deployment commands
-1. Ensure we are in the project which contains the AcornFile, DockerFile, manage.py and requirements.txt < ls >
-2. Make sure that kubernetes works < kubectl get nodes > it should say :
-   (venv) (base) cristiandumbravanu@Mac restaurant_project % kubectl get nodes
-    NAME             STATUS   ROLES           AGE   VERSION
-    docker-desktop   Ready    control-plane   75s   v1.32.2
-
-### What does this mean 
-Inside settings.py I added : 
-ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io","https://*.on-acorn.io"]
-
-
 # Stack :
 1. Part 1 (Django + DRF side)
    - Backend: Models,ORM,APIs,Database
    - Rest is an architerctural style for structuring APIs/resources and JSON is simply the most common response format.
    - Serializers converts Django model objects into Python dictionaries into lists and Response() converts them into a JSON body.
    - REST API page is the developer/testing interface not fronted UI.
+
 2. Part 2 (Docker)
    - Docker : platform/tool for runnning and building containers. (Where images are created into containers)
    - DockerFile : How to build an image/environment
    - Container : A running isolated environment
    - DockerFile -> Image Built -> Image started -> Running Container
+
 3. Part 3 (Kubernetes)
    - Kubernetes : automates orchestratration of many container, itself run inside cluster env
    - Cluster : The kubernetes environment
    - We have containers for every responsibility inside of project
-4. Part 4 (Acorn)
-   - Simplifies the deploying/managing the apps on Kubernetes
-   - AcornFile describes the entire deployment application system 
-
 
 # What is a Dockerfile:
 A recipe for building an image and not running the container itself.
@@ -184,46 +159,9 @@ CMD command runs when the container starts.
 BUILD PHASE : FROM, COPY, RUN    RUNTIME PHASE : CMD
 CMD is necessary because containers live while their main process lives.
 
-# Acorn File:
-(Sits on top of Docker + Kubernetes)
-- The Python:3.12 is commonly used for Python apps
-
-
-containers: {
-  (Name of the container is web)
-  web: {
-    image: "python:3.12"
-
-    build: {
-      context: "."
-    }
-- This means current folder on your computer, files which Docker can access during the build.(Current directory)
-
-    ports: {
-      publish: "8000:8000/http"
-- My confusion was why not have it as 0.0.0.0.8000? 
-- Acorn has its own port syntax of HOST_PORT : CONTAINER_PORT / PROTOCOL
-- Meaning take the Mac port of (HOST_PORT) forward all the traffic to container port 8000 (CONTAINER PORT) using HTTP
-    }
-
-    env: {
-- Why not have the requirements.txt mentioned? : requirements are used in the BUILD Time but env is for runrime environment variables (e.g. configuration, passwords or settings)
-      DJANGO_SETTINGS_MODULE: "store.settings"
-    }
-
-    command: [
-      "python",
-      "manage.py",
-      "runserver",
-      "0.0.0.0:8000"
-    ]
-  }
-}
-
 # 123.0.0.1 vs 0.0.0.0 
 127 only accepts connections from INSIDE this env
 while 0.0.0.0 accepts connections from ANY netwrk interface including Docker, external requests etc
-
 
 # What is a PORT
 computer = apartment building
@@ -236,4 +174,56 @@ Port gets you to application, URL path handles inside of the application
 # Commads : 
 docker ps : which container uses my port
 docker stop c7bc550291c3: stop container
-Run docker run -p 8000:8000 restaurant-app:
+docker images : all the images
+
+# Server Logic
+There are two servers involved : 1. My Mac 2. Django server inside of Django
+When I run < docker run -p 8000:8000 restaurant-app >, it does not turn the Mac into Django.
+Instead : Mac runs Docker, Docker runs containers and containers runs Django. So the Django server is inside of the container. 
+Docker is like a Tiny Virtual Computer and the container is a mini isolated LinuxComputer inside my Mac.
+Inside this mini computer : Python exists, Django exists, Requirements exists, Project exists and server runs.
+
+When the Browser sends request to localhost : 8000 -> The mac receives the request -> Docker catches the request on Mac port 8000 -> Docker forwarfds the request into container -> Container port 8000 receives it -> Django responds -> Response goes back through Docker and Browser receives the HTML.
+This means Mac does not directly run Django anymore its Docker who runs it.
+
+Mac only: 
+1. Hosting Docker
+2. Forwards Traffic
+3. Provides resources (CPU/RAM)
+  
+< docker run -p 8000:8000 restaurant-app >
+what < -p 8000:8000 > means is HOST_PORT : CONTAINER_PORT 
+Mac port 8000 forwards all requests to container port 8000
+
+Every port has its own purpose e.g. 8000 Django
+
+Why does browser still use localhost even if Docker runs it?
+- Because Docker exposes the container to your machine meaning arriving at local host forwards to container.
+- So Browser still talks to your mac but the Mac forwards traffic into Docker container.
+- Browser does not know containers exists
+
+# Running Docker:
+registry inside of docker is the warehouse where the images are stored
+
+<docker run -p 8000:8000 restaurant-app>
+- run: Create and start a new container from an image
+- -p : publish a port meaning forward traffic between host and container
+- 8000:8000 from mac port 8000 to container port 8000
+- restaurant-app is the image Name.
+- docker stop cc8831d01683 : stops current docker container
+- kubectl get nodes : checks the kubernetes nodes status
+
+# Building the actual Docker Image:
+<docker build -t restaurant-app .>
+
+I first made the Docker File with instructions for container
+I then entered < docker build -t restaurant-app .> which read the DockerFile, followed instructions, Created the Docker Image and named it restaurant-app (Created IMAGE not container). After you can run < docker run -p 8000:8000 restaurant-app > to create the container from this image.
+
+# Does The image stay forever?
+- Does the image need to be rebuild every time? No. Only if code, dependencies, dockerfile changes so then run < docker build -t restaurant-app . > 
+- How does Docker find DockerFile? Docker automatically searches the directory for Dockerfile with exact name
+- Can I delete the DockerFile after building? Yes because image already exists and this container contains all Python, dependencies, Djagno code, CMD and copied Files. 
+  - BUT PROFESSIONALS DONT DO IT BECAUSE ITS SOURCE CODE AND DOCUMENTATION SO WITHOUT IT YOU CANT REBUILD SOMETHING LATER
+  - One DockerFile usually describes one application/image so each project gets its own docker file
+- Check for image list: <docker image ls>
+- Check for running containers : <docker ps>
