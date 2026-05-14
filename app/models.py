@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
 
+from .validators import validate_unique_restaurant_name
+
 # DataTimeField and DateField
 # DateTime Field : date + time 2026 - 04 - 06 14:30
 # DateField Field : only the date 2026 - 06 - 06
@@ -89,6 +91,13 @@ class Restaurant(models.Model):
     @property
     def is_full(self):
         return self.current_occupancy >= self.capacity
+
+    def clean(self):
+
+        validate_unique_restaurant_name(
+            self.restaurant_name,
+            instance = self
+        )
 
     def __str__(self):
         return f"{self.restaurant_name}"

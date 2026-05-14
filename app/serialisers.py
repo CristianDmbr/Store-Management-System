@@ -22,8 +22,18 @@
 
 from rest_framework import serializers
 from .models import Restaurant
+from .validators import validate_unique_restaurant_name
 
 class RestaurantSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Restaurant
     fields = ["restaurant_name","owner","date_opened","location","restaurant_cuisine","capacity"]
+
+  # Because its validate_<restaurant_name> it automatically pasese the restaurant name
+  def validate_restaurant_name(self,name):
+    validate_unique_restaurant_name(
+      name,
+      instance=self.instance
+    )
+
+    return name

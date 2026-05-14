@@ -3,6 +3,8 @@ from .models import Restaurant, MenuItem, Staff, Shift, Reservation
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from .validators import validate_unique_restaurant_name
+
 # FORM IS USED TO VALIDATE BOTH GET REQUESTS AND POST REQUESTS INCOMING FROM THE CLIENT.
 
 # Semantic contract of clean and clean_<Field name>
@@ -67,12 +69,11 @@ class RestaurantForm(forms.ModelForm):
         if name and name.lower() in banned_words:
             raise ValidationError(f"Cannot use the word {name}!")
     
-        if name:
-            qs = Restaurant.objects.filter(restaurant_name = name)
-            if self.instance.pk:
-                qs = qs.exclude(pk = self.instance.pk)
-            if qs.exists():
-                raise ValidationError(f"Name : {name} already exists")
+        validate_unique_restaurant_name(
+            name,
+            instance = self.instance
+        )
+
         return name
     
 class ReservationForm(forms.ModelForm):

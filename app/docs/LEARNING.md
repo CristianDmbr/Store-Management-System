@@ -3,6 +3,17 @@
 # Interpreter : A program that read and executes code/commands
 # Hanging : A process appears to be stuck or unresponsive
 
+# Django forms:
+Uses clean_<field_name> to automatically pass the parameter
+# DRF serializers:
+Uses  validate_<field_name> to automatically pass the parameter 
+
+# self.instace
+During every backend functionality we have a self.instance.
+If its CREATE it internally automatically tries to extract a object which does not exist in the DB self.instance = Restaurant() which creates a EMPTY unsaved Python object so its pk is None.
+For an UPDATE we extract the instance of pk.
+This does not happen in ListView because it works with many objects.
+
 # Validation
 Enforced by Python not by DB.
 If exists only in forms then APIs can bypass it. 

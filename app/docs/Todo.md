@@ -1,4 +1,5 @@
 # TODO
+- [ ] Centralise validations
 - [ ] Finish REST API for the all of the models
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page

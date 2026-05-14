@@ -1,9 +1,16 @@
 from django.core.exceptions import ValidationError
-from .models import Restaurant
 
+# Confusion about instance = None
+# When we use this Validation for a CREATE we dont pass the object we want to create since its new meaning instance by default is None,
+# this there is nothing for this query set array to ignore.
+# If its an UPDATE request then we pass the Object itself and ignore it inside of the query set array.
 def validate_unique_restaurant_name(name, instance=None):
 
+    # Prevents infinite loop over importing validator in models.py and model in validators.py
+    from .models import Restaurant
+
     qs = Restaurant.objects.filter(
+        # __iexact means case insensitive exact match meaning pizza matches Pizza or pIzza
         restaurant_name__iexact=name
     )
 
