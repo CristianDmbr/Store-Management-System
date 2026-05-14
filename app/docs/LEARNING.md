@@ -3,6 +3,13 @@
 # Interpreter : A program that read and executes code/commands
 # Hanging : A process appears to be stuck or unresponsive
 
+# Validation
+Enforced by Python not by DB.
+If exists only in forms then APIs can bypass it. 
+So its professional to centralize reusable validation into a validators.py inside of app.
+Good validators.py logic is to have validators which can be used everywhere in the system meaning True on every level e.g. admin, forms, apis.
+But things that are specifc to say API behaviour, user session should not be mentioned since they are specific
+
 # What is the {% csrf_token %}?
 - Inserts a hidden input input into the HTML form containing a protection of your form from submisions from malicious requests from other websites.
 
@@ -37,6 +44,32 @@ Right now: Django views return the HTML templates.
 
 With APIs:
 Django will return data (JSON) instead which allows for mobile apps, react frontends and other systems to use the backend.
+
+# API POST flow:
+(DRF serializers do not use Django Forms).
+DRF serializers are the API equivalent of forms.
+DJANGO HTML APP : Forms, HTML form input, Form Validation
+DRF API: Serializers, JSON/API input, serializers validation
+
+POST only uses One object so it uses serializers data = request.data instead of many = True since its just one object incoming
+
+When a Client send a POST request DRF converts incoming request into request.data:
+Wheater its JASON:
+{
+  "name" : "Pizza Place"
+}
+or HTML
+name = Pizza+Place
+
+it gets converted to request.data which behaives like a Python dictionary.
+
+Serialization Validation Flow:
+1. Raw request Data 2. Serialization.is_valid() 3. Field Validation 4. Custom Serializer Validation 5. Model instance
+(Serializers validate before database save to catch errors)
+
+The models.clean() or any custome field_validation that is inside models.py DOES NOT get automatically called because DRF serializers are independent validation systems
+
+
 
 # Deployment:
 DockerFile: Tells Docker how to build and run my Django Project

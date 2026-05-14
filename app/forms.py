@@ -3,6 +3,8 @@ from .models import Restaurant, MenuItem, Staff, Shift, Reservation
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+# FORM IS USED TO VALIDATE BOTH GET REQUESTS AND POST REQUESTS INCOMING FROM THE CLIENT.
+
 # Semantic contract of clean and clean_<Field name>
 # I have seen a def clean_<field> which extracts two different fields from the cleaned_data and it worked.
 # Python technically allows it but its best practice to use clean for multiple fields and its a more professional design.

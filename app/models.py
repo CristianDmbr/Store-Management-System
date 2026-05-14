@@ -7,8 +7,6 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
 
-# Hello 3
-
 # DataTimeField and DateField
 # DateTime Field : date + time 2026 - 04 - 06 14:30
 # DateField Field : only the date 2026 - 06 - 06

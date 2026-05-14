@@ -184,7 +184,7 @@ class RestaurantDelete(DeleteView):
 
     ##### API
     # DRF generic views
-    # Create an API view that can LIST and CREATE restaurant (so gets us GET to returnO all restaurant and POST to create new restaurant)
+    # Create an API view that can LIST and CREATE restaurant (so gets us GET to return all restaurant and POST to create new restaurant)
     # GET request : 1. Queries all restaurants -> serialises (converts to JSON) -> returns the JSON
     # POST request : 1. Incoming JSON, Serialiser validates it, Creates a Restaurant Object, Saves to DB and returns the JSON response
     # Having a CBV mixed view is more risky than a GET POST DRF ListCreate

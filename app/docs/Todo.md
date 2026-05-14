@@ -1,20 +1,58 @@
 # TODO
-- [ ] understand < docker run -p 8000:8000 restaurant-app >
+- [ ] Finish REST API for the all of the models
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)
 - [ ] Review that the website all makes sense and make a diagram
 
-## Backend:
-- [ ] Do brew install acorn-io/cli/acorn once its downloaded
+ROAD MAP : 
+1. 
+- [ ] Learn properly: DRF Generic Views
+* ListAPIView
+* CreateAPIView
+* RetrieveAPIView
+* UpdateAPIView
+* DestroyAPIView
+Then:
+* ListCreateAPIView
+* RetrieveUpdateDestroyAPIView
 
-## Learning: 
-- [ ] Learn Django from https://www.youtube.com/watch?v=t-uAgI-AUxc .
-- [ ] Learn SQL from reel
+2.
+Then ViewSets + Routers
 
-## Architecture:
-- [ ] Add age range (kids adults) to reservation people
-- [ ] Create a graph to represent the database and everything connectin
+Very important professional skill.
 
+Learn:
 
-## Leftoff:
+* ModelViewSet
+* DefaultRouter
+
+This is how many professional DRF APIs are structured.
+
+3.
+PHASE 2 — Authentication & Security
+
+VERY important.
+
+Learn:
+
+* session auth
+* token auth
+* JWT authentication
+
+Use: Django REST Framework Docs￼
+
+Add:
+
+* login API
+* register API
+* user permissions
+* admin/staff roles
+
+For example:
+
+* managers can edit restaurants
+* staff can only view shifts
+* customers can place orders
+
+This is where projects start feeling “real”.
