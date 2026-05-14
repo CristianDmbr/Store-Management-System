@@ -20,20 +20,31 @@
 # My confusion is that at the moment I have passed a Python Object using kwargs and my templates read it all fine so why still use JSON?
 # The templates and Python backend are both inside Django meaning Python Objects are allows, but separate systems like React need a universal format.
 
+# attrs : A dictionary containing all validated serializer field values
+# Used in def validate(self, attrs) when more than one field is needed and works as attrs.get("capacity")
+
+# Because its validate_<restaurant_name> it automatically passes the restaurant name# Validation in DRF is more direct so no nead for clean_data to get data.
+
+
 from rest_framework import serializers
 from .models import Restaurant
-from .validators import validate_unique_restaurant_name
+from .validators import validate_unique_restaurant_name, validate_appropriate_restaurant_name
 
 class RestaurantSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Restaurant
     fields = ["restaurant_name","owner","date_opened","location","restaurant_cuisine","capacity"]
 
-  # Because its validate_<restaurant_name> it automatically pasese the restaurant name
-  def validate_restaurant_name(self,name):
-    validate_unique_restaurant_name(
-      name,
-      instance=self.instance
-    )
+  def validate_restaurant_name(self, name):
 
-    return name
+        validate_unique_restaurant_name(
+
+            name,
+
+            instance=self.instance
+
+        )
+
+        validate_appropriate_restaurant_name(name)
+
+        return name

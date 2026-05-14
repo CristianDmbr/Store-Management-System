@@ -1,4 +1,5 @@
 # TODO
+- [ ] Understand why getting data from serializers is done without clean_Data but with forms you need it.
 - [ ] Centralise validations
 - [ ] Finish REST API for the all of the models
 - [ ] Plan for the Future and make a list of things this program shoud do

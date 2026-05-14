@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
 
-from .validators import validate_unique_restaurant_name
+from .validators import validate_unique_restaurant_name, validate_appropriate_restaurant_name, validate_unique_restaurant_name_reservation
 
 # DataTimeField and DateField
 # DateTime Field : date + time 2026 - 04 - 06 14:30
@@ -99,6 +99,10 @@ class Restaurant(models.Model):
             instance = self
         )
 
+        validate_appropriate_restaurant_name(
+            self.restaurant_name
+        )
+
     def __str__(self):
         return f"{self.restaurant_name}"
     
@@ -115,15 +119,11 @@ class Reservation(models.Model):
     def total_people(self):
         return self.kids + self.teens + self.adults
 
-    # DB level of constraints
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields = ["restaurant","name_of_reservation"],
-                name = "unique_reservation_per_restaurant"
-                # This name comes up when errors come up or when we want to migrate the DB to other systems
-            )
-        ]
+    def clean(self):
+        validate_unique_restaurant_name_reservation(
+            self.restaurant, self.name_of_reservation, self
+        )
+
     
 class Staff(models.Model):
 

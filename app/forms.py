@@ -3,7 +3,8 @@ from .models import Restaurant, MenuItem, Staff, Shift, Reservation
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from .validators import validate_unique_restaurant_name
+from .validators import (validate_unique_restaurant_name, validate_appropriate_restaurant_name, 
+                        validate_unique_restaurant_name_reservation)
 
 # FORM IS USED TO VALIDATE BOTH GET REQUESTS AND POST REQUESTS INCOMING FROM THE CLIENT.
 
@@ -53,28 +54,6 @@ class RestaurantForm(forms.ModelForm):
         widgets = {
             "date_opened": forms.DateInput(attrs={"type": "date"})
         }
-
-    ### Before there was a general def clean() for all of the fields inside one form validation form.
-    ### Practice using single field rules def clean_<field>
-
-    def clean_restaurant_name(self):
-        name = self.cleaned_data.get("restaurant_name")
-
-        banned_words = [
-            "illegal", "banned", "fake", "spam", "scam", "virus",
-            "hate", "terror", "bomb", "drugs", "xxx", "nsfw",
-            "fraud", "pirate"
-        ]
-
-        if name and name.lower() in banned_words:
-            raise ValidationError(f"Cannot use the word {name}!")
-    
-        validate_unique_restaurant_name(
-            name,
-            instance = self.instance
-        )
-
-        return name
     
 class ReservationForm(forms.ModelForm):
     class Meta:
@@ -88,12 +67,10 @@ class ReservationForm(forms.ModelForm):
         name = cleaned_data.get("name_of_reservation")
         restaurant = cleaned_data.get("restaurant")
 
-        if name and restaurant:
-            qs = Reservation.objects.filter(name_of_reservation = name, restaurant = restaurant)
-            if self.instance.pk:
-                qs = qs.exclude(pk = self.instance.pk)
-            if qs.exists():
-                raise ValidationError(f"{name} already has a reservation at {restaurant}")
+        validate_unique_restaurant_name_reservation(
+            restaurant, name, self.instance
+        )
+
         return cleaned_data
 
 

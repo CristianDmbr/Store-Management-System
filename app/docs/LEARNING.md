@@ -3,6 +3,8 @@
 # Interpreter : A program that read and executes code/commands
 # Hanging : A process appears to be stuck or unresponsive
 
+# Keep reusable global rule validators to just models.py for cleaner code which automatically gets put onto forms and serializers
+
 # Django forms:
 Uses clean_<field_name> to automatically pass the parameter
 # DRF serializers:

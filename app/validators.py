@@ -23,4 +23,28 @@ def validate_unique_restaurant_name(name, instance=None):
             f"Restaurant name '{name}' already exists."
         )
 
+    return name 
+
+def validate_appropriate_restaurant_name(name):
+
+    banned_words = [
+            "illegal", "banned", "fake", "spam", "scam", "virus",
+            "hate", "terror", "bomb", "drugs", "xxx", "nsfw",
+            "fraud", "pirate"
+        ]
+
+    if name and name.lower() in banned_words:
+        raise ValidationError("This name is not appropriate.")
+    
     return name
+
+def validate_unique_restaurant_name_reservation(restaurant, reservation_name, instance = None):
+
+    from .models import Reservation
+
+    qs = Reservation.objects.filter(restaurant = restaurant,name_of_reservation = reservation_name)
+
+    if instance and instance.pk:
+        qs = qs.exclude(pk = instance.pk)
+    if qs.exists():
+        raise ValidationError(f"{reservation_name} already has an active reservation at {restaurant}.")
