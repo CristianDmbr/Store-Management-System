@@ -354,12 +354,20 @@ class ShiftView(CreateView):
     model = Shift
     form_class = ShiftForm
     template_name = "shift.html"
-    success_url = reverse_lazy("shift_lits")
+    success_url = reverse_lazy("shift_list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["shift_form"] = self.get_form()
         return context
+    
+class ShiftListView(ListView):
+    model = Shift
+    template_name = "shift_list.html"
+    context_object_name = "shifts"
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("employee")
 
 class IndividualShiftView(ListView):
     model = Shift
@@ -367,7 +375,7 @@ class IndividualShiftView(ListView):
     context_object_name = "individual_user_shifts"
 
     def get_queryset(self):
-        return Shift.objects.filter(employee = get_object_or_404(Staff, pk = self.kwargs['pk'])).order_by("start_time")
+        return Shift.objects.filter(employee = get_object_or_404(Sçtaff, pk = self.kwargs['pk'])).order_by("start_time")
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

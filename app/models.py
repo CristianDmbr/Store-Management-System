@@ -7,7 +7,11 @@ from django.contrib.auth.models import User
 from datetime import date
 from django.core.exceptions import ValidationError
 
-from .validators import validate_unique_restaurant_name, validate_appropriate_restaurant_name, validate_unique_restaurant_name_reservation
+from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
+                           validate_unique_restaurant_name_reservation, # Reservation
+                           validate_unique_name_and_surname, validate_date_of_birth, # Staff
+                           validate_shift_time # Shift
+                           )
 
 # DataTimeField and DateField
 # DateTime Field : date + time 2026 - 04 - 06 14:30
@@ -164,6 +168,11 @@ class Staff(models.Model):
         default = 10.00
     )
 
+    def clean(self):
+        validate_unique_name_and_surname(self.name,self.surname,instance = self)
+        validate_date_of_birth(self.date_of_birth)
+
+
     @property
     def age(self):
         today = date.today()
@@ -191,23 +200,10 @@ class Shift(models.Model):
         ("completed", "Completed")
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="planned")
-
-    # def clean is also recognised inside of the models and is used in the background when form validation is calling all
-    # field validation.
+        
     def clean(self):
-        if self.end_time <= self.start_time:
-            raise ValidationError("End time must be after start time")
 
-        # Check overlapping shifts by filtering all of the shifts of the current employee where the 
-        overlapping = Shift.objects.filter(
-            employee=self.employee,
-            # Give me all the shifts where the start time is less than end time
-            start_time__lt=self.end_time,
-            # Gime me all the shifts where the end time is greater than start time
-            end_time__gt=self.start_time
-        ).exclude(pk=self.pk)
-        if overlapping.exists():
-            raise ValidationError("This shift overlaps with another shift for this employee")
+        validate_shift_time(self.employee, self.start_time, self.end_time, instance = self)
 
     #########    #########    #########    #########    #########    #########    #########    #########
 

@@ -7,6 +7,10 @@
 # Forms does not activate the def clean() from models so just mention it inside of the serializer
 
 # Validators that depend on a foreign key relationship are usually placed inside the model that owns or defines that foreign key relationship.
+# The ORM lets Django treat database rows as Python objects and allows queries/comparisons between in-memory model objects and database data.
+
+# Serialisation
+It converts any database row or input into a Python model object (Python array of python dictionaries) and the response turn it into JSON. So that's why model validation, ORM still works.
 
 # Local Python object memory
 My confusion is how does self.restaurant_name works for a row I am trying to create which does not exist in the database?

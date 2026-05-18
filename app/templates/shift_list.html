@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Shifts</title>
+</head>
+<body>
+
+    <h1>All Shifts</h1>
+
+    <ul>
+        {% for shift in shifts %}
+            <li>
+                <strong>
+                    {{ shift.employee.name }}
+                    {{ shift.employee.surname }}
+                </strong>
+
+                <br>
+
+                Start:
+                {{ shift.start_time }}
+
+                <br>
+
+                End:
+                {{ shift.end_time }}
+
+                <br>
+
+                Duration:
+                {{ shift.duration_hours }} hours
+
+                <br>
+
+                Earnings:
+                £{{ shift.earnings }}
+
+                <br>
+
+                Status:
+                {{ shift.status }}
+            </li>
+
+            <hr>
+
+        {% empty %}
+            <li>No shifts found.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'shift_view' %}">
+        Add Shift
+    </a>
+
+</body>
+</html>

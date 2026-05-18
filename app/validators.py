@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 # Confusion about instance = None
 # When we use this Validation for a CREATE we dont pass the object we want to create since its new meaning instance by default is None,
@@ -44,7 +45,7 @@ def validate_appropriate_restaurant_name(name):
 
 def validate_unique_restaurant_name_reservation(restaurant, reservation_name, instance = None):
 
-    from .models import Reservation
+    from .models import Reservation 
 
     qs = Reservation.objects.filter(restaurant = restaurant,name_of_reservation = reservation_name)
 
@@ -52,3 +53,51 @@ def validate_unique_restaurant_name_reservation(restaurant, reservation_name, in
         qs = qs.exclude(pk = instance.pk)
     if qs.exists():
         raise ValidationError(f"{reservation_name} already has an active reservation at {restaurant}.")
+    
+
+def validate_unique_name_and_surname(name, surname, instance = None):
+
+    from .models import Staff
+
+    qs = Staff.objects.filter(name = name, surname = surname)
+
+    if instance and instance.pk:
+        qs = qs.exclude(pk = instance.pk)
+    if qs.exists():
+        raise ValidationError(f"{name} {surname} is already in the system.")
+    
+def validate_date_of_birth(dob):
+
+    today = timezone.localdate()
+
+    if today < dob:
+        raise ValidationError(f"Date of birth cannot be in the future.")
+    
+    age = (today - dob).days // 365
+
+    if age < 18:
+        raise ValidationError("Employee must be at least 18 years old.")
+
+    return dob
+    
+def validate_shift_time(employee, start_time,end_time, instance = None):
+
+    if start_time and end_time:
+        if end_time <= start_time:
+            raise ValidationError("Incorrect shift entry. Ensure the Start Time is before the End Time.")
+
+    from .models import Shift
+
+    overlapping = Shift.objects.filter(
+        employee = employee,
+        start_time__lt = end_time,
+        end_time__gt = start_time
+    )
+
+    if instance and instance.pk:
+        overlapping = overlapping.exclude(pk = instance.pk)
+    
+    if overlapping.exists():
+        raise ValidationError(f"This shift overlapps with another shift for {employee.name}  {employee.surname}.")
+    
+    return start_time,end_time

@@ -5,6 +5,7 @@
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)
 - [ ] Review that the website all makes sense and make a diagram
+- [ ] Shift list addition
 
 ROAD MAP : 
 1. 

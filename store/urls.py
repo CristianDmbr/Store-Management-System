@@ -67,6 +67,8 @@ urlpatterns = [
     path("staff/<int:pk>/shifts",views.IndividualShiftView.as_view(), name = "individual_shifts"),
     path("staff/<int:pk>/add_individual_shift",views.AddIndividualShiftView.as_view(),name = "add_individual_shifts"),
 
+    path("shift_list/",views.ShiftListView.as_view(), name = "shift_list"),
+
     path("combined/", views.combine_form_view, name = "combined_form"),
 ]
  

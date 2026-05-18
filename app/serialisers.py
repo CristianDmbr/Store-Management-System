@@ -27,8 +27,8 @@
 
 
 from rest_framework import serializers
-from .models import Restaurant
-from .validators import validate_unique_restaurant_name, validate_appropriate_restaurant_name
+from .models import Restaurant, Reservation
+from .validators import validate_unique_restaurant_name, validate_appropriate_restaurant_name, validate_unique_restaurant_name_reservation
 
 class RestaurantSerialiser(serializers.ModelSerializer): 
   class Meta:
@@ -41,3 +41,14 @@ class RestaurantSerialiser(serializers.ModelSerializer):
         validate_appropriate_restaurant_name(name)
 
         return name
+    
+class ReservationSerialiser(serializers.ModelSerializer):
+  class Meta:
+    model = Reservation
+    fields = ["name_of_reservation","restaurant","is_active","kids","teens","adults"]
+
+    def validate_name_of_reservation(self,name_of_reservation,restaurant):
+      
+      validate_unique_restaurant_name_reservation(name_of_reservation, restaurant)
+      
+      return name_of_reservation

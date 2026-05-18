@@ -60,20 +60,6 @@ class ReservationForm(forms.ModelForm):
         model = Reservation
         fields = ["name_of_reservation","restaurant","kids","teens","adults"]
 
-    def clean(self):
-
-        cleaned_data = super().clean()
-
-        name = cleaned_data.get("name_of_reservation")
-        restaurant = cleaned_data.get("restaurant")
-
-        validate_unique_restaurant_name_reservation(
-            restaurant, name, self.instance
-        )
-
-        return cleaned_data
-
-
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
@@ -81,29 +67,7 @@ class StaffForm(forms.ModelForm):
 
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})
-        }
-
-    def clean(self):
-        cleaned_data = super().clean()
-        name = cleaned_data.get("name")
-        surname = cleaned_data.get("surname")
-
-        if name and surname:
-            qs = Staff.objects.filter(name = name, surname = surname)
-            if self.instance.pk:
-                qs = qs.exclude( pk = self.instance.pk)
-            if qs.exists():
-                raise forms.ValidationError(f" {name} {surname} already works here.")
-        
-        dob = cleaned_data.get("date_of_birth")
-
-        if dob:
-            today = timezone.localdate()
-            if today < dob:
-                raise ValidationError(f"Can't be born before {today}")
-        
-        return cleaned_data
-        
+        }    
 
 class ShiftForm(forms.ModelForm):
     class Meta:
@@ -113,18 +77,7 @@ class ShiftForm(forms.ModelForm):
         widgets = {
             "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-        }
-    
-    def clean(self):
-        cleaned_data = super().clean()
-
-        start_date = cleaned_data.get("start_time")
-        end_date = cleaned_data.get("end_time")
-
-        if start_date and end_date:
-            if end_date <= start_date:
-                raise forms.ValidationError("End time must be after start time.")
-        
+        }    
 
 class ShiftForEmployeeForm(forms.ModelForm):
     class Meta:
