@@ -1,6 +1,5 @@
 # TODO
-- [ ] Centralise validations
-- [ ] Finish REST API for the all of the models and add validations from validators.py
+- [ ] Finish the backend for APIs
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)

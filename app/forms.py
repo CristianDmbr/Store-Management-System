@@ -95,29 +95,5 @@ class ShiftForEmployeeForm(forms.ModelForm):
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["restaurant", "name", "description", "price", "category","calories","availability"]
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        name = cleaned_data.get("name")
-        restaurant = cleaned_data.get("restaurant")
-
-        if restaurant and name:
-            qs = MenuItem.objects.filter(name = name , restaurant = restaurant)
-            if self.instance.pk:
-                qs = qs.exclude(pk = self.instance.pk)
-            if qs.exists():
-                raise forms.ValidationError(f"{name} is already in the {restaurant}'s menu")
-        
-        
-        calories = cleaned_data.get("calories")
-
-    def clean_calories(self):
-        cals = self.cleaned_data.get("calories")
-
-        if cals is not None and cals > 1000:
-            raise forms.ValidationError(f"Cannot have a item more than 1000kcal, this item has {cals}kcal.")
-        
-        return cals
+        fields = ["restaurant", "name", "description", "price", "category","calories","availability","ingredience"]
     

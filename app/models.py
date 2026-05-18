@@ -9,8 +9,9 @@ from django.core.exceptions import ValidationError
 
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
                            validate_unique_restaurant_name_reservation, # Reservation
-                           validate_unique_name_and_surname, validate_date_of_birth, # Staff
-                           validate_shift_time # Shift
+                           validate_unique_name_and_surname, validate_date_of_birth, validate_date_employed, # Staff
+                           validate_shift_time, # Shift
+                           validate_unique_menu_item_name, validate_calories # Menu Item
                            )
 
 # DataTimeField and DateField
@@ -171,7 +172,7 @@ class Staff(models.Model):
     def clean(self):
         validate_unique_name_and_surname(self.name,self.surname,instance = self)
         validate_date_of_birth(self.date_of_birth)
-
+        validate_date_employed(self.date_employed)
 
     @property
     def age(self):
@@ -246,14 +247,11 @@ class MenuItem(models.Model):
         decimal_places = 2
     )
     ingredience = models.TextField(blank= True, null = True)
+    
+    def clean(self):
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields = ["restaurant","name"],
-                name = "unique_menu_item_per_restaurant"
-            )
-        ]
+        validate_unique_menu_item_name(self.name,self.restaurant,self)
+        validate_calories(self.calories)
 
     def __str__(self):
         return f"{self.name} ({self.restaurant})"

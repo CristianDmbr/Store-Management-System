@@ -9,6 +9,10 @@ from django.utils import timezone
 # Cure business rule : core rule of application lives. e.g. database validators.
 # Meaning its more professional to have them inside models.py since models.py gets ran by forms, admin and so no whenerver we want to make a change.
 # We do however have behavioural specific validations for forms or serialisers which do require unique validators.
+
+# To prevent case sensitive duplicates use __iexact : case insensitive exact match to treat every capitalization versions the same e.g. call bob and it gets you Bob bOb
+# (ONLY WORK ON TEXT/STRING FIELDS NOT FOREINGKEYS)
+
 def validate_unique_restaurant_name(name, instance=None):
 
     # Prevents infinite loop over importing validator in models.py and model in validators.py
@@ -47,7 +51,7 @@ def validate_unique_restaurant_name_reservation(restaurant, reservation_name, in
 
     from .models import Reservation 
 
-    qs = Reservation.objects.filter(restaurant = restaurant,name_of_reservation = reservation_name)
+    qs = Reservation.objects.filter(restaurant = restaurant,name_of_reservation__iexact = reservation_name)
 
     if instance and instance.pk:
         qs = qs.exclude(pk = instance.pk)
@@ -59,12 +63,21 @@ def validate_unique_name_and_surname(name, surname, instance = None):
 
     from .models import Staff
 
-    qs = Staff.objects.filter(name = name, surname = surname)
+    qs = Staff.objects.filter(name__iexact = name, surname__iexact = surname)
 
     if instance and instance.pk:
         qs = qs.exclude(pk = instance.pk)
     if qs.exists():
         raise ValidationError(f"{name} {surname} is already in the system.")
+    
+def validate_date_employed(date_employed):
+
+    today = timezone.now()
+
+    if today < date_employed:
+        raise ValidationError("Cannot have an employment date in the future.")
+    
+    return date_employed
     
 def validate_date_of_birth(dob):
 
@@ -101,3 +114,24 @@ def validate_shift_time(employee, start_time,end_time, instance = None):
         raise ValidationError(f"This shift overlapps with another shift for {employee.name}  {employee.surname}.")
     
     return start_time,end_time
+
+def validate_unique_menu_item_name(name,restaurant, instance = None):
+
+    from .models import MenuItem
+
+    qs = MenuItem.objects.filter(name__iexact = name, restaurant = restaurant)
+
+    if instance and instance.pk:
+        qs = qs.exclude(pk = instance.pk)
+    
+    if qs.exists():
+        raise ValidationError(f"The restaurant {restaurant} already has a dish called '{name}'.")
+    
+    return name, restaurant
+
+def validate_calories(calories):
+
+    if calories > 1000:
+        raise ValidationError(f" Cannot have an item exceed 1000kcal (this item has {calories}kcal).")
+    
+    return calories
