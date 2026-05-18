@@ -190,7 +190,7 @@ class Shift(models.Model):
     )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    # Why duration and earnings are null? We calculate it at the end
+    # Why duration and earnings are null? They are not manually entered in forms, they get worked out manually
     duration_hours = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     earnings = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
@@ -202,22 +202,19 @@ class Shift(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="planned")
         
     def clean(self):
-
         validate_shift_time(self.employee, self.start_time, self.end_time, instance = self)
 
-    #########    #########    #########    #########    #########    #########    #########    #########
-
+    # If validation passes, save gets used at the very end to save python object to DB.
     def save(self, *args, **kwargs):
-        if self.start_time and self.end_time and self.employee_id:
-            delta = self.end_time - self.start_time
-            self.duration_hours = delta.total_seconds() / 3600
+        if self.start_time and self.end_time and self.employee:
+            duration = self.end_time - self.start_time
+            self.duration_hours = duration.total_seconds() / 3600
 
-            pay = float(self.employee.pay_per_hour) if self.employee_id else 0
+            pay = float(self.employee.pay_per_hour)
             self.earnings = self.duration_hours * pay
 
         super().save(*args, **kwargs)
     
-
     def __str__(self):
         return f"{self.employee_id} | {self.start_time} - {self.end_time}"
 

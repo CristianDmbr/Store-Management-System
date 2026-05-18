@@ -375,7 +375,7 @@ class IndividualShiftView(ListView):
     context_object_name = "individual_user_shifts"
 
     def get_queryset(self):
-        return Shift.objects.filter(employee = get_object_or_404(Sçtaff, pk = self.kwargs['pk'])).order_by("start_time")
+        return Shift.objects.filter(employee = get_object_or_404(Staff, pk = self.kwargs['pk'])).order_by("start_time")
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

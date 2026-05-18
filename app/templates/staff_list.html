@@ -17,6 +17,7 @@
                 Pay/hour: £{{ staff.pay_per_hour }}
                 <a href="{% url 'staff_update' staff.pk %}">Edit</a>
                 <a href="{% url 'staff_delete' staff.pk %}">Delete</a>
+                <a href="{% url 'add_individual_shifts' staff.pk %}">Add Shift</a>
                 <small>
                     <a href="{% url 'individual_shifts' staff.pk %}">
                         {{ staff.name }}'s Shifts

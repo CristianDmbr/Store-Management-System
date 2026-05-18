@@ -1,11 +1,12 @@
 # TODO
 - [ ] Centralise validations
-- [ ] Finish REST API for the all of the models
+- [ ] Finish REST API for the all of the models and add validations from validators.py
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)
+- [ ] For each employee you can see how much they earned and how much they are predicted to earn, add tax, add hours per week.
 - [ ] Review that the website all makes sense and make a diagram
-- [ ] Shift list addition
+
 
 ROAD MAP : 
 1. 
