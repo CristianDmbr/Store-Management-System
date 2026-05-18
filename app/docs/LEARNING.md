@@ -3,7 +3,32 @@
 # Interpreter : A program that read and executes code/commands
 # Hanging : A process appears to be stuck or unresponsive
 
-# Keep reusable global rule validators to just models.py for cleaner code which automatically gets put onto forms and serializers
+# Keep reusable global rule validators to just models.py for cleaner code which automatically gets put onto forms
+# Forms does not activate the def clean() from models so just mention it inside of the serializer
+
+# Validators that depend on a foreign key relationship are usually placed inside the model that owns or defines that foreign key relationship.
+
+# Local Python object memory
+My confusion is how does self.restaurant_name works for a row I am trying to create which does not exist in the database?
+A model instance can exist in Python memory before it exists in the database.
+There are two things : Python objects in memory and a actual database row.
+When submiting a form, Django does not automatically save it DB but it first creates a dictionary instance which is a Python object, living in memory, not saved yet, its not a DB row yet but its an instance.
+The self is never None since it always exists inside of function since Django already created a model object in Python memory, its the self.pk that is None because it has not been saved to database yet.
+Forms does not work with database row dirrectly, it uses Python model objects.
+Model is just a blue print used for Python model objects.
+SERIALIZERS WORK THE SAME WAY AS FORMS.
+
+# UPDATE single row with Python object memory:
+Extract row from database and this row becomes a Python object, pass this object into form so instance = restaurant so it means update this object instead of create a new one. Django updates the same Python object so the object changes in memeory and this same object gets send for validation inside of the models.py.
+
+
+# Why have validators with instance = None if theres always a instance?
+Because we want validators to be reusable and some things like tests or shell scripts does not have instance.
+
+# How does self work for both creatinga and updating if used inside of models.py ?
+Both Create and Update use a model object in memory so in both cases self and self.restaurant_name works.
+CREATE : user submits form data and Django created a new Python model object which exists inside Python memory, not in database yet but has no self.pk yet so when restaurant.clean() is ran self works because self is a temporary Python object.
+UPDATE : Django first loads existing databse row, it then becomes a Python object, form updates it so restaurant.clean is ran again but with pk = 5
 
 # Django forms:
 Uses clean_<field_name> to automatically pass the parameter

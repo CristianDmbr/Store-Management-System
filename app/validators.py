@@ -4,6 +4,10 @@ from django.core.exceptions import ValidationError
 # When we use this Validation for a CREATE we dont pass the object we want to create since its new meaning instance by default is None,
 # this there is nothing for this query set array to ignore.
 # If its an UPDATE request then we pass the Object itself and ignore it inside of the query set array.
+
+# Cure business rule : core rule of application lives. e.g. database validators.
+# Meaning its more professional to have them inside models.py since models.py gets ran by forms, admin and so no whenerver we want to make a change.
+# We do however have behavioural specific validations for forms or serialisers which do require unique validators.
 def validate_unique_restaurant_name(name, instance=None):
 
     # Prevents infinite loop over importing validator in models.py and model in validators.py
