@@ -1,5 +1,6 @@
 # TODO
 - [ ] Finish the backend for APIs
+- [ ] TDD testing
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)

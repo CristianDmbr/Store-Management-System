@@ -1,4 +1,5 @@
 # Manually made by me
+
 # Serialisation is converting Python objects into a format that can be sent over to the intervet (usually JSON) (Deserialization)
 # This is needed because say restaurant = Restaurant.objects.first() is not understood by browser and frontend
 # The serialisation doesn't convert into JSON straight away how it works is that the serialisation first takes the DJANGO objects
@@ -26,6 +27,8 @@
 # Because its validate_<restaurant_name> it automatically passes the restaurant name# Validation in DRF is more direct so no nead for clean_data to get data.
 # Working with more than one field inside of def DRF function:
 # def validate(self, attrs) attrs = attributes (Validated Python values/objects)
+
+# Serializers only call the models.py database level constrants (because enforced by database) and not the validators in clean () so we have to call them here.
 
 from rest_framework import serializers
 from .models import Restaurant, Reservation, Staff, Shift, MenuItem
