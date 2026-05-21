@@ -1,6 +1,10 @@
 # TODO
-- [ ] Finish the backend for APIs
 - [ ] TDD testing
+1. Validator tests
+2. Model tests
+3. Serializer tests
+4. API endpoint tests
+5. Authentication/permission tests
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)

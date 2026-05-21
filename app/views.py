@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm
-from .serialisers import RestaurantSerialiser
+from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
@@ -288,6 +288,22 @@ class ReservationCreateView(CreateView):
             # forms.HiddenInput() user does not see the field but it still gets submitted to DB because of previous get_initial.
             form.fields["restaurant"].widget = forms.HiddenInput()
         return form
+    
+class ReservationListCreateAPI(generics.ListCreateAPIView):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerialiser
+
+    def delete(self, *args,**kwargs):
+        Reservation.objects.all().delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
+        
+    def get_queryset(self):
+        return super().get_queryset().order_by("restaurant")
+
+class ReservationRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerialiser
+    lookup_field = "pk"
 
 ######################################################___Menu List___######################################################
     
@@ -323,6 +339,28 @@ class MenuListView(FormMixin, ListView):
         # Re render the exact page but with included invalid errors
         return self.get(request, *args, **kwargs)
 
+class MenuListCreateAPI(generics.ListCreateAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerialiser
+
+    def delete(self, *args,**kwargs):
+        MenuItem.objects.all().delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("restaurant")
+
+class MenuItemRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerialiser
+    
+    def get_object(self):
+        return get_object_or_404(
+            MenuItem,
+            name__iexact = self.kwargs["name"],
+            restaurant__restaurant_name__iexact = self.kwargs["restaurant"]
+        )
+
 ######################################################___Staff___######################################################
 
 class StaffView(CreateView):
@@ -347,6 +385,28 @@ class StaffDelete(DeleteView):
     model = Staff
     template_name = "staff_delete.html"
     success_url = reverse_lazy("staff_list")
+
+class StaffListCreateAPI(generics.ListCreateAPIView):
+    queryset = Staff.objects.all()
+    serializer_class = StaffSerialiser
+
+    def delete(self, *args, **kwargs):
+        Staff.objects.all().delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("restaurant")
+
+class StaffRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Staff.objects.all()
+    serializer_class = StaffSerialiser
+    
+    def get_object(self):
+        return get_object_or_404(
+            Staff,
+            name__iexact = self.kwargs["name"],
+            surname__iexact = self.kwargs["surname"]
+        )
 
 ######################################################___Shift___######################################################
 
@@ -401,6 +461,23 @@ class AddIndividualShiftView(CreateView):
         context = super().get_context_data(**kwargs)
         context["employee"] = get_object_or_404(Staff, pk=self.kwargs["pk"])
         return context
+
+class ShiftListCreateAPI(generics.ListCreateAPIView):
+    queryset = Shift.objects.all()
+    serializer_class = ShiftSerialiser
+
+    def delete(self,*args,**kwargs):
+        Shift.objects.all().delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("employee")
+
+class ShiftRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Shift.objects.all()
+    serializer_class = ShiftSerialiser
+    lookup_field = "pk"
+    
 
 ######################################################___Other___######################################################
 

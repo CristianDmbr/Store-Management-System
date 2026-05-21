@@ -304,3 +304,27 @@ I then entered < docker build -t restaurant-app .> which read the DockerFile, fo
   - One DockerFile usually describes one application/image so each project gets its own docker file
 - Check for image list: <docker image ls>
 - Check for running containers : <docker ps>
+
+# Pass one URL Converter:
+lookup_field = "pk"
+  
+# Pass more than one URL Converters
+path("individual_staff/<str:name>/<str:surname>",StaffRetreiveUpdateDestroyAPI.as_view(), name = "staff_retrieve_update_destroy"),
+<class StaffRetreiveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Staff.objects.all()
+    serializer_class = StaffSerialiser
+    
+    def get_object(self):
+        return get_object_or_404(
+            Staff,
+            name__iexact = self.kwargs["name"],
+            surname__iexact = self.kwargs["surname"]
+        )>
+    
+# When passing more than one converter that is from a FK module:
+def get_object(self):
+        return get_object_or_404(
+            MenuItem,
+            name__iexact = self.kwargs["name"],
+            restaurant__restaurant_name__iexact = self.kwargs["restaurant"]
+        )

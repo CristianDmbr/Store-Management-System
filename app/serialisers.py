@@ -42,7 +42,7 @@ from .validators import  (  validate_unique_restaurant_name, validate_appropriat
 class RestaurantSerialiser(serializers.ModelSerializer): 
   class Meta:
     model = Restaurant
-    fields = ["restaurant_name","owner","date_opened","location","restaurant_cuisine","capacity"]
+    fields = ["pk","restaurant_name","owner","date_opened","location","restaurant_cuisine","capacity"]
 
   def validate(self, attrs):
     restaurant_name = attrs.get("restaurant_name")
@@ -55,7 +55,7 @@ class RestaurantSerialiser(serializers.ModelSerializer):
 class ReservationSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Reservation
-    fields = ["name_of_reservation","restaurant","is_active","kids","teens","adults"]
+    fields = ["pk","name_of_reservation","restaurant","is_active","kids","teens","adults"]
 
   def validate(self, attrs):
     name_of_reservation = attrs.get("name_of_reservation")
@@ -67,7 +67,7 @@ class ReservationSerialiser(serializers.ModelSerializer):
 class StaffSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Staff
-    fields = ["name","surname","manager","restaurant","date_of_birth","date_employed","work_right","position","pay_per_hour"]
+    fields = ["pk","name","surname","manager","restaurant","date_of_birth","date_employed","work_right","position","pay_per_hour"]
   
   def validate(self, attrs):
 
@@ -78,7 +78,7 @@ class StaffSerialiser(serializers.ModelSerializer):
 
     validate_unique_name_and_surname(name,surname,self.instance)
     validate_date_of_birth(date_of_birth)
-    validate_date_employed(date_employeed)
+    validate_date_employed(date_employed)
 
     return attrs
   
