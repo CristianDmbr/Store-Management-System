@@ -454,6 +454,8 @@ class AddIndividualShiftView(CreateView):
         form = super().get_form(form_class)
         # Instance is the current form we want to save inside of the model.
         # This shift belongs to employee with pk from kwargs
+        # Employee_id is automatically created by the foreign key relationship, so be careful with the naming.
+        # But we could also just get the Emplyee object and assign it to the instance.employee = staff_object
         form.instance.employee_id = self.kwargs["pk"]
         return form
 
@@ -461,7 +463,7 @@ class AddIndividualShiftView(CreateView):
         context = super().get_context_data(**kwargs)
         context["employee"] = get_object_or_404(Staff, pk=self.kwargs["pk"])
         return context
-
+ 
 class ShiftListCreateAPI(generics.ListCreateAPIView):
     queryset = Shift.objects.all()
     serializer_class = ShiftSerialiser

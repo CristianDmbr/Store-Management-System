@@ -11,6 +11,21 @@
 
 # save() is the very last function ran by Django after validating everything and before saving to DB.
 
+# Prefill the field 2 ways:
+Hidden prefilled form field : The field is included in the form, prefilled with a value using get_initial(), then hidden from the user with HiddenInput so it still gets submitted automatically.
+Backend assignment model instance: The field is completely excluded from the form and instead assigned directly to form.instance before the model object is saved to the database.
+1. Django creates a form instance using submitted form data.
+2. The form instance internally creates and populates a temporary model instance.
+3. The model instance is still only in Python memory and not saved to the database yet.
+4. form.save() is what finally saves it to the database.
+
+# Flow of forms instance and model instance
+1. User submits data request.POST (containing raw strings)
+2. Django creates a FORM instance (ShiftForm(request.POST) (validation object))
+3. Form creates an interval model instance and its populated with validated data (Still not saved yet)
+4. Get form runs After Django created the form instance but also before the final database save (So temporary model object exists and its populated with submited form data, but you can modify it before save happens)
+5. You can modify the form.instance and then its form.save() to the database
+   
 # Serialisation
 It converts any database row or input into a Python model object (Python array of python dictionaries) and the response turn it into JSON. So that's why model validation, ORM still works.
 
