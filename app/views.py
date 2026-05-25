@@ -154,6 +154,11 @@ class RestaurantCreate(CreateView):
     # reverse_lazy doesnt resolve it immediatelly but instead it waits until  URL is needed.
     success_url = reverse_lazy("restaurant_list")
 
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["capacity"] = 100
+        return initial
+
     # UpdateView uses a get_object to get the pk and filter the exact row and then it passes it through the form.
     # GET -> show form (with prefilled data from row), POST -> UPDATE object
 class RestaurantUpdate(UpdateView):
@@ -172,7 +177,7 @@ class RestaurantUpdate(UpdateView):
     # Main attributes : returns one object, used in UpdateView, DeleteView, DetailView, it uses pk from the path converter passed to URL.
     # Below you will see how it works by default:
     def get_object(self):
-        return Restaurant.objects.get(pk = self.kwargs["pk"])
+        return get_object_or_404(Restaurant, pk = self.kwargs["pk"])
 
 
     # Delete View works almost the same as UpdateView but it retrieves ONE object using a pk and then it deletes it instead of updating it.
@@ -451,7 +456,7 @@ class AddIndividualShiftView(CreateView):
         # Employee id is not present in the form.
         # This is a Shift method where you exclude field and set it in the background
     def get_form(self, form_class=None):
-        form = super().get_form(form_class)
+        form = super().get_form()
         # Instance is the current form we want to save inside of the model.
         # This shift belongs to employee with pk from kwargs
         # Employee_id is automatically created by the foreign key relationship, so be careful with the naming.

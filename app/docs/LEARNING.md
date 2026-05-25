@@ -343,3 +343,49 @@ def get_object(self):
             name__iexact = self.kwargs["name"],
             restaurant__restaurant_name__iexact = self.kwargs["restaurant"]
         )
+
+# get_form() Utilisation
+( My Confusion was that get_form was used to get form during a GET request but also it can we used with .instance to modify during a POST request )
+- get_form its used both on GET and POST requests. Its used for displaying forms but also when processing submitted forms.
+Full Flow :
+GET : 
+1. User opens page GET /shift/5/add and CreateView CBV calls get_form(), 
+2. Inside get_form() Django creates a form = super().get_form() (Empty form of ShiftFormEmployeeForm). And internally it makes a form.instance = Shift() which is a empty unsaved model object
+3. The model instance gets modified < form.instance.employee_id = self.kwargs["pk"] > So now the temporary Shift Object has employee already attatched to it
+4. Template renders the forms where only start_time, end_time and status is shown (Thats because we do not mention employee_id inside of the form.)
+  
+POST : 
+1. CreateView is called again and it calles get_form() but with a request.POST
+2. So this time it creates a form = ShiftForm(request.POST) 
+ < form.instance = Shift(
+    start_time=...,
+    end_time=...,
+    status=...
+) > (Still not saved)
+3. Override runs again < form.instance.employee_id = self.kwargs["pk"]> so this employee gets added before validation/save
+4. Validation runs and the employee field is longer missing
+With my example of : 
+< def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Instance is the current form we want to save inside of the model.
+        # This shift belongs to employee with pk from kwargs
+        # Employee_id is automatically created by the foreign key relationship, so be careful with the naming.
+        # But we could also just get the Emplyee object and assign it to the instance.employee = staff_object
+        form.instance.employee_id = self.kwargs["pk"]
+        return form > I have overrode for both POST and GET (Its most important during POST)
+
+Why for < def get_form(self, form_class=None): > we mention form_class = None? 
+If no custom form is passed, use the default self.form_class. 
+Between < super().get_form(form_class) > and < form = super().get_form() > use second its more simple 
+
+# Preffiling FK.
+When filling the id field of a FK e.g. form.instance.employee_id = 5 we need the raw data < form.instance.employee_id = self.kwargs["pk"] >
+But we could also do a Full object with form.instance.employee = get_object_or_404(Employee, pk = self.kwargs["pk"])
+(Raw is a bit more efficient because it doesnt require extra DB query)
+
+## Main Request lifecycle methods:
+< get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
+< get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)
+< get_context_data() > : Extra variables to template.
+< get_initial() > : Prefill form default before rendering
+< get_form() > : Modify form object before validation,rendering (Hide fields, inject FK, disable fields, dynamic forms)  
