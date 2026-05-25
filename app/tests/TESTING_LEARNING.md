@@ -15,4 +15,26 @@ Packages : Django's LiveServerTestCase, Selenium, Cypress
 Packages : unittests, pytest, Selenium
 
 # The unittest (Unit testing framework)
-Django's test are built on top of.
+Django's test are built on top of and adds more utilities on top of it.
+It supports object oriented concepts.
+ 
+- Test fixture : preperation needed to perform one or more tests, any cleanup actions. (e.g. creating temporary proxy or data or starting a server process).
+- TestCase : The individual unit of testing. Checks for a specific response to a particular set of inputs. 
+- Test suite : A collection of test cases. Used to aggregate tests that should be executed together.
+- Test runner : Component that orchestrates the execution of tests and provides outcome to the user. Could be a graphical interface, texture interface or return special value to indicate result of executing the tests.
+
+# Assertions
+Checks inside tests that verify your code behaves as expected.
+
+Main assert methods:
+1. Equality: self.assertEquality(a,b) a == b
+2. True/False self.assertTrue(condition) self.assertFalse(condition) 
+3. None self.assertIsNone(value) self.assertIsNotNone(value)
+4. Exception testing:
+< with self.assertRaises(ValidationError) >
+example of :
+< with self.assertRaises(ValidationError):
+    validate_calories(5000) > 
+Means this must raise ValidationError so because we cant have more than 1000 kcal then 5000 unit test will be true since it fails the test. If it doesnt raise a error then it will return False
+5. Contains self.assertIn("pizza",list)
+
