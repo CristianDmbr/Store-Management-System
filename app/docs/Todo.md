@@ -1,4 +1,5 @@
 # TODO
+- [ ] Pupose of 
 - [ ] TDD testing
 1. Validator tests
 2. Model tests

@@ -389,3 +389,30 @@ But we could also do a Full object with form.instance.employee = get_object_or_4
 < get_context_data() > : Extra variables to template.
 < get_initial() > : Prefill form default before rendering
 < get_form() > : Modify form object before validation,rendering (Hide fields, inject FK, disable fields, dynamic forms)  
+
+# Purpose of __init__ in folders
+When Python sees __init__.py inside a folder it understands that this folder containts python code that can be treated as a package, so files inside it can be imported else where. For example the reason we can do from app.models import Restaurant.
+This files/modules inside a package inside it can be imported elsewhere.
+
+< Found 1 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+Destroying test database for alias 'default'... >
+
+Found 1 test means 1 test method inside it, Creating test database uses a temp isolated database. (The temporary test database is built using the same models, fields, migrations, and table structure as your real database.)
+System check looks into all parts of Django : Models, URLs and so on. 0 silenced means no problems found.
+<.> Each dot represents a test passed successfully
+The last < OK > means all test passed
+Then DB gets destroyed
+
+1. Django found tests
+2. Created temporary DB
+3. Ran system checks
+4. Executed tests
+5. All passed
+6. Deleted temporary DB
