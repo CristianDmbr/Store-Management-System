@@ -391,8 +391,13 @@ But we could also do a Full object with form.instance.employee = get_object_or_4
 < get_form() > : Modify form object before validation,rendering (Hide fields, inject FK, disable fields, dynamic forms)  
 
 # Purpose of __init__ in folders
+< __init__ > package initializer file
+Its primarily for Python not Django.
 When Python sees __init__.py inside a folder it understands that this folder containts python code that can be treated as a package, so files inside it can be imported else where. For example the reason we can do from app.models import Restaurant.
 This files/modules inside a package inside it can be imported elsewhere.
+So Python uses the initializer file to recognise a folder as a importable Python package/modules.
+Package : A folder containing Python modules/files
+A module : A single Python File
 
 < Found 1 test(s).
 Creating test database for alias 'default'...
@@ -416,3 +421,120 @@ Then DB gets destroyed
 4. Executed tests
 5. All passed
 6. Deleted temporary DB
+
+# Backend Architecture (Forms -> Model Instance -> Python Object Flow)
+# GET request:
+1. Calls get_form() to make an empty form object < form = RestaurantForm() > which: Renders HTML inputs, Users sees form
+(An empty form object is created and an empty form.instance model object does exist but its not populated)
+
+
+# POST request:
+1. User sends a request.POST
+2. A new Django form.instance is created < RestaurantForm(request.POST) > (This is a new instance that is different from the empty one from get_form during the GET request)
+3. Inside of this form.instance we also create a empty python memory Model instance Restaurant() where the data to the fields are None
+4. We can modify any sent POST request using get_form.instance to make changes or insert data into it before we send it to validate.
+5. We call form.is_valid(): which will convert all string user input into Python data types ("50" to int 50), it will run clean_field(),clean().
+6. If validation is successfull it will generate a cleaned_data() which is a Python dictionary of inputs converted into proper data types.
+7. This cleaned_data() is copied inside of forms.instance() and inside of the emtpy Model instance Restaurant(cleaned_data).
+8. form.save() is ran which then calls model.save() which takes this model instance with validated data, inserts/updates it into the database, which runs database constraints and saves it.
+
+
+- Form instance : It contains fields from the model, validation rules, widgets, errors
+- Cleaned_data : form_data after we validate the form.instance (A dictionary)
+{
+    "restaurant_name": "Pizza Palace",
+    "capacity": 50
+}
+- Django model instance is a Python Object representing a database row so thats why we can do < form.instance.capacity >
+  e.g. 
+  restaurant = Restaurant(
+    restaurant_name="Pizza Palace",
+    capacity=50
+)
+
+# GET vs POST flow
+GET : 
+- View
+- get_initial()
+- get_form()
+- get_context_data()
+- template render
+
+POST :
+- View
+- get_form()
+- form_created using request.POST
+- form.instance exists 
+- validation
+- form_valid()
+- form.save()
+- model_save()
+
+# Modifying POST request :
+1. Modify form.instance (Most Common)
+  < form.instance.name = ... > (Professional and clean)
+2. Modify the request data itself 
+  < data = request.data.copy() 
+    data["owner"] = request.user.id> (We have to copy the request.data because it can be imuttable sometimes, at the end return the copied/modified data)
+
+# many = True
+In DRF we have a many = True concept where we can make it so the serializer object expects more than one object, e.g. a queryset. 
+Forms don't have this since it always expects only one object.
+
+# serialzier.validated_data == form.cleaned_data
+
+# Why does serializers have a Many = True?
+Also why does a ListCreateAPIView use a serializer. DEF always works throught serializers. 
+A serializer is used for BOTH GET list and POST create.
+
+# GET DRF:
+< restaurant = Restaurant.object.all()
+  serializer = RestaurantSerializer(
+    restaurants,
+    many = True
+  ) > 
+
+< serializer.data >
+[
+    {
+        "id": 1,
+        "restaurant_name": "Pizza"
+    }
+]
+
+# Does GET DRF validate eveyrthing? 
+The reason we have a serializer is to convert Model Objects into Python Dictionaries to be used JSON.
+
+# Serializer GET request Flow
+1. Restaurant.objects.all()
+2. Serializer used with < RestaurantSeriazlier(queryset, many = True) >
+3. serializer.data is a Python List of dictionaries.
+4. Response (seriazlier.data)
+5. JSON gets sent to client
+
+# POST DRF request Flow:
+1. User sends JSON request.data
+{
+    "restaurant_name": "Pizza Palace",
+    "capacity": 50
+}
+2. Create serializer using this data < serializer = RestaurantSerializer( data=request.data )>
+No model instance yet, unlike ModelForms, serializers do not create an empty model instances immediately.
+3. Validate using serializer.is_valid() which creates serializer.validated_date()
+{
+    "restaurant_name": "Pizza Palace",
+    "capacity": 50
+} equaivalent of form.cleaned_data
+4. Save the serializer serializer.save()
+5. Make a model instance 
+  Restaurant.objects.create(
+    **serializer.validated_data
+)
+5. save it.
+6. After saving it take the model instance we just made and serialize it again to turn it back into a python dictionary which is serialzier.data
+7. use this serialized.data to make a JSON response to show back to user.
+
+
+# Difference between form request.data and serializer request.data which comes from POST
+Django Forms : The user input of forms comes in a form of a Python dictionary where all the values are strings, these values are converte into Python types during is_valid() e.g. "50" to int 50
+DRF : sends the data into the serializer as an already parsed from JSON to Python Objects using DRF's parse before validation starts.

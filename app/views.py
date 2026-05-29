@@ -457,10 +457,7 @@ class AddIndividualShiftView(CreateView):
         # This is a Shift method where you exclude field and set it in the background
     def get_form(self, form_class=None):
         form = super().get_form()
-        # Instance is the current form we want to save inside of the model.
-        # This shift belongs to employee with pk from kwargs
-        # Employee_id is automatically created by the foreign key relationship, so be careful with the naming.
-        # But we could also just get the Emplyee object and assign it to the instance.employee = staff_object
+        # Because get_form gets calles for both GET and POST, We insert this pk into both the instances but the POST is the one that matters.
         form.instance.employee_id = self.kwargs["pk"]
         return form
 
