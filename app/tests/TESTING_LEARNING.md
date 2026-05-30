@@ -41,6 +41,6 @@ Means this must raise ValidationError so because we cant have more than 1000 kca
 # Ways to run tests:
 1. Run all tests < python manage.py tests >
 2. One specific file < python manage.py test app.tests >
-3. One specific file inside a tests folder < python manage.py test app.tests.test_validators >
+3. One specific file inside a tests folder < python manage.py test app.tests.test_validators > 
 4. One specific class < python manage.py test app.tests.test_validators.RestaurantValidatorsTests.test_duplicate_restaurant_name_fails >
 

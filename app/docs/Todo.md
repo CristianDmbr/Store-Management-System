@@ -1,23 +1,82 @@
 # TODO
-- [ ] Also I thoutht that forms make a python objects before saving it using the models but then I realised it makes a Models instance then somehwere and somehow it becomes a python memory object and then it gets validated and saved ( Please explain the flow )
-- [ ] Explain to me the two different types of validators and when it hits the forms because I thought forms instance go thorughtt he models validators
-- [ ] Just give me the flow of GET and POST and where each thing is activated and runs in teh background e.g. get_instance, get_form, save() and so on and so on.
-- [ ] I am confused of I know a get_form  is used for a GET request and then a separate for the POST request but are they using the same get_form.instance ? Like it starts as an emoty forms object are filling it using the psot request and then later we can acess it at the POST get_form.instance to modify it.
-- [ ] When is clean_date made in forms and whats the equivalent in serializers.
-- [ ] How can I modify the POST request ? I thougth I can do it using the get_form instance
-- [ ] Whats the purpose of many = True? when is it used and why?
-- [ ] What does serializer.data do?
-- [ ] Pupose of request.data.copy() in backend
-- [ ] What does it mean serializer.data and what is many = True ans is the same for forms?
 - [ ] TDD testing
-1. Validator tests
-2. Model tests
-3. Serializer tests
-4. API endpoint tests
+  - [ ] Rename misleading test names
+  - [ ] Make positive tests (Where tests are expected to pass)
+1. Model tests
+2. Serializer tests
+3. API endpoint tests
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)
 - [ ] For each employee you can see how much they earned and how much they are predicted to earn, add tax, add hours per week.
 - [ ] Review that the website all makes sense and make a diagram
 - [ ] Learn PostgreSQL properly
-  
+
+- [ ] Understand
+- [ ] < @api_view(['POST'])
+@permission_classes([AllowAny])
+def create_post(request):
+    try:
+        user_id = request.headers.get('x-user-id')
+
+        if not user_id:
+            return Response(
+                {'message': 'Not authenticated'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        data = request.data.copy()
+
+        # Required fields
+        title = data.get('title')
+        content = data.get('content')
+        category = data.get('category')
+
+        if not title or not content or not category:
+            return Response(
+                {'message': 'Title, content, and category are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Auto excerpt
+        if not data.get('excerpt'):
+            data['excerpt'] = content[:150]
+
+        # Tags fallback
+        if data.get('tags') is None:
+            data['tags'] = []
+
+        # Read time auto calc
+        data['read_time'] = max(1, len(content.split()) // 200)
+
+        # Create post
+        post = Post.objects.create(
+            title=title,
+            content=content,
+            excerpt=data['excerpt'],
+            category=category,
+            tags=data['tags'],
+            read_time=data['read_time'],
+            author_id=user_id
+        )
+
+        return Response({
+            'message': 'Post created successfully',
+            'post': {
+                'id': post.id,
+                'title': post.title,
+                'content': post.content,
+                'excerpt': post.excerpt,
+                'category': post.category,
+                'tags': post.tags,
+                'read_time': post.read_time,
+                'published': post.published
+            }
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        print(f'Create post error: {e}')
+        return Response(
+            {'message': 'Server error creating post'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        ) >

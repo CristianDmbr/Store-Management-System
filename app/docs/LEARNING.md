@@ -383,12 +383,6 @@ When filling the id field of a FK e.g. form.instance.employee_id = 5 we need the
 But we could also do a Full object with form.instance.employee = get_object_or_404(Employee, pk = self.kwargs["pk"])
 (Raw is a bit more efficient because it doesnt require extra DB query)
 
-## Main Request lifecycle methods:
-< get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
-< get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)
-< get_context_data() > : Extra variables to template.
-< get_initial() > : Prefill form default before rendering
-< get_form() > : Modify form object before validation,rendering (Hide fields, inject FK, disable fields, dynamic forms)  
 
 # Purpose of __init__ in folders
 < __init__ > package initializer file
@@ -538,3 +532,45 @@ No model instance yet, unlike ModelForms, serializers do not create an empty mod
 # Difference between form request.data and serializer request.data which comes from POST
 Django Forms : The user input of forms comes in a form of a Python dictionary where all the values are strings, these values are converte into Python types during is_valid() e.g. "50" to int 50
 DRF : sends the data into the serializer as an already parsed from JSON to Python Objects using DRF's parse before validation starts.
+
+# Serializer.data:
+< {
+    "id": 1,
+    "restaurant_name": "Pizza Palace"
+} >
+
+# QuerySet
+< restaurants = Restaurant.objects.all()
+
+for restaurant in restaurants:
+    print(restaurant.restaurant_name) > 
+
+[
+    Restaurant(
+        restaurant_name="Pizza Palace",
+        capacity=50
+    ),
+    Restaurant(
+        restaurant_name="Burger House",
+        capacity=100
+    )
+]
+
+# Query Parameters 
+URL : < /api/restaurants/search?name=pizza&location=london >
+But the actual URL route is < api/restaurant/search >
+
+How to Extract : 
+- CBV or FBV: request.GET.get("name")
+- DRF : request.query_params.get("name)
+
+Purpose of URL converters : Identify a specific resource
+Purpose of a query parameter : optional settings for filtering, searching, 
+
+
+## Main Request lifecycle methods:
+< get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
+< get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)
+< get_context_data() > : Extra variables to template.
+< get_initial() > : Prefill form default before rendering
+< get_form() > : Modify form object before validation,rendering (Hide fields, inject FK, disable fields, dynamic forms)  
