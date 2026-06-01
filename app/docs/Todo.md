@@ -1,6 +1,5 @@
 # TODO
 - [ ] TDD testing
-  - [ ] Rename misleading test names
   - [ ] Make positive tests (Where tests are expected to pass)
 1. Model tests
 2. Serializer tests

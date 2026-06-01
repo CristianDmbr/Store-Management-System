@@ -20,6 +20,9 @@ from app.validators import (
     validate_unique_menu_item_name, validate_calories
 )
 
+# Unit Test professional naming patter :
+# < test_<condition>_<expected_result> >
+
 # Test Suite for restaurant
 class RestaurantValidatorTests(TestCase):
 
@@ -41,13 +44,20 @@ class RestaurantValidatorTests(TestCase):
             capacity = 50
         )
     
+    def test_unique_restaurant_name_pass(self):
+
+        result = validate_unique_restaurant_name("Andys")
+
+        self.assertEqual(result, "Andys")
+
+
     def test_duplicate_restaurant_name_fails(self):
         # "with" just means run the code below and watch if it pass or fail
         # Besides ValidationError we can put other errors e.g. ValueError
         with self.assertRaises(ValidationError):
             validate_unique_restaurant_name("pizza palace")
         
-    def test_valid_appropriate_restaurant_name(self):
+    def test_inappropriate_restaurant_name_fails(self):
         with self.assertRaises(ValidationError):
             validate_appropriate_restaurant_name("xxx")
     
@@ -74,7 +84,7 @@ class ReservationValidatorsTests(TestCase):
             adults = 5
         )
     
-    def test_duplicate_reservation(self):
+    def test_duplicate_reservations_fails(self):
         with self.assertRaises(ValidationError):
             # I have set restaurant to be Restaurant object not just name
             validate_unique_restaurant_name_reservation(reservation_name = "cristian", restaurant = self.restaurant)
@@ -106,22 +116,22 @@ class StaffValidatorsTests(TestCase):
         )
 
 
-    def test_unique_name_and_surname(self):
+    def test_duplicate_name_surname_fails(self):
         with self.assertRaises(ValidationError):
             validate_unique_name_and_surname(name = "Cristian",surname = "Dumbravanu")
         
-    def test_date_employed(self):
+    def test_date_employed_future_date_fails(self):
         future_date = timezone.now() + timedelta(days = 365)
         with self.assertRaises(ValidationError):
             validate_date_employed(future_date)
         
     # Instead of having both test under one function its more professional to have one per behaviour/scenario
-    def test_date_of_birth_underage(self):
+    def test_date_of_birth_underage_fails(self):
         with self.assertRaises(ValidationError):
             
             validate_date_of_birth(date(2021,4,4))
     
-    def test_date_of_birth_future(self):
+    def test_date_of_birth_future_fails(self):
             with self.assertRaises(ValidationError):
                 validate_date_of_birth(date(2027,4,4))
     
@@ -160,11 +170,11 @@ class ShiftValidatorTests(TestCase):
             status="planned"
         )
     
-    def test_shift_overlapping(self):
+    def test_shift_overlapping_fails(self):
         with self.assertRaises(ValidationError):
             validate_shift_time(employee = self.staff, start_time = timezone.now(), end_time = timezone.now() + timedelta(hours = 1))
     
-class ManuItemTests(TestCase):
+class ManuItemValidatorTests(TestCase):
     def setUp(self):
         self.user = User.objects.create(
         username="admin")
@@ -189,10 +199,10 @@ class ManuItemTests(TestCase):
             ingredience="Tomato, Mozzarella, Basil"
         )
     
-    def test_unique_menu_item(self):
+    def test_duplicate_menu_item_fails(self):
         with self.assertRaises(ValidationError):
             validate_unique_menu_item_name(name = "Margherita Pizza",restaurant = self.restaurant)
     
-    def test_calorie_count(self):
+    def test_calorie_count_exceeding_fails(self):
         with self.assertRaises(ValidationError):
             validate_calories(10000)
