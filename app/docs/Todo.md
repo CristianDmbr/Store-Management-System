@@ -1,6 +1,4 @@
 # TODO
-- [ ] TDD testing
-  - [ ] Make positive tests (Where tests are expected to pass)
 1. Model tests
 2. Serializer tests
 3. API endpoint tests

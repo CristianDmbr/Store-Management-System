@@ -48,12 +48,15 @@ class RestaurantValidatorTests(TestCase):
             capacity = 50
         )
     
+    def test_restaurant_name_case_insensitive_fails(self):
+        with self.assertRaises(ValidationError):
+            validate_unique_restaurant_name("PIzza Palace")
+    
     def test_unique_restaurant_name_pass(self):
 
         result = validate_unique_restaurant_name("Andys")
 
         self.assertEqual(result, "Andys")
-
 
     def test_duplicate_restaurant_name_fails(self):
         # "with" just means run the code below and watch if it pass or fail
