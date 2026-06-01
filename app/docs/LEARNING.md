@@ -567,6 +567,20 @@ How to Extract :
 Purpose of URL converters : Identify a specific resource
 Purpose of a query parameter : optional settings for filtering, searching, 
 
+# Definition of < from .models import Restaurant >
+Not importing the database rows but instead the model blueprint which contains the information of the fields and if its CharField,IntegerField etc...
+Restaurant = blueprint
+Restaurant.objects = managaer that can talk to a database
+- My confusion is how does Django know whether to use the test database or the real database?
+Normally Restaurant manager is connecteed to the production database so normally any <.objects> works on the production database.
+But when we run < python manage.py test > it temporarily switches the connection from the real database to the test temporary database and once temporary database is destroyed, it reconnects back to the original database.
+
+# An aware datetime knows the timezone its in but < datetime(2022, 2, 2, 22, 10) > is a naive datetime which does not know the timezone (Only applies to datetime not date)
+aware date time < timezone.make_aware(datetime(2022,2,2,22,10)) >
+naive datetime < datetime(2022,2,2,22,10) >
+
+# Time delta
+timedelta() can be used to modify a datetime field with either days = 1 or hours = 10
 
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)

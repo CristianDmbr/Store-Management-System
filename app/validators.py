@@ -13,6 +13,8 @@ from django.utils import timezone
 # To prevent case sensitive duplicates use __iexact : case insensitive exact match to treat every capitalization versions the same e.g. call bob and it gets you Bob bOb
 # (ONLY WORK ON TEXT/STRING FIELDS NOT FOREINGKEYS)
 
+# A validator should return the validated value or raise ValidationError. Most of the time return one value.
+
 def validate_unique_restaurant_name(name, instance=None):
 
     # Prevents infinite loop over importing validator in models.py and model in validators.py
@@ -58,6 +60,7 @@ def validate_unique_restaurant_name_reservation(restaurant, reservation_name, in
     if qs.exists():
         raise ValidationError(f"{reservation_name} already has an active reservation at {restaurant}.")
     
+    return reservation_name
 
 def validate_unique_name_and_surname(name, surname, instance = None):
 
@@ -69,10 +72,13 @@ def validate_unique_name_and_surname(name, surname, instance = None):
         qs = qs.exclude(pk = instance.pk)
     if qs.exists():
         raise ValidationError(f"{name} {surname} is already in the system.")
+
+    return name,surname
     
 def validate_date_employed(date_employed):
 
     today = timezone.now()
+    # Returns a date time
 
     if today < date_employed:
         raise ValidationError("Cannot have an employment date in the future.")
@@ -127,7 +133,7 @@ def validate_unique_menu_item_name(name,restaurant, instance = None):
     if qs.exists():
         raise ValidationError(f"The restaurant {restaurant} already has a dish called '{name}'.")
     
-    return name, restaurant
+    return name
 
 def validate_calories(calories):
 
