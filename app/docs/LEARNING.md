@@ -579,8 +579,29 @@ But when we run < python manage.py test > it temporarily switches the connection
 aware date time < timezone.make_aware(datetime(2022,2,2,22,10)) >
 naive datetime < datetime(2022,2,2,22,10) >
 
+# timezone.now() vs datetime.now() 
+Both are date time fields but the timezone is imported from djago.utils which makes an aware datetime.
+datetime is imported from datetime
+
 # Time delta
 timedelta() can be used to modify a datetime field with either days = 1 or hours = 10
+
+# My worry with testing was that I only have assertEqual() assertRaises() assertTrue() assertFalse().
+These assertions are 80% - 90% of the Django testing.
+
+# date.today() datetime.now()
+
+# Accessing rows while being a FK
+Suppose you have :
+< class Shift(models.Model):
+    employee = models.ForeignKey(
+        Staff,
+        related_name="shifts",
+        on_delete=models.CASCADE
+    ) >
+Doing staff.shifts doesnt bring the shifts themselves but its a UI related manager to query. e.g. :
+staff.shifts.all()
+staff.shifts.filter()
 
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)

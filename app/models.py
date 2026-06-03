@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
-from datetime import date
+from datetime import date, timedelta, datetime
 from django.core.exceptions import ValidationError
 
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
@@ -13,6 +13,8 @@ from .validators import  (  validate_unique_restaurant_name, validate_appropriat
                            validate_shift_time, # Shift
                            validate_unique_menu_item_name, validate_calories # Menu Item
                            )
+
+# related_name = "str" how we can reverse the fk rows related.
 
 # DataTimeField and DateField
 # DateTime Field : date + time 2026 - 04 - 06 14:30
@@ -90,6 +92,11 @@ class Restaurant(models.Model):
         )
     
     @property
+    def innactive_reservations(self):
+        return sum(
+            r.total_people for r in self.reservations.filter(is_active = False)
+        )
+    @property
     def remaining_spots(self):
         return self.capacity - self.current_occupancy
     
@@ -107,7 +114,8 @@ class Restaurant(models.Model):
         validate_appropriate_restaurant_name(
             self.restaurant_name
         )
-
+    # When you query rows it still comes as  <Restaurant: Pizza Place> even with this __str__, the Pizza Place comes from that __str__.
+    # To only just get the name you can do str(self.RestaurantObject) or print(restaurant).
     def __str__(self):
         return f"{self.restaurant_name}"
     
@@ -173,11 +181,69 @@ class Staff(models.Model):
         validate_unique_name_and_surname(self.name,self.surname,instance = self)
         validate_date_of_birth(self.date_of_birth)
         validate_date_employed(self.date_employed)
+    
+    @property
+    def total_earned(self):
+        return sum(shift.earnings or 0 for shift in self.shifts.all())
+    
+    @property
+    def total_earned_this_week(self):
+        last_week = timezone.now() - timedelta(days = 7)
+
+        return sum(
+            shift.earnings or 0 for shift in self.shifts.filter(start_time__gte = last_week)
+        )
+    
+    @property
+    def total_earned_last_month(self):
+        last_month = timezone.now() - timedelta(days = 30)
+
+        return sum(
+            shift.earnings or 0 for shift in self.shifts.filter(start_time__gte = last_month)
+        )
+    
+    @property
+    def total_earned_last_year(self):
+        last_year = timezone.now() - timedelta(days = 365)
+
+        return sum(
+            shift.earnings or 0 for shift in self.shifts.filter(start_time__gte = last_year)
+        )
+    
+    @property
+    def total_hours_worked(self):
+        return sum(shift.duration_hours or 0 for shift in self.shifts.all())
+    
+    @property
+    def total_hours_worked_last_week(self):
+        one_week_ago = timezone.now() - timedelta(days = 7)
+
+        return sum(
+            shift.duration_hours or 0 for shift in self.shifts.filter(start_time__gte = one_week_ago)
+        )
+        
+    @property
+    def total_hours_worked_last_month(self):
+        
+        one_month_ago = timezone.now() - timedelta(days = 30)
+
+        return sum(
+            shift.duration_hours or 0 for shift in self.shifts.filter(start_time__gte = one_month_ago)
+        )
+
+    @property
+    def total_hours_worked_last_year(self):
+        one_year_ago = timezone.now() - timedelta(days = 365)
+
+        return sum(
+            shift.duration_hours or 0 for shift in self.shifts.filter(start_time__gte = one_year_ago)
+        )
 
     @property
     def age(self):
         today = date.today()
         return (today - self.date_of_birth).days // 365
+    
 
     def __str__(self):
         return f"{self.name} {self.surname}"
