@@ -283,7 +283,7 @@ class Shift(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.employee_id} | {self.start_time} - {self.end_time}"
+        return f"{self.employee} | {self.start_time} - {self.end_time}"
 
 
 class MenuItem(models.Model):

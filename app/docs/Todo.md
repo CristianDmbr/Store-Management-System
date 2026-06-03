@@ -1,7 +1,8 @@
 # TODO
-1. Model tests
-2. Serializer tests
-3. API endpoint tests
+1. View test
+2. API test
+3. Serializer tests
+4. API endpoint tests
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)

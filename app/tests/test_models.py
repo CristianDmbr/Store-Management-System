@@ -4,11 +4,12 @@
 # 4. Constraints and model-level validation
 
 from django.test import TestCase
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
-from app.models import Restaurant, Reservation, Staff
+from app.models import Restaurant, Reservation, Staff, Shift, MenuItem
 
 class RestaurantModelTests(TestCase):
 
@@ -156,14 +157,134 @@ class StaffModelTests(TestCase):
             name = "Ana",
             surname = "Bostan",
             date_of_birth = date.today(),
-            date_employed = datetime.now(),
+            date_employed = timezone.now(),
             work_right = "uk_passport",
             position = "waiter",
             pay_per_hour = "12.00"
+        )
+
+        self.shift_1 = Shift.objects.create(
+            employee=self.staff,
+            start_time=timezone.now() - timedelta(hours=20),
+            end_time=timezone.now() - timedelta(hours=12),
+            status="completed"
+        )
+
+        self.shift_2 = Shift.objects.create(
+            employee=self.staff,
+            start_time=timezone.now() - timedelta(hours=10),
+            end_time=timezone.now() - timedelta(hours=4),
+            status="completed"
+        )
+
+        self.shift_3 = Shift.objects.create(
+                employee=self.staff,
+                start_time=timezone.now() - timedelta(hours=3),
+                end_time=timezone.now(),
+                status="completed"
         )
     
     def test_age_true(self):
         expected_age = (date.today() - self.staff.date_of_birth).days // 365
 
         self.assertEqual(self.staff.age, expected_age)
+    
+    def test_total_earned_pass(self):
+        expected_total_earned = self.staff.total_earned
 
+        self.assertEqual(expected_total_earned, 204)
+    
+    def test_total_hours_worked_passed(self):
+        expected_total_hours_worked = self.staff.total_hours_worked
+
+        self.assertEqual(expected_total_hours_worked, 17)
+
+class ShiftModelTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "KFC",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 100
+        )
+    
+        self.staff = Staff.objects.create(
+            manager = self.user,
+            restaurant = self.restaurant,
+            name = "Ana",
+            surname = "Bostan",
+            date_of_birth = date.today(),
+            date_employed = timezone.now(),
+            work_right = "uk_passport",
+            position = "waiter",
+            pay_per_hour = "12.00"
+        )
+
+        self.shift_1 = Shift.objects.create(
+            employee=self.staff,
+            start_time=timezone.now() - timedelta(hours=20),
+            end_time=timezone.now() - timedelta(hours=12),
+            status="completed"
+        )
+
+        self.shift_2 = Shift.objects.create(
+            employee=self.staff,
+            start_time=timezone.now() - timedelta(hours=10),
+            end_time=timezone.now() - timedelta(hours=4),
+            status="completed"
+        )
+
+        self.shift_3 = Shift.objects.create(
+                employee=self.staff,
+                start_time=timezone.now() - timedelta(hours=3),
+                end_time=timezone.now(),
+                status="completed"
+        )
+    
+    def test__str__pass(self):
+        
+        expected = (
+            f"{self.staff} | "
+            f"{self.shift_1.start_time} - "
+            f"{self.shift_1.end_time}" 
+        )
+
+        self.assertEqual(str(self.shift_1), expected)
+
+class MenuItemModelTests(TestCase):
+
+    def setUp(self):
+
+        self.user = User.objects.create(
+            username="Cristian"
+        )
+
+        self.restaurant = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="KFC",
+            date_opened=date.today(),
+            location="east_london",
+            restaurant_cuisine="fast_food",
+            capacity=100
+        )
+
+        self.menu_item = MenuItem.objects.create(
+            restaurant=self.restaurant,
+            name="Zinger Burger",
+            description="Spicy chicken burger",
+            price=8.99,
+            category="main",
+            availability=True,
+            calories=650,
+            ingredience="Chicken, Bun, Lettuce, Mayo"
+        )
+    
+    def test__str__pass(self):
+        excepted = (
+            f"{self.menu_item.name} ({self.restaurant})"
+        )
