@@ -36,6 +36,8 @@ from app import views
 #   self.object = Restaurant.objects.get(pk = restaurant.pk) so get_object only fetches one row and the form_class is used to display pre filled and 
 #   validate that one row.
 
+# URL ROUTER : 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 

@@ -1,4 +1,5 @@
 # TODO
+REVISE BODY OF REQUEST AND REPLIES FOR VIEWS
 1. View test
 2. API test
 3. Serializer tests

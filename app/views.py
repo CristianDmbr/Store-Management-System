@@ -128,6 +128,7 @@ class RestaurantList(ListView):
     template_name = "restaurant_list.html"
     # Context object name allows to change the variable name which we use inside of the restaurant_list.html 
     # e.g. : <for restaurant in restaurants>
+    # changes the query name to restaurants inside of the get_context_data 
     context_object_name = "restaurants"
 
     # get_context_data is a prebuilt Django function which builds the context dictionary sent into the template.

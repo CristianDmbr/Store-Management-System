@@ -478,7 +478,7 @@ Forms don't have this since it always expects only one object.
 # serialzier.validated_data == form.cleaned_data
 
 # Why does serializers have a Many = True?
-Also why does a ListCreateAPIView use a serializer. DEF always works throught serializers. 
+Also why does a ListCreateAPIView use a serializer. DRF always works throught serializers. 
 A serializer is used for BOTH GET list and POST create.
 
 # GET DRF:
@@ -602,6 +602,96 @@ Suppose you have :
 Doing staff.shifts doesnt bring the shifts themselves but its a UI related manager to query. e.g. :
 staff.shifts.all()
 staff.shifts.filter()
+
+# What is self.client()
+When Django creates a TestCase (e.g. RestaurantViewTests(TestCase)) it automatically creates a < self.client > which represents a fake browser. So instead of having a Real Browser asking requests of the URL router we have the Django Test Client communicationg to the url router similar to how we have a temporary DB inside a TestCase.
+With this self.client we can also do a POST.
+GET : 
+< response = self.cient.get(reverse("restaurant_list")) >
+Push : 
+< response = self.client.post(reverse("restaurant_add"),{"restaurant_name" : kfc, ...}) >
+
+# Purpose of reverse("restaurant_list")
+It convets "restaurant_list" into "/restaurants/".
+Using the url router it will return < "/restaurants/" >
+The client sends GET "/restaurants/" to Django and it finds the path with the RestaurantList.as_view().
+Django then executes the RestaurantList and this view returns a Django HttpResponse object containing :
+- status_code : 200
+- content : rendeted HTML
+- context : {"restaurants" : < queryset >}
+- templates = [""restaurant_list.html]
+
+# self.assertTemplateUsed checks if the Http response used the template, not if the template equals the response.
+
+# Why not import a CBV for testing?
+Users dont do RestaurantList() instead it they call GET /restaurant/ so the tests should do the same.
+  
+# Status_code
+Every HTTP response contains a status code.
+Easy memory trick :
+2xx = Sucess
+3xx = Redirect
+4xx = User Problem
+5xx = Programmer Problem
+
+# What is happening in :
+<  def test_restaurant_list_contains_restaurants_pass(self):
+
+        response = self.client.get(
+            reverse("restaurant_list")
+        )
+
+        self.assertIn(self.restaurant, response.context["restaurants"]) >
+1. This TestCase creates a temporary database with real database rows inside.
+2. Client makes a request so the name of url "restaurant_list" gets converted to a real URL request GET /restaurants/ just like a browser.
+3. In the URL router it executes RestaurantList
+4. The CBV queries the TEST database with get_queryset() from the temporary database.
+5. This query set is placed inside get_context which gets passed to the template to show as restaurants because of related_object_name. 
+6. Template received the context with the query set and is kept within the response.context["restaurants"]
+7. We compare if our Model instance self.restaurant object is within this queryset of other model instance objects. 
+   
+# Idea of having tests inside of unit tests
+We can have multiple self.asserts under the same unit test if its under the same behaviour. e.g. :
+<     def test_restaurant_age_are_ordered_by_date_opened_descending_pass(self):
+        
+        older_restaurant = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Old Restaurant",
+            date_opened=date(2020, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=50
+            )
+
+        newer_restaurant = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="New Restaurant",
+            date_opened=date(2025, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=50
+            )
+        
+        response = self.client.get(reverse("restaurant_list"))
+        restaurants = list(response.context["restaurants"])
+
+        self.assertEqual(self.restaurant,restaurants[0])
+        self.assertEqual(newer_restaurant, restaurants[1])
+        self.assertEqual(older_restaurant, restaurants[2]) >
+    
+# self.assertIsInstance
+It can be used to check if a response from the server has the instance of a form.
+<     def test_restaurant_create_uses_restaurant_form(self):
+        response = self.client.get(reverse("restaurant_create"))
+        self.assertIsInstance(response.context["form"],RestaurantForm) >
+  
+# Check amount of rows in a Database:
+< Restaurant.objects.count() >
+
+# Redirect success_code = 302
+
+# Failed POST request
+If a POST request fails status code will be 200 because it has failed and curr page will reload again with error.
 
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
