@@ -3,6 +3,7 @@
 # Also test any modifications to the parent case methods
 
 # e.g. CreateView RestaurantCreate : Can I acess form, Can I create Object, Does it redirect, Do my custom modifications work?
+# e.g. UpdateView RestaurantUpdate : Page returns 200, Correct form is used, Correct template is used, existing object is used, sucessfully updates
 
 # In Django this response we get from a self.client is a Django HttpResponse object containing 
 # status_code : 200, content : rendered HTLM, context : {restaurant : <queryset>},templates : ["restaurant_list.html"]
@@ -16,7 +17,7 @@ from datetime import date, datetime, timedelta
 from app.models import Restaurant
 from app.forms import RestaurantForm
 
-class RestaurantViewTests(TestCase):
+class RestaurantListViewTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create(username = "Cristian")
@@ -93,7 +94,7 @@ class RestaurantViewTests(TestCase):
         self.assertEqual(older_restaurant, restaurants[2])
 
 
-class RestaurantCreateTests(TestCase):
+class RestaurantCreateViewTests(TestCase):
 
     def setUp(self):
         self.user = User.objects.create(username = "Cristian")
@@ -124,7 +125,8 @@ class RestaurantCreateTests(TestCase):
         # form has an initial attribute
         self.assertEqual(response.context["form"].initial["capacity"],100)
 
-    # Check valid POST creates restaurant row
+    # Check valid POST creates restaurant row.
+    # This row only exists during this single test case.
     def test_valid_post_create_restaurant_pass(self):
         response = self.client.post(
             reverse("restaurant_create"),
@@ -169,3 +171,36 @@ class RestaurantCreateTests(TestCase):
         self.assertEqual(Restaurant.objects.count(), 0)
         # If a post request fails it will reprint the curr page so status code is 200
         self.assertEqual(response.status_code,200)
+
+class RestaurantUpdateTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+    
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "italian",
+            capacity = 100
+        )
+
+    def test_restaurant_update_load_status_200_pass(self):
+        response = self.client.get(reverse("restaurant_edit",
+                                    kwargs = {"pk" : self.restaurant.pk}))
+
+        self.assertEqual(response.status_code, 200)
+    
+    def test_restaurant_update_correct_template_pass(self):
+        response = self.client.get(reverse("restaurant_edit",
+                                    kwargs = {"pk" : self.restaurant.pk}))
+
+        self.assertTemplateUsed(response, "restaurant_update.html")
+    
+    def test_restaurant_update_correct_form_pass(self):
+
+        response = self.client.get(reverse("restaurant_edit",
+                                    kwargs = {"pk" : self.restaurant.pk}))
+
+        self.assertIsInstance(response.context["form"],RestaurantForm)
