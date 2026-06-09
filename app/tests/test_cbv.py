@@ -4,6 +4,7 @@
 
 # e.g. CreateView RestaurantCreate : Can I acess form, Can I create Object, Does it redirect, Do my custom modifications work?
 # e.g. UpdateView RestaurantUpdate : Page returns 200, Correct form is used, Correct template is used, existing object is used, sucessfully updates
+# e.g. DeleteView RestaurantDelete : returns 200, uses correct template, loads correct restaurant object, deletes retaurant, redirects, returns 302
 
 # In Django this response we get from a self.client is a Django HttpResponse object containing 
 # status_code : 200, content : rendered HTLM, context : {restaurant : <queryset>},templates : ["restaurant_list.html"]
@@ -158,6 +159,7 @@ class RestaurantCreateViewTests(TestCase):
             )   
         
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("restaurant_list"))
     
     # Check invalid Post that does not create restaurant
     def test_invalid_post_not_create_restaurant_pass(self):
@@ -172,9 +174,10 @@ class RestaurantCreateViewTests(TestCase):
         # If a post request fails it will reprint the curr page so status code is 200
         self.assertEqual(response.status_code,200)
 
-class RestaurantUpdateTests(TestCase):
+class RestaurantUpdateViewTests(TestCase):
 
     def setUp(self):
+        # Django model instance objects
         self.user = User.objects.create(username = "Cristian")
     
         self.restaurant = Restaurant.objects.create(
@@ -204,3 +207,105 @@ class RestaurantUpdateTests(TestCase):
                                     kwargs = {"pk" : self.restaurant.pk}))
 
         self.assertIsInstance(response.context["form"],RestaurantForm)
+    
+    def test_invalid_update_does_not_change_restaurant(self):
+
+        self.client.post(
+            reverse(
+                "restaurant_edit",
+                kwargs={"pk": self.restaurant.pk}
+            ),
+            {
+                "restaurant_name": ""
+            }
+        )
+
+        self.restaurant.refresh_from_db()
+
+        self.assertEqual(
+            self.restaurant.restaurant_name,
+            "Andys"
+        )
+
+    def test_update_form_containts_existing_restaurant_date_pass(self):
+        response = self.client.get(
+            reverse("restaurant_edit",
+            kwargs = {"pk": self.restaurant.pk}
+            )
+        )
+        # form.instance holds the Django model object
+        self.assertEqual(response.context["form"].instance,self.restaurant)
+    
+    def test_update_reponse_302_pass(self):
+        response = self.client.post(
+            reverse("restaurant_edit",
+            kwargs={"pk":self.restaurant.pk}),
+            {
+            "owner": self.user.pk,
+            "restaurant_name": "Andys Updated",
+            "date_opened": date.today(),
+            "location": "east_london",
+            "restaurant_cuisine": "italian",
+            "capacity": 10,
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("restaurant_list"))
+    
+    def test_valid_post_updates_restaurant_pass(self):
+        self.client.post(
+            reverse("restaurant_edit",kwargs={"pk" : self.restaurant.pk}),
+            {
+                "owner": self.user.pk,
+                "restaurant_name": "Andys Updated",
+                "date_opened": date.today(),
+                "location": "east_london",
+                "restaurant_cuisine": "italian",
+                "capacity": 10,
+            }
+        )
+
+        self.restaurant.refresh_from_db()
+
+        self.assertEqual(self.restaurant.restaurant_name,"Andys Updated")
+        self.assertEqual(self.restaurant.capacity,10)
+
+class RestaurantDeleteViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "west_london",
+            restaurant_cuisine = "fast_food",
+            capacity = "200"
+        )
+
+    def test_restaurant_delete_status_code_200_pass(self):
+        response = self.client.get(reverse("restaurant_delete",
+                                    kwargs={"pk":self.restaurant.pk}))
+
+        self.assertEqual(response.status_code,200)
+
+    def test_restaurant_delete_correct_template_used_pass(self):
+        response = self.client.get(reverse("restaurant_delete",
+                                    kwargs={"pk":self.restaurant.pk}))
+
+        self.assertTemplateUsed(response, "restaurant_delete.html")
+    
+    def test_restaurant_delete_correct_get_objects_pass(self):
+        response = self.client.get(reverse("restaurant_delete",
+                                    kwargs={"pk":self.restaurant.pk}))
+        
+        self.assertEqual(response.context["object"], self.restaurant)
+    
+    def test_restaurant_detele_check_deletes_restaurant_pass(self):
+        response = self.client.post(reverse("restaurant_delete",
+                                    kwargs={"pk" : self.restaurant.pk}))
+        
+        self.assertEqual(Restaurant.objects.count(),0)
+        self.assertEqual(response.status_code,302)
+        self.assertRedirects(response,reverse("restaurant_list"))

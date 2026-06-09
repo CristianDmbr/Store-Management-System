@@ -693,6 +693,34 @@ It can be used to check if a response from the server has the instance of a form
 # Failed POST request
 If a POST request fails status code will be 200 because it has failed and curr page will reload again with error.
 
+# Reverse a Update/Delete request
+Because the URL path contains URL parameters when a client makes a url request it must have :
+         < response = self.client.get(reverse("restaurant_edit",
+                                    kwargs = {"pk" : self.restaurant.pk})) > 
+That is only because we mention the pk in the URL parameter list : 
+        < path("restaurant/<int:pk>/edit",views.RestaurantUpdate.as_view(), name = "restaurant_edit"), > 
+  
+# UpdateView
+It uses the form to display data by taking the object and converting into form fields to populate the HTML inputs, this comes from from.instance. 
+form.instance is the actual model object instance and not the cleaned_data.
+This is because when we use GET request to an UpdateView Django already has the model object no need to convert to a Python dictionary to display like the serializers because tehre you cannot send Django model objects over HTTP. 
+
+# In APIs, we do not expose Django model objects directly. Instead, we retrieve model instances from the database, serialize them into Python dictionaries, and then convert those dictionaries into JSON for transmission to the client.
+
+# Reverse() needs to also contain url parameters
+# Check if the redirect of a response is correct
+< self.assertRedirects(response, reverse("restaurant_list")) >
+
+# self.restaurant.refresh_from_db() 
+Updates any objects in memory after changes to the database. e.g. after updating a row and wanting to get the new updated name.
+
+# Delete view 
+Django automatically passes the Django instance object as context["object"] = Django model instance
+
+# Check if a redirection was to the correct template
+< self.assertRedirects(response,reverse("restaurant_list")) >
+response is a HTTPResponseRedirect status_code = 302 and the reverse is a string URL.
+
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
 < get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)
