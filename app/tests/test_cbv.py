@@ -1,13 +1,14 @@
 # How view testing works:
+# CBV test for : Template, Context, Form, Redirects, HTML page loads
 # e.g. ListView RestaurantList : Does the page load? Does it use the correct template? Does it contain my restaurants?
-# Also test any modifications to the parent case methods
-
 # e.g. CreateView RestaurantCreate : Can I acess form, Can I create Object, Does it redirect, Do my custom modifications work?
 # e.g. UpdateView RestaurantUpdate : Page returns 200, Correct form is used, Correct template is used, existing object is used, sucessfully updates
 # e.g. DeleteView RestaurantDelete : returns 200, uses correct template, loads correct restaurant object, deletes retaurant, redirects, returns 302
 
+# Also test any modifications to the parent case methods
 # In Django this response we get from a self.client is a Django HttpResponse object containing 
 # status_code : 200, content : rendered HTLM, context : {restaurant : <queryset>},templates : ["restaurant_list.html"]
+# (API responses do not have context because there are no templates)
 
 from django.test import TestCase
 from django.urls import reverse
@@ -17,6 +18,8 @@ from datetime import date, datetime, timedelta
 
 from app.models import Restaurant
 from app.forms import RestaurantForm
+
+######################################################____Restaurant___######################################################
 
 class RestaurantListViewTests(TestCase):
 
@@ -309,3 +312,4 @@ class RestaurantDeleteViewTests(TestCase):
         self.assertEqual(Restaurant.objects.count(),0)
         self.assertEqual(response.status_code,302)
         self.assertRedirects(response,reverse("restaurant_list"))
+

@@ -721,6 +721,8 @@ Django automatically passes the Django instance object as context["object"] = Dj
 < self.assertRedirects(response,reverse("restaurant_list")) >
 response is a HTTPResponseRedirect status_code = 302 and the reverse is a string URL.
 
+# CBV created 302, API created 201
+
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
 < get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)
