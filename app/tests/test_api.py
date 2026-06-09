@@ -35,7 +35,7 @@ class RestaurantListCreateAPITests(APITestCase):
             capacity = 50
         )
 
-    def test_get_restaurant_returns_200(self):
+    def test_get_restaurant_returns_200_pass(self):
         response = self.client.get(reverse("restaurant_create_api"))
 
         self.assertEqual(response.status_code, 200)
@@ -70,5 +70,97 @@ class RestaurantListCreateAPITests(APITestCase):
             
         self.assertEqual(response.status_code, 400),
         self.assertEqual(Restaurant.objects.count(),1)
+
+    def test_all_delete_button_pass(self):
+        response = self.client.delete(reverse("restaurant_create_api"))
+
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Restaurant.objects.count(),0)
     
-    #### Add test to the cutom delete and get_query
+    def test_restaurant_ordered_by_date_opened_descending_order_pass(self):
+        oldest_restaurant = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Old Restaurant",
+            date_opened=date(2020, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=50
+        )
+
+        newer_restaurant = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="New Restaurant",
+            date_opened=date(2022, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=50
+        )
+
+        response = self.client.get(reverse("restaurant_create_api"))
+
+        self.assertEqual(response.data[0]["restaurant_name"],self.restaurant.restaurant_name)
+        self.assertEqual(response.data[1]["restaurant_name"],newer_restaurant.restaurant_name)
+        self.assertEqual(response.data[2]["restaurant_name"],oldest_restaurant.restaurant_name)
+
+class RestaurantRetrieveUpdateDestroyAPITests(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "italian",
+            capacity = 50
+        )
+    
+    def test_get_restaurant_200_pass(self):
+        response = self.client.get(reverse("restaurant_retrieve_update_destroy_api",
+                                kwargs = {"pk" : self.restaurant.pk}))
+        # Single resource doesnt have a list of dictionaries instead its a single dictionary
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(Restaurant.objects.count(),1)
+        self.assertEqual(response.data["restaurant_name"],self.restaurant.restaurant_name)
+    
+    def test_delete_restaurant_pass(self):
+        response = self.client.delete(reverse("restaurant_retrieve_update_destroy_api", 
+                                                kwargs = {"pk": self.restaurant.pk}))
+                                            
+        self.assertEqual(Restaurant.objects.count(),0)
+        self.assertEqual(response.status_code, 204)
+    
+    def test_no_restaurant_404_pass(self):
+        response = self.client.delete(reverse("restaurant_retrieve_update_destroy_api", 
+                                                kwargs = {"pk": 999999}))
+        
+        self.assertEqual(response.status_code,404)
+    
+    def test_update_restaurant_pass(self):
+        response = self.client.put(reverse("restaurant_retrieve_update_destroy_api",
+                                            kwargs = {"pk" : self.restaurant.pk}),
+                                    {
+                                            "owner": self.user.pk,
+                                            "restaurant_name": "Andys Updated",
+                                            "date_opened": "2025-01-01",
+                                            "location": "east_london",
+                                            "restaurant_cuisine": "italian",
+                                            "capacity": 100,
+                                    })
+        self.restaurant.refresh_from_db()
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["restaurant_name"],"Andys Updated")
+    
+    def test_invalid_put_returns_400_pass(self):
+        response = self.client.put(
+            reverse(
+                "restaurant_retrieve_update_destroy_api",
+                kwargs={"pk": self.restaurant.pk}
+            ),
+            {
+                "restaurant_name": ""
+            }
+        )
+
+        self.assertEqual(response.status_code, 400)

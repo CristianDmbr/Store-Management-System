@@ -1,5 +1,8 @@
 # TODO
-REVISE BODY OF REQUEST AND REPLIES FOR VIEWS
+1. Test the custom APIView (RestaurantSearchView) 
+2. Test every CBV that contains custom logic (Ignore standard CRUD view)
+3. Test every DRF API endpoint 
+
 1. View test
 2. API test
 3. Serializer tests

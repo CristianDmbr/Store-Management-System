@@ -230,31 +230,77 @@ class HelloWorldView(APIView):
     def get(self,request):
         return Response({"message":"Hello World !!!!"})
     
-# Understand
 # Not automatic like generics so it gives full control over logic
 # Inherit from the APIView 
 class RestaurantSearchView(APIView):
-    # Runs when get request, it runs when we open the Rest API page
-    def get(self, request):
-        # Did the user send something called a name? if not then not then empthy by default 
-        # query_params gets us anything after the defined URL so for < /restaurant/search?name=pizza&page=2 > 
-        # restaurant/search used for Django routing and the query params is after ? so name=pizza&page=2
-        name = request.query_params.get("name","")
 
-        # If user provided a search value then find restaurants where name contains the search value
+    # GET /api/restaurants/search/?name=pizza
+    def get(self, request):
+
+        name = request.query_params.get("name", "")
+
         if name:
-            restaurants = Restaurant.objects.filter(restaurant_name__icontains = name)
-        # Else return everything 
+            restaurants = Restaurant.objects.filter(
+                restaurant_name__icontains=name
+            )
         else:
             restaurants = Restaurant.objects.all()
-        
-        # Converts Datao objects -> Python -> JSON-ready (Python dictionary )
-        # My confusion is how does many = True works if we do pass a query_param ? would it not crash since its one instace?
-        # .filter returns a query set (so a list of objects) so even if its just one object many = True works because its a list. 
-        serializer = RestaurantSerialiser(restaurants, many = True)
-        # Send JSON back to the browser (Client)
-        # status.HTTP_200_OK tells the client that the request succeeded
-        return Response(serializer.data, status = status.HTTP_200_OK)
+
+        serializer = RestaurantSerialiser(
+            restaurants,
+            many=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    # POST /api/restaurants/search/
+    def post(self, request):
+
+        serializer = RestaurantSerialiser(
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # DELETE /api/restaurants/search/
+    # DELETE /api/restaurants/search/?pk=5
+    def delete(self, request):
+
+        pk = request.query_params.get("pk")
+
+        # Delete one restaurant
+        if pk:
+            restaurant = get_object_or_404(
+                Restaurant,
+                pk=pk
+            )
+
+            restaurant.delete()
+
+            return Response(
+                status=status.HTTP_204_NO_CONTENT
+            )
+
+        # Delete all restaurants
+        Restaurant.objects.all().delete()
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
 ######################################################___Reservations___######################################################
 
 class ReservationCreateView(CreateView):
