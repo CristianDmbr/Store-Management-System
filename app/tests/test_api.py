@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date, datetime, timedelta
+from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase
 
@@ -51,7 +52,7 @@ class RestaurantListCreateAPITests(APITestCase):
                             {
                                 "owner": self.user.pk,
                                 "restaurant_name": "Burger House",
-                                "date_opened": "2025-01-01",
+                                "date_opened": date(2025,1,1),
                                 "location": "east_london",
                                 "restaurant_cuisine": "italian",
                                 "capacity": 100
@@ -102,6 +103,7 @@ class RestaurantListCreateAPITests(APITestCase):
         self.assertEqual(response.data[1]["restaurant_name"],newer_restaurant.restaurant_name)
         self.assertEqual(response.data[2]["restaurant_name"],oldest_restaurant.restaurant_name)
 
+
 class RestaurantRetrieveUpdateDestroyAPITests(APITestCase):
 
     def setUp(self):
@@ -118,7 +120,7 @@ class RestaurantRetrieveUpdateDestroyAPITests(APITestCase):
     def test_get_restaurant_200_pass(self):
         response = self.client.get(reverse("restaurant_retrieve_update_destroy_api",
                                 kwargs = {"pk" : self.restaurant.pk}))
-        # Single resource doesnt have a list of dictionaries instead its a single dictionary
+        # Single resource doesnt have a list of dictionaries instead its a single dictionary data
         self.assertEqual(response.status_code,200)
         self.assertEqual(Restaurant.objects.count(),1)
         self.assertEqual(response.data["restaurant_name"],self.restaurant.restaurant_name)
@@ -164,3 +166,77 @@ class RestaurantRetrieveUpdateDestroyAPITests(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+class RestaurantSearchView(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant_1 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Pizza Hut",
+            date_opened=date(2024, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=100
+        )
+
+        self.restaurant_2 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Burger House",
+            date_opened=date(2023, 1, 1),
+            location="west_london",
+            restaurant_cuisine="fast_food",
+            capacity=80
+        )
+
+    
+    def test_get_with_no_query_parameters_pass(self):
+        response = self.client.get(reverse("search_api"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.data),2)
+    
+    def test_get_with_query_parameters_pass(self):
+        response = self.client.get(reverse("search_api"), {"name" : "pizza"})
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.data), 1)
+        # Since we have used many = True for serializer even if there is one row, the .data is a list not just a single object.
+        self.assertEqual(response.data[0]["restaurant_name"],"Pizza Hut")
+    
+    def test_valid_create_new_row_pass(self):
+        response = self.client.post(reverse("search_api"),
+                                {
+                                    "owner": self.user.pk,
+                                    "restaurant_name": "DGK",
+                                    "date_opened": "2000-2-22",
+                                    "location": "east_london",
+                                    "restaurant_cuisine": "italian",
+                                    "capacity": 10
+                                })
+        
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(Restaurant.objects.count(),3)
+        self.assertEqual(response.data["restaurant_name"],"DGK")
+    
+    def test_invalid_create_new_row_pass(self):
+        response = self.client.post(reverse("search_api"),
+                                {
+                                    "restaurant_name": "DGK",
+                                    "date_opened": "2000-2-22",
+                                    "location": "east_london",
+                                })
+        
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(Restaurant.objects.count(),2)
+    
+    def test_valid_delete_pass(self):
+        response = self.client.delete(reverse("search_api") + "?name=Pizza Hut")
+
+        self.assertFalse(Restaurant.objects.filter(restaurant_name = "Pizza Hut"))
+        self.assertEqual(Restaurant.objects.count(),1)
+        self.assertEqual(response.status_code,204)
+
+
+

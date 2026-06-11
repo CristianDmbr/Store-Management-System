@@ -18,7 +18,7 @@ from rest_framework.views import APIView
 
 # DRF page:
 # Not a HTML and used for debugging, testing and debugging API so not real website URL, not meant for users and you cannot design navigation
-
+   
 # DRF is an extension of Django that lets you build APIs instead of HTML pages.
 # Django (Uses FBV or CBV) [request -> View -> Template -> HTML]
 # DRF (Functions are called serialisers either Manual API or Generic Views) [request -> View -> Serialisation -> JSON]
@@ -240,9 +240,7 @@ class RestaurantSearchView(APIView):
         name = request.query_params.get("name", "")
 
         if name:
-            restaurants = Restaurant.objects.filter(
-                restaurant_name__icontains=name
-            )
+            restaurants = Restaurant.objects.filter(restaurant_name__icontains=name)
         else:
             restaurants = Restaurant.objects.all()
 
@@ -280,16 +278,13 @@ class RestaurantSearchView(APIView):
     # DELETE /api/restaurants/search/?pk=5
     def delete(self, request):
 
-        pk = request.query_params.get("pk")
+        name = request.query_params.get("name")
 
         # Delete one restaurant
-        if pk:
-            restaurant = get_object_or_404(
-                Restaurant,
-                pk=pk
-            )
+        if name:
+            restaurants = Restaurant.objects.filter(restaurant_name = name)
 
-            restaurant.delete()
+            restaurants.delete()
 
             return Response(
                 status=status.HTTP_204_NO_CONTENT

@@ -54,22 +54,15 @@ class RestaurantListViewTests(TestCase):
 
         self.assertTemplateUsed(response,"restaurant_list.html")
 
-    def test_restaurant_list_contains_restaurants_pass(self):
+    def test_restaurant_list_contains_restaurants_title_pass(self):
 
         response = self.client.get(
             reverse("restaurant_list")
         )
 
         self.assertIn(self.restaurant, response.context["restaurants"])
-
-    def test_page_title_added_to_context_pass(self):
-        
-        response = self.client.get(
-            reverse("restaurant_list")
-        )
-
         self.assertEqual(response.context["page_title"],"List of all restaurant sorted by date openened.")
-    
+
     def test_restaurant_are_ordered_by_date_opened_descending_pass(self):
         
         older_restaurant = Restaurant.objects.create(
@@ -96,6 +89,7 @@ class RestaurantListViewTests(TestCase):
         self.assertEqual(self.restaurant,restaurants[0])
         self.assertEqual(newer_restaurant, restaurants[1])
         self.assertEqual(older_restaurant, restaurants[2])
+
 
 
 class RestaurantCreateViewTests(TestCase):
@@ -137,7 +131,7 @@ class RestaurantCreateViewTests(TestCase):
             {
                 "owner": self.user.pk,
                 "restaurant_name": "Burger House",  
-                "date_opened": "2025-01-01",
+                "date_opened": "2025-01-01", 
                 "location": "east_london",
                 "restaurant_cuisine": "italian",
                 "capacity": 80,
@@ -176,6 +170,8 @@ class RestaurantCreateViewTests(TestCase):
         self.assertEqual(Restaurant.objects.count(), 0)
         # If a post request fails it will reprint the curr page so status code is 200
         self.assertEqual(response.status_code,200)
+
+
 
 class RestaurantUpdateViewTests(TestCase):
 
@@ -274,6 +270,8 @@ class RestaurantUpdateViewTests(TestCase):
         self.assertEqual(self.restaurant.restaurant_name,"Andys Updated")
         self.assertEqual(self.restaurant.capacity,10)
 
+
+
 class RestaurantDeleteViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create(username = "Cristian")
@@ -313,3 +311,4 @@ class RestaurantDeleteViewTests(TestCase):
         self.assertEqual(response.status_code,302)
         self.assertRedirects(response,reverse("restaurant_list"))
 
+ 

@@ -723,6 +723,57 @@ response is a HTTPResponseRedirect status_code = 302 and the reverse is a string
 
 # CBV created 302, API created 201
 
+# Query parameters starts after a url path is followed by ?name=pizza
+reverse() does not take any query parameters similar to kwargs :
+< response = self.client.get(
+    reverse("search_api", {"name": "pizza"})
+) > 
+
+Instead it takes it as:
+response = self.client.get(
+    reverse("search_api"),
+    {"name": "pizza"}
+)
+
+# JSon and Python Dictionaries
+e.g.:
+< 
+{
+    "owner": 1,
+    "restaurant_name": "Pizza Hut",
+    "date_opened": "2026-06-11",
+    "location": "east_london",
+    "restaurant_cuisine": "italian",
+    "capacity": 100
+} >
+
+This is a valid Json (only uses "") but this is also a valid Python (uses both "" and '')
+
+# Case sensitivity is added with the __i e.g. < restaurants = Restaurant.objects.filter( restaurant_name__icontains=name) > i adds the case sensitivity and the contains checks for which contains.
+
+# Distinction between a direct ORM saving and a request (CBV or API).
+When using the Django code :
+< Restaurant.objects.create(
+    owner=self.user,
+    date_opened=date(2025, 1, 1)
+) >
+It lets us use self.user which is a User object and the Python data object
+Because Django converts them into database values when saving.
+
+When using a request (CBV or API):
+< self.client.post(
+    reverse("restaurant_create"),
+    {
+        "owner": self.user.pk,
+        "date_opened": "2025-01-01",
+    }
+) >
+We are simulating a browser submitting so we cannot send a < User : Cristian > or data(2004,1,1)
+
+# Passing query params for GET VS Delete
+For GET : response = self.client.get(reverse("search_api"), {"name" : "pizza"})
+For DELETE response = self.client.delete(reverse("search_api") + "?name=Pizza Hut")
+
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
 < get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)

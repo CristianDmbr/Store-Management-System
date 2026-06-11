@@ -1,12 +1,11 @@
 # TODO
-1. Test the custom APIView (RestaurantSearchView) 
-2. Test every CBV that contains custom logic (Ignore standard CRUD view)
-3. Test every DRF API endpoint 
+1. Test every CBV that contains custom logic (Ignore standard CRUD view)
+2. Test every DRF API endpoint 
 
-1. View test
-2. API test
-3. Serializer tests
-4. API endpoint tests
+3. View test
+4. API test
+5. Serializer tests
+6. API endpoint tests
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)
