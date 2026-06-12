@@ -392,6 +392,12 @@ class MenuListView(FormMixin, ListView):
             return redirect(self.success_url)
         # Re render the exact page but with included invalid errors
         return self.get(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return super().get_queryset().order_by(
+            "restaurant",
+            "date_added"
+        )
 
 class MenuListCreateAPI(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
@@ -402,7 +408,9 @@ class MenuListCreateAPI(generics.ListCreateAPIView):
         return Response(status = status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
-        return super().get_queryset().order_by("restaurant")
+        return super().get_queryset().order_by(
+            "restaurant",
+            "date_added")
 
 class MenuItemRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()

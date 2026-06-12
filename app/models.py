@@ -294,6 +294,7 @@ class MenuItem(models.Model):
         ("dessert","Desert"),
         ("drink","Drink"),
         ("snack","Snack"),
+        ("side","Side"),
     ]
     
     restaurant = models.ForeignKey(
@@ -307,7 +308,7 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     category = models.CharField(max_length=50, choices = CATEGORY_CHOICES, default = "main")
     availability = models.BooleanField(default=True)
-    date_added = models.DateTimeField(auto_now_add=True)
+    date_added = models.DateField(default = date.today)
     calories = models.DecimalField(
         max_digits = 6,
         decimal_places = 2

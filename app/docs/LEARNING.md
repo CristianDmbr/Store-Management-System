@@ -780,6 +780,14 @@ I had a confusion that for the hidden ReservationCreateview where I set the inti
 # Testing Invalid POST with no FK
 Have a fk present even if purposely trying to enter an invalid POST request. 
 
+# Ordering by more than one field
+e.g. Sort by Restaurant then for each restaurant sort by date
+<     def get_queryset(self):
+        return super().get_queryset().order_by(
+            "restaurant",
+            "date_added"
+        ) >
+
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
 < get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)

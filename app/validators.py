@@ -137,7 +137,7 @@ def validate_unique_menu_item_name(name,restaurant, instance = None):
 
 def validate_calories(calories):
 
-    if calories > 1000:
+    if calories is not None and calories > 1000:
         raise ValidationError(f" Cannot have an item exceed 1000kcal (this item has {calories}kcal).")
     
     return calories

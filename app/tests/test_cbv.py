@@ -16,8 +16,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date, datetime, timedelta 
 
-from app.models import Restaurant, Reservation
-from app.forms import RestaurantForm, ReservationForm
+from app.models import Restaurant, Reservation, MenuItem
+from app.forms import RestaurantForm, ReservationForm, MenuItemForm
 
 ######################################################____Restaurant___######################################################
 
@@ -364,3 +364,132 @@ class ReservationsCreateViewTests(TestCase):
         
         self.assertEqual(response.status_code,200)
         self.assertEqual(Reservation.objects.count(),0)
+
+
+class MenuListViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 25
+        )
+
+        self.menu_item = MenuItem.objects.create(
+            restaurant = self.restaurant,
+            name = "Texas supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = date.today(),
+            calories = 900.00,
+            ingredience = "meats"
+        )
+    
+    def test_page_opening_200_pass(self):
+        response = self.client.get(reverse("menu_list"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"menu_list.html")
+        self.assertEqual(MenuItem.objects.count(),1)
+        self.assertIsInstance(response.context["form"],MenuItemForm)
+    
+    def test_ordered_by_restaurant_date_added_pass(self):
+        restaurant_2 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Pizza Hut",
+            date_opened=date.today(),
+            location="west_london",
+            restaurant_cuisine="italian",
+            capacity=50
+        )
+
+        menu_item_2 = MenuItem.objects.create(
+            restaurant=self.restaurant,
+            name="Pepperoni Feast",
+            description="",
+            price=15.99,
+            category="main",
+            availability=True,
+            date_added=date(2024, 1, 1),
+            calories=800,
+            ingredience="pepperoni"
+        )
+
+        menu_item_3 = MenuItem.objects.create(
+            restaurant=self.restaurant,
+            name="BBQ Chicken",
+            description="",
+            price=17.99,
+            category="main",
+            availability=True,
+            date_added=date(2025, 1, 1),
+            calories=850,
+            ingredience="chicken"
+        )
+
+        menu_item_4 = MenuItem.objects.create(
+            restaurant= restaurant_2,
+            name="Veggie Delight",
+            description="",
+            price=13.99,
+            category="main",
+            availability=True,
+            date_added=date(2023, 1, 1),
+            calories=600,
+            ingredience="vegetables"
+        )
+
+        menu_item_5 = MenuItem.objects.create(
+            restaurant=restaurant_2,
+            name="Meat Feast",
+            description="",
+            price=20.99,
+            category="main",
+            availability=True,
+            date_added=date(2024, 6, 1),
+            calories=1000,
+            ingredience="mixed meats"
+        )
+    
+        response = self.client.get(reverse("menu_list"))
+
+        self.assertEqual(response.context["menu_items"][0],menu_item_2)
+        self.assertEqual(response.context["menu_items"][4], menu_item_5)
+    
+    def test_valid_post_pass(self):
+        response = self.client.post(reverse("menu_list"),
+                                {
+                                 "restaurant" : str(self.restaurant.pk),
+                                 "name" : "spicy wings",
+                                 "desciption" : "Spicy Wings!!",
+                                 "price" : "9.99",
+                                 "category" : "side",
+                                 "availability" : "True",
+                                 "date_added" : "2026-1-2",
+                                 "calories" : "560.00"
+                                }
+                            )
+        
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(MenuItem.objects.count(), 2)
+        self.assertRedirects(response,reverse("menu_list"))
+    
+    def test_invalid_post_pass(self):
+        response = self.client.post(reverse("menu_list"),
+                                {
+                                    "restaurant" : str(self.restaurant.pk),
+                                    "name" : ""
+                                }
+                            )
+                        
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(MenuItem.objects.count(),1)
+        self.assertIsNotNone(response.context["form"].errors)
+
+    

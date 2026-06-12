@@ -20,8 +20,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase
 
-from app.models import Restaurant, Reservation
-from app.serialisers import RestaurantSerialiser
+from app.models import Restaurant, Reservation, MenuItem
 
 class RestaurantListCreateAPITests(APITestCase):
     def setUp(self):
@@ -389,4 +388,192 @@ class ReservationRetrieveUpdateDestroyAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
 
 
-######################################################## MenuListView ########################################################
+class MenuListCreateAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant_1 = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 25
+        )
+
+        self.restaurant_2 = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 30
+        )
+
+        self.menu_item_1 = MenuItem.objects.create(
+            restaurant = self.restaurant_1,
+            name = "Texas supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = date.today(),
+            calories = 900.00,
+            ingredience = "meats"
+        )
+
+        self.menu_item_2 = MenuItem.objects.create(
+            restaurant = self.restaurant_1,
+            name = "Vegan supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = "2022-1-2",
+            calories = 900.00,
+            ingredience = "meats"
+        )
+
+        self.menu_item_3 = MenuItem.objects.create(
+            restaurant = self.restaurant_2,
+            name = "Andys supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = "2022-1-2",
+            calories = 900.00,
+            ingredience = "meats"
+        )
+    
+    def test_page_loading_200_pass(self):
+        response = self.client.get(reverse("menu_list_create_api"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.data),3)
+    
+    def test_get_queryset_pass(self):
+        response = self.client.get(reverse("menu_list_create_api"))
+
+        self.assertEqual(response.data[0]["name"],self.menu_item_2.name)
+        self.assertEqual(response.data[2]["name"],self.menu_item_3.name)
+    
+    def test_delete_button_pass(self):
+        response = self.client.delete(reverse("menu_list_create_api"))
+
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(MenuItem.objects.count(),0)
+    
+    def test_valid_post_pass(self):
+        response = self.client.post(reverse("menu_list_create_api"),
+                                    {
+                                        "restaurant" : str(self.restaurant_1.pk),
+                                        "name" : "fries",
+                                        "description" : "French fries",
+                                        "price" : "9.99",
+                                        "category" : "snack",
+                                        "availability" : "True",
+                                        "date_added" : "2026-4-2",
+                                        "calories" : "200.00",
+                                        "ingredience" : "Potatoes, spice"
+                                    }
+                                )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(MenuItem.objects.count(),4)
+    
+class MenuItemRetrieveUpdateDestroyAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant_1 = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 25
+        )
+
+        self.restaurant_2 = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 30
+        )
+
+        self.menu_item_1 = MenuItem.objects.create(
+            restaurant = self.restaurant_1,
+            name = "Texas supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = date.today(),
+            calories = 900.00,
+            ingredience = "meats"
+        )
+
+        self.menu_item_2 = MenuItem.objects.create(
+            restaurant = self.restaurant_1,
+            name = "Vegan supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = "2022-1-2",
+            calories = 900.00,
+            ingredience = "meats"
+        )
+
+        self.menu_item_3 = MenuItem.objects.create(
+            restaurant = self.restaurant_2,
+            name = "Andys supreme",
+            description = "",
+            price = 19.99,
+            category = "main",
+            availability = True,
+            date_added = "2022-1-2",
+            calories = 900.00,
+            ingredience = "meats"
+        )
+    
+    def test_get_load_page_200(self):
+        response = self.client.get(reverse("menu_item_retrieve_update_destroy_api",
+                                    kwargs = {"name" : "Andys supreme", "restaurant" : "Andys"}))
+    
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["name"],"Andys supreme")
+    
+    def test_load_invalid_get_pass(self):
+        response = self.client.get(reverse("menu_item_retrieve_update_destroy_api",
+                                    kwargs = {"name" : "Bob", "restaurant" : "Bob's"}))
+    
+        self.assertEqual(response.status_code,404)
+                                
+    def test_valid_delete_pass(self):
+        response = self.client.delete(reverse("menu_item_retrieve_update_destroy_api",
+                                    kwargs = {"name" : "Andys supreme", "restaurant" : "Andys"}))
+        
+        self.assertEqual(response.status_code,204)
+        self.assertIsNone(response.data)
+
+    def test_valid_update_pass(self):
+        response = self.client.put(reverse("menu_item_retrieve_update_destroy_api",
+                                    kwargs = {"name" : "Andys supreme", "restaurant" : "Andys"}),
+                                    {
+                                        "restaurant" : str(self.restaurant_2.pk),
+                                        "name" : "Updated Andys Supreme",
+                                        "description" : "",
+                                        "price ": "19.99",
+                                        "category" : "main",
+                                        "availability" : True,
+                                        "date_added" : "2022-1-2",
+                                        "calories" : "900.00",
+                                        "ingredience" : "meats"
+                                    }
+                                )
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["name"],"Updated Andys Supreme")
