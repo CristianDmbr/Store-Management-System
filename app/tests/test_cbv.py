@@ -16,8 +16,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date, datetime, timedelta 
 
-from app.models import Restaurant
-from app.forms import RestaurantForm
+from app.models import Restaurant, Reservation
+from app.forms import RestaurantForm, ReservationForm
 
 ######################################################____Restaurant___######################################################
 
@@ -311,4 +311,56 @@ class RestaurantDeleteViewTests(TestCase):
         self.assertEqual(response.status_code,302)
         self.assertRedirects(response,reverse("restaurant_list"))
 
- 
+
+class ReservationsCreateViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "west_london",
+            restaurant_cuisine = "fast_food",
+            capacity = "200"
+        )
+    
+    def test_loads_page_pass(self):
+        response = self.client.get(reverse("create_reservation", kwargs = {"restaurant_id" : self.restaurant.pk}))
+
+        self.assertEqual(response.status_code,200)
+        self.assertIsInstance(response.context["form"],ReservationForm)
+        self.assertTemplateUsed(response,"create_reservation.html")
+        self.assertEqual(response.context["restaurant"].restaurant_name, self.restaurant.restaurant_name)
+        self.assertEqual(response.context["form"].initial["restaurant"].pk, self.restaurant.pk)
+        self.assertNotIn("restaurant",response.context["form"])
+    
+    def test_load_invalid_restaurant_pass(self):
+        response = self.client.get(reverse("create_reservation", kwargs = {"restaurant_id" : 999999}))
+
+        self.assertEqual(response.status_code, 404)
+    
+    def test_create_valid_row_pass(self):
+        response = self.client.post(reverse("create_reservation", kwargs = {"restaurant_id" : self.restaurant.pk}),
+                                        {
+                                            "restaurant" : str(self.restaurant.pk),
+                                            "name_of_reservation" : "Mihai",
+                                            "is_active" : "True",
+                                            "kids" : "1",
+                                            "teens" : "9",
+                                            "adults" : "10"
+                                        })
+
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(Reservation.objects.count(),1)
+        self.assertRedirects(response,reverse("restaurant_list"))
+    
+    def test_invalid_post_pass(self):
+        response = self.client.post(reverse("create_reservation", kwargs = {"restaurant_id": self.restaurant.pk}),
+                                    {
+                                        "restaurant" : str(self.restaurant.pk),
+                                        "name_of_reservation" : "",
+                                    })
+        
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(Reservation.objects.count(),0)

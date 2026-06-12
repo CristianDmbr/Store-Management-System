@@ -770,9 +770,15 @@ When using a request (CBV or API):
 ) >
 We are simulating a browser submitting so we cannot send a < User : Cristian > or data(2004,1,1)
 
-# Passing query params for GET VS Delete
+# Passing query params for GET VS Delete ()
 For GET : response = self.client.get(reverse("search_api"), {"name" : "pizza"})
 For DELETE response = self.client.delete(reverse("search_api") + "?name=Pizza Hut")
+
+# Passing a hidden field
+I had a confusion that for the hidden ReservationCreateview where I set the intial value of the field, then during the get_form I set the instance restaurant as well which works because during regular user usage that hidden field is passed during POST. But when manually entering the POST during testing, it cannot see the restaurant_id and it crashes. This is because during POST unit tests it ignores the GET request.
+
+# Testing Invalid POST with no FK
+Have a fk present even if purposely trying to enter an invalid POST request. 
 
 ## Main Request lifecycle methods:
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)

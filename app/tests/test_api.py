@@ -20,7 +20,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase
 
-from app.models import Restaurant
+from app.models import Restaurant, Reservation
 from app.serialisers import RestaurantSerialiser
 
 class RestaurantListCreateAPITests(APITestCase):
@@ -238,5 +238,155 @@ class RestaurantSearchView(APITestCase):
         self.assertEqual(Restaurant.objects.count(),1)
         self.assertEqual(response.status_code,204)
 
+class ReservationListCreateAPITests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant_1 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Pizza Hut",
+            date_opened=date(2024, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=100
+        )
+
+        self.restaurant_2 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Burger House",
+            date_opened=date(2023, 1, 1),
+            location="west_london",
+            restaurant_cuisine="fast_food",
+            capacity=80
+        )
+        self.reservation_1 = Reservation.objects.create(
+            restaurant=self.restaurant_1,
+            name_of_reservation="Mihai",
+            kids=1,
+            teens=2,
+            adults=4,
+        )
+
+        self.reservation_2 = Reservation.objects.create(
+            restaurant=self.restaurant_2,
+            name_of_reservation="Alex",
+            kids=0,
+            teens=1,
+            adults=2,
+        )
+
+        self.reservation_3 = Reservation.objects.create(
+            restaurant=self.restaurant_2,
+            name_of_reservation="John",
+            kids=3,
+            teens=0,
+            adults=2,
+        )
+    
+    def test_get_page_pass(self):
+        response = self.client.get(reverse("reservations_list_create_api"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(Reservation.objects.count(),3)
+
+    def test_query_set_order_pass(self):
+        response = self.client.get(reverse("reservations_list_create_api"))
+
+        self.assertEqual(response.data[0]["name_of_reservation"], "Mihai")
+        self.assertEqual(response.data[-1]["name_of_reservation"],"John")
+    
+    def test_post_valid_pass(self):
+        response = self.client.post(reverse("reservations_list_create_api"),
+                                    {
+                                        "name_of_reservation" : "Marcel",
+                                        "restaurant" : str(self.restaurant_1.pk),
+                                        "is_active" : "True",
+                                        "kids" : "2",
+                                        "teens" : "1",
+                                        "adults" : "9"
+                                    })
+        
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(Reservation.objects.count(),4)
+
+    def test_delete_all_posts(self):
+        response = self.client.delete(reverse("reservations_list_create_api"))
+
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Reservation.objects.count(),0)
+        self.assertIsNone(response.data)
+    
+class ReservationRetrieveUpdateDestroyAPI(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant_1 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Pizza Hut",
+            date_opened=date(2024, 1, 1),
+            location="east_london",
+            restaurant_cuisine="italian",
+            capacity=100
+        )
+
+        self.restaurant_2 = Restaurant.objects.create(
+            owner=self.user,
+            restaurant_name="Burger House",
+            date_opened=date(2023, 1, 1),
+            location="west_london",
+            restaurant_cuisine="fast_food",
+            capacity=80
+        )
+        self.reservation_1 = Reservation.objects.create(
+            restaurant=self.restaurant_1,
+            name_of_reservation="Mihai",
+            kids=1,
+            teens=2,
+            adults=4,
+        )
+
+        self.reservation_2 = Reservation.objects.create(
+            restaurant=self.restaurant_2,
+            name_of_reservation="Alex",
+            kids=0,
+            teens=1,
+            adults=2,
+        )
+
+        self.reservation_3 = Reservation.objects.create(
+            restaurant=self.restaurant_2,
+            name_of_reservation="John",
+            kids=3,
+            teens=0,
+            adults=2,
+        )
+    
+    def test_get_pass_page_test(self):
+        response = self.client.get(reverse("reservation_retrieve_update_destroy_api", kwargs = {"pk" : self.reservation_1.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["name_of_reservation"], "Mihai")
+    
+    def test_delete_pass(self):
+        response = self.client.delete(reverse("reservation_retrieve_update_destroy_api", kwargs = {"pk" : self.reservation_1.pk}))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Reservation.objects.count(),2)
+    
+    def test_post_requet_pass(self):
+        response = self.client.put(reverse("reservation_retrieve_update_destroy_api", kwargs = {"pk" : self.reservation_1.pk}),
+                                {
+                                    "name_of_reservation" : "Bob",
+                                    "restaurant" : str(self.restaurant_1.pk),
+                                    "is_active" : "False",
+                                    "kids" : "2",
+                                    "teens" : "5",
+                                    "adults" : "10"
+                                }
+                            )
+        
+        self.assertEqual(response.data["name_of_reservation"], "Bob")
+        self.assertEqual(response.status_code, 200)
 
 
+######################################################## MenuListView ########################################################

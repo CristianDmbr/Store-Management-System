@@ -334,7 +334,14 @@ class ReservationCreateView(CreateView):
             # Widget is how the field is displayed in HTML
             # forms.HiddenInput() user does not see the field but it still gets submitted to DB because of previous get_initial.
             form.fields["restaurant"].widget = forms.HiddenInput()
+
+            form.instance.restaurant = get_object_or_404(Restaurant, pk = self.kwargs.get("restaurant_id"))
         return form
+    
+    def form_valid(self, form):
+        form.instance.restaurant = get_object_or_404(Restaurant, pk = self.kwargs.get("restaurant_id"))
+        
+        return super().form_valid(form)
     
 class ReservationListCreateAPI(generics.ListCreateAPIView):
     queryset = Reservation.objects.all()
