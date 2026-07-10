@@ -63,7 +63,7 @@ class ReservationForm(forms.ModelForm):
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
-        fields = ["name","surname","date_of_birth","date_employed","position","manager","restaurant","pay_per_hour"]
+        fields = ["name","surname","date_of_birth","date_time_employed","position","manager","restaurant","pay_per_hour"]
 
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})

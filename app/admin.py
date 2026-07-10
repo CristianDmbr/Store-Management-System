@@ -32,7 +32,7 @@ class StaffAdmin(admin.ModelAdmin):
         "name",
         "surname",
         "date_of_birth",
-        "date_employed",
+        "date_time_employed",
         "work_right",
         "position",
         "pay_per_hour",

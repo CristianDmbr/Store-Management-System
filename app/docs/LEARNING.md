@@ -320,7 +320,7 @@ I then entered < docker build -t restaurant-app .> which read the DockerFile, fo
 - Check for image list: <docker image ls>
 - Check for running containers : <docker ps>
 
-# Pass one URL Converter:
+# Pass one URL Converter for the generics API views :
 lookup_field = "pk"
   
 # Pass more than one URL Converters
@@ -380,7 +380,7 @@ Between < super().get_form(form_class) > and < form = super().get_form() > use s
 
 # Preffiling FK.
 When filling the id field of a FK e.g. form.instance.employee_id = 5 we need the raw data < form.instance.employee_id = self.kwargs["pk"] >
-But we could also do a Full object with form.instance.employee = get_object_or_404(Employee, pk = self.kwargs["pk"])
+But we could also do a full object with form.instance.employee = get_object_or_404(Employee, pk = self.kwargs["pk"])
 (Raw is a bit more efficient because it doesnt require extra DB query)
 
 
@@ -418,7 +418,7 @@ Then DB gets destroyed
 
 # Backend Architecture (Forms -> Model Instance -> Python Object Flow)
 # GET request:
-1. Calls get_form() to make an empty form object < form = RestaurantForm() > which: Renders HTML inputs, Users sees form
+1. Calls get_form() to make an empty form object < form = RestaurantForm() > which: Renders HTML inputs, Users see form
 (An empty form object is created and an empty form.instance model object does exist but its not populated)
 
 
@@ -470,6 +470,7 @@ POST :
 2. Modify the request data itself 
   < data = request.data.copy() 
     data["owner"] = request.user.id> (We have to copy the request.data because it can be imuttable sometimes, at the end return the copied/modified data)
+
 
 # many = True
 In DRF we have a many = True concept where we can make it so the serializer object expects more than one object, e.g. a queryset. 
@@ -528,6 +529,13 @@ No model instance yet, unlike ModelForms, serializers do not create an empty mod
 6. After saving it take the model instance we just made and serialize it again to turn it back into a python dictionary which is serialzier.data
 7. use this serialized.data to make a JSON response to show back to user.
 
+# Life Cycle of when the row gets saved to the database for both Serializers/Forms
+1. Incoming data
+2. Validated
+3. Populate the model instance
+4. form.save() / serializer.save()
+5. Database row is created or updated
+Summary : First validate the incoming data, producing cleaned_data (forms) or validated_data (serializers). Django then uses the data to populate the model instance. Finally call form.save() or serializer.save() where that populated model instance is written into the database.
 
 # Difference between form request.data and serializer request.data which comes from POST
 Django Forms : The user input of forms comes in a form of a Python dictionary where all the values are strings, these values are converte into Python types during is_valid() e.g. "50" to int 50
@@ -570,7 +578,7 @@ Purpose of a query parameter : optional settings for filtering, searching,
 # Definition of < from .models import Restaurant >
 Not importing the database rows but instead the model blueprint which contains the information of the fields and if its CharField,IntegerField etc...
 Restaurant = blueprint
-Restaurant.objects = managaer that can talk to a database
+Restaurant.objects = manager that can talk to a database
 - My confusion is how does Django know whether to use the test database or the real database?
 Normally Restaurant manager is connecteed to the production database so normally any <.objects> works on the production database.
 But when we run < python manage.py test > it temporarily switches the connection from the real database to the test temporary database and once temporary database is destroyed, it reconnects back to the original database.
@@ -619,12 +627,12 @@ Django then executes the RestaurantList and this view returns a Django HttpRespo
 - status_code : 200
 - content : rendeted HTML
 - context : {"restaurants" : < queryset >}
-- templates = [""restaurant_list.html]
+- templates = ["restaurant_list.html"]
 
 # self.assertTemplateUsed checks if the Http response used the template, not if the template equals the response.
 
 # Why not import a CBV for testing?
-Users dont do RestaurantList() instead it they call GET /restaurant/ so the tests should do the same.
+Users don't do RestaurantList() instead it they call GET /restaurant/ so the tests should do the same.
   
 # Status_code
 Every HTTP response contains a status code.
@@ -703,7 +711,7 @@ That is only because we mention the pk in the URL parameter list :
 # UpdateView
 It uses the form to display data by taking the object and converting into form fields to populate the HTML inputs, this comes from from.instance. 
 form.instance is the actual model object instance and not the cleaned_data.
-This is because when we use GET request to an UpdateView Django already has the model object no need to convert to a Python dictionary to display like the serializers because tehre you cannot send Django model objects over HTTP. 
+This is because when we use GET request to an UpdateView Django already has the model object no need to convert to a Python dictionary to display like the serializers because then you cannot send Django model objects over HTTP. 
 
 # In APIs, we do not expose Django model objects directly. Instead, we retrieve model instances from the database, serialize them into Python dictionaries, and then convert those dictionaries into JSON for transmission to the client.
 
@@ -788,7 +796,12 @@ e.g. Sort by Restaurant then for each restaurant sort by date
             "date_added"
         ) >
 
+# Testing response.context and response.data
+For response.context : because CBV use templates the context can have a lot of info e.g. template, extra objects or info...
+For response.data : APIs do not use templates so it just has data which is a list of python serialized data e.g. array of Python dictionaries (If its a list API), for individual API (retrieve,delete,update) data is just one serialised dictionary.
+
 ## Main Request lifecycle methods:
+< objects.filter() > : returns a list of objects.
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
 < get_object() > : Controls how ONE object is retrieved (UpdateView,DeleteView,DetailView,RetriveAPIview)
 < get_context_data() > : Extra variables to template.

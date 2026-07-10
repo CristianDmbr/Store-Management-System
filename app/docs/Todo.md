@@ -1,6 +1,7 @@
 # TODO
-1. Test every CBV that contains custom logic (Ignore standard CRUD view)
-2. Test every DRF API endpoint 
+1. Complete all test for Staff as revision.
+2. Test every CBV that contains custom logic (Ignore standard CRUD view)
+3. Test every DRF API endpoint 
 
 3. View test
 4. API test

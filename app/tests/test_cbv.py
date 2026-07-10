@@ -4,7 +4,7 @@
 # e.g. CreateView RestaurantCreate : Can I acess form, Can I create Object, Does it redirect, Do my custom modifications work?
 # e.g. UpdateView RestaurantUpdate : Page returns 200, Correct form is used, Correct template is used, existing object is used, sucessfully updates
 # e.g. DeleteView RestaurantDelete : returns 200, uses correct template, loads correct restaurant object, deletes retaurant, redirects, returns 302
-
+ 
 # Also test any modifications to the parent case methods
 # In Django this response we get from a self.client is a Django HttpResponse object containing 
 # status_code : 200, content : rendered HTLM, context : {restaurant : <queryset>},templates : ["restaurant_list.html"]
@@ -16,8 +16,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date, datetime, timedelta 
 
-from app.models import Restaurant, Reservation, MenuItem
-from app.forms import RestaurantForm, ReservationForm, MenuItemForm
+from app.models import Restaurant, Reservation, MenuItem, Shift, Staff
+from app.forms import RestaurantForm, ReservationForm, MenuItemForm, ShiftForm, ShiftForEmployeeForm, StaffForm
 
 ######################################################____Restaurant___######################################################
 
@@ -251,26 +251,11 @@ class RestaurantUpdateViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("restaurant_list"))
-    
-    def test_valid_post_updates_restaurant_pass(self):
-        self.client.post(
-            reverse("restaurant_edit",kwargs={"pk" : self.restaurant.pk}),
-            {
-                "owner": self.user.pk,
-                "restaurant_name": "Andys Updated",
-                "date_opened": date.today(),
-                "location": "east_london",
-                "restaurant_cuisine": "italian",
-                "capacity": 10,
-            }
-        )
 
         self.restaurant.refresh_from_db()
 
         self.assertEqual(self.restaurant.restaurant_name,"Andys Updated")
         self.assertEqual(self.restaurant.capacity,10)
-
-
 
 class RestaurantDeleteViewTests(TestCase):
     def setUp(self):
@@ -398,6 +383,7 @@ class MenuListViewTests(TestCase):
         self.assertTemplateUsed(response,"menu_list.html")
         self.assertEqual(MenuItem.objects.count(),1)
         self.assertIsInstance(response.context["form"],MenuItemForm)
+        
     
     def test_ordered_by_restaurant_date_added_pass(self):
         restaurant_2 = Restaurant.objects.create(
@@ -493,3 +479,69 @@ class MenuListViewTests(TestCase):
         self.assertIsNotNone(response.context["form"].errors)
 
     
+class StaffCreateViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Pizza Mania",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "italian",
+            capacity = 50
+        )
+
+        self.staff = Staff.objects.create(
+            manager = self.user,
+            restaurant = self.restaurant,
+            name = "Ana-Maria",
+            surname = "Bostan",
+            date_of_birth = date.today(),
+            date_time_employed = timezone.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 10.12
+        )
+    
+    def test_page_opening_pass(self):
+        response = self.client.get(reverse("staff_view"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertIsInstance(response.context["form"], StaffForm)
+        self.assertTemplateUsed(response,"staff_add.html")
+    
+    def test_valid_creation(self):
+        response = self.client.post(reverse("staff_view"),
+                                        {
+                                            "manager" : self.user.pk,
+                                            "restaurant" : self.restaurant.pk,
+                                            "name" : "Mihai",
+                                            "surname" : "Bos",
+                                            "date_of_birth" : "2004-10-10",
+                                            "date_time_employed" : "2025-10-10 09:00:00",
+                                            "work_right" : "eu_passport",
+                                            "position" : "waiter",
+                                            "pay_per_hour" : "10.12"
+                                        })
+        self.assertEqual(Staff.objects.count(),2)
+        self.assertEqual(response.status_code,302)
+        self.assertRedirects(response,reverse("staff_list"))
+    
+    def test_invalid_create(self):
+            response = self.client.post(reverse("staff_view"),
+                                        {
+                                            "manager" : self.user.pk,
+                                            "restaurant" : self.restaurant.pk,
+                                            "date_of_birth" : "2004-10-10",
+                                            "date_time_employed" : "2025-10-10 09:00:00",
+                                            "work_right" : "eu_passport",
+                                            "position" : "waiter",
+                                            "pay_per_hour" : "10.12"
+                                        })
+
+            self.assertEqual(response.status_code,200)
+            self.assertEqual(Staff.objects.count(),1)
+            self.assertIsNotNone(response.context["form"].errors)
+            self.assertIn("name", response.context["form"].errors)
+            self.assertIn("surname", response.context["form"].errors)

@@ -53,6 +53,12 @@ from .validators import  (  validate_unique_restaurant_name, validate_appropriat
 
 class Restaurant(models.Model):
 
+    owner = models.ForeignKey(
+        User, 
+        on_delete = models.CASCADE,
+        related_name = "restaurants_owned"
+    )
+
     LOCATIONS_CHOICES = [
         ("east_london", "East London"),
         ("south_london", "South London"),
@@ -71,11 +77,6 @@ class Restaurant(models.Model):
         ("korean", "Korean")
     ]
 
-    owner = models.ForeignKey(
-        User, 
-        on_delete = models.CASCADE,
-        related_name = "restaurants_owned"
-    )
     restaurant_name = models.CharField(max_length = 200, null = False, blank = False)
     date_opened = models.DateField(null = False, blank = False)
     location = models.CharField( max_length = 200, choices = LOCATIONS_CHOICES)
@@ -120,10 +121,14 @@ class Restaurant(models.Model):
         return f"{self.restaurant_name}"
     
 class Reservation(models.Model):
-    name_of_reservation = models.CharField(max_length=200, null = False, blank = False)
-    restaurant = models.ForeignKey(Restaurant, on_delete = models.CASCADE, related_name = "reservations")
-    is_active = models.BooleanField(default = True)
 
+    restaurant = models.ForeignKey(
+        Restaurant, 
+        on_delete = models.CASCADE,
+        related_name = "reservations")
+
+    name_of_reservation = models.CharField(max_length=200, null = False, blank = False)
+    is_active = models.BooleanField(default = True)
     kids = models.PositiveIntegerField(default = 0)
     teens = models.PositiveIntegerField(default = 0)
     adults = models.PositiveIntegerField(default = 1)
@@ -168,9 +173,10 @@ class Staff(models.Model):
     name = models.CharField(max_length = 200, null = False, blank = False)
     surname = models.CharField(max_length = 200, null = False, blank = False)
     date_of_birth = models.DateField()
-    date_employed = models.DateTimeField(default = timezone.now)
+    date_time_employed = models.DateTimeField(default = timezone.now)
     work_right = models.CharField(max_length = 200, choices = WORK_STATUS)
     position = models.CharField(max_length = 200, choices = ROLES, default = "waiter")
+
     pay_per_hour = models.DecimalField(
         max_digits = 6,
         decimal_places = 2,
@@ -180,7 +186,7 @@ class Staff(models.Model):
     def clean(self):
         validate_unique_name_and_surname(self.name,self.surname,instance = self)
         validate_date_of_birth(self.date_of_birth)
-        validate_date_employed(self.date_employed)
+        validate_date_employed(self.date_time_employed)
     
     @property
     def total_earned(self):
@@ -250,28 +256,28 @@ class Staff(models.Model):
 
 
 class Shift(models.Model):
+
     employee = models.ForeignKey(
         Staff,
         on_delete=models.CASCADE,
         related_name="shifts"
     )
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    # Why duration and earnings are null? They are not manually entered in forms, they get worked out manually
-    duration_hours = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    earnings = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     STATUS_CHOICES = [
         ("planned", "Planned"),
         ("active", "Active"),
         ("completed", "Completed")
     ]
+
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    # Why duration and earnings are null? They are not manually entered in forms, they get worked out manually
+    duration_hours = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    earnings = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="planned")
-        
-    def clean(self):
-        validate_shift_time(self.employee, self.start_time, self.end_time, instance = self)
 
     # If validation passes, save gets used at the very end to save python object to DB.
+    # Save runs after we populate the model instance with cleaned data and save the form/serialiser.
     def save(self, *args, **kwargs):
         if self.start_time and self.end_time and self.employee:
             duration = self.end_time - self.start_time
@@ -281,6 +287,9 @@ class Shift(models.Model):
             self.earnings = self.duration_hours * pay
 
         super().save(*args, **kwargs)
+
+    def clean(self):
+        validate_shift_time(self.employee, self.start_time, self.end_time, instance = self)
     
     def __str__(self):
         return f"{self.employee} | {self.start_time} - {self.end_time}"
