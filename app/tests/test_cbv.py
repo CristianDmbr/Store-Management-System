@@ -16,8 +16,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date, datetime, timedelta 
 
-from app.models import Restaurant, Reservation, MenuItem, Shift, Staff
-from app.forms import RestaurantForm, ReservationForm, MenuItemForm, ShiftForm, ShiftForEmployeeForm, StaffForm
+from app.models import Restaurant, Reservation, MenuItem, Staff, Shift 
+from app.forms import RestaurantForm, ReservationForm, MenuItemForm, StaffForm, ShiftForm
 
 ######################################################____Restaurant___######################################################
 
@@ -776,7 +776,192 @@ class StaffDeleteViewTests(TestCase):
     def test_invalid_delete_pass(self):
         response = self.client.post(reverse("staff_delete",
                                     kwargs = {"pk" : 3}))
-                                    
+
         self.assertEqual(response.status_code,404)
         self.assertEqual(Staff.objects.count(),2)
     
+
+class ShiftCreateViewTests(TestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date(2020,4,10),
+            location = "west_london",
+            restaurant_cuisine = "indian",
+            capacity = 35
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 45
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = datetime(2025,2,10, 9,00,00),
+            work_right = "uk_passport",
+            position = "manager",
+            pay_per_hour = 15.25
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Marcel",
+            surname = "Dobzeu",
+            date_of_birth = date(1971,10,10),
+            date_time_employed = datetime.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 9.00
+        )
+
+        self.shift1 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = datetime(2026,6,6,9,00,00),
+            end_time = datetime(2026,6,16,00,00),
+            status = "completed"
+        )
+
+        self.shift2 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = datetime.now(),
+            end_time = datetime.now() + timedelta(hours = 8),
+            status = "planned"
+        )
+
+        self.shift3 = Shift.objects.create(
+            employee = self.staff2,
+            start_time = datetime(2026,5,12,12,00,00),
+            end_time = datetime(2026,5,12,18,00,00),
+            status = "completed"
+        )
+
+    def test_page_opening_pass(self):
+        response = self.client.get(reverse("shift_view"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertIsInstance(response.context["form"],ShiftForm)
+        self.assertTemplateUsed(response,"shift.html")
+        self.assertIn("shift_form", response.context)
+    
+    def test_valid_creation_pass(self):
+        response = self.client.post(reverse("shift_view"),
+                                    {
+                                        "employee" : str(self.staff1.pk),
+                                        "start_time" : "2025-01-01 9:00:00",
+                                        "end_time" : "2025-01-01 18:00:00",
+                                        "status" : "completed"
+                                    })
+            
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(Shift.objects.count(), 4)
+        self.assertRedirects(response,reverse("shift_list"))
+
+    def test_invalid_create_pass(self):
+        response = self.client.post(reverse("shift_view"),
+                                    {
+                                        "employee" : str(self.staff1.pk),
+                                        "status" : "completed"          
+                                    })
+        
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(Shift.objects.count(),3)
+        self.assertIn("start_time",response.context["form"].errors)
+        self.assertIn("end_time",response.context["form"].errors)
+    
+
+class ShiftListViewTestst(TestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date(2020,4,10),
+            location = "west_london",
+            restaurant_cuisine = "indian",
+            capacity = 35
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 45
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = datetime(2025,2,10, 9,00,00),
+            work_right = "uk_passport",
+            position = "manager",
+            pay_per_hour = 15.25
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Marcel",
+            surname = "Dobzeu",
+            date_of_birth = date(1971,10,10),
+            date_time_employed = datetime.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 9.00
+        )
+
+        self.shift1 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = datetime(2026,6,6,9,00,00,tzinfo=datetime.timezone.utc),
+            end_time = datetime(2026,6,16,00,00,tzinfo=datetime.timezone.utc),
+            status = "completed"
+        )
+
+        self.shift2 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = datetime.now(),
+            end_time = datetime.now() + timedelta(hours = 8),
+            status = "planned"
+        )
+
+        self.shift3 = Shift.objects.create(
+            employee = self.staff2,
+            start_time = datetime(2026,5,12,12,00,00),
+            end_time = datetime(2026,5,12,18,00,00),
+            status = "completed"
+        )
+    
+    def test_open_page_valid(self):
+        response = self.client.get(reverse("shift_list"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"shift_list.html")
+        self.assertEqual(len(response.context["shifts"]),3)
+    
+    def test_order_pass(self):
+        response = self.client.get(reverse("shift_list"))
+
+        self.assertEqual(response.context["shifts"][0].start_time,self.shift1.start_time)
+        self.assertEqual(response.context["shifts"][0].end_time,self.shift1.end_time)
+
+# python manage.py test app.tests.test_cbv

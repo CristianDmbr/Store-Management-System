@@ -493,7 +493,10 @@ class ShiftListView(ListView):
     context_object_name = "shifts"
 
     def get_queryset(self):
-        return super().get_queryset().order_by("employee")
+        return super().get_queryset().order_by(
+                            "employee",
+                            "start_time"
+                            )
 
 class IndividualShiftView(ListView):
     model = Shift

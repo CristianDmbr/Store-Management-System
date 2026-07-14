@@ -101,6 +101,9 @@ def validate_date_of_birth(dob):
     
 def validate_shift_time(employee, start_time,end_time, instance = None):
 
+    if not employee or not start_time or not end_time:
+        return 
+
     if start_time and end_time:
         if end_time <= start_time:
             raise ValidationError("Incorrect shift entry. Ensure the Start Time is before the End Time.")

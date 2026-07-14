@@ -793,3 +793,4 @@ class StaffRetrieveUpdateDestroyAPITests(APITestCase):
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Staff.objects.count(),2)
+
