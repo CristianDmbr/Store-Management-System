@@ -545,3 +545,150 @@ class StaffCreateViewTests(TestCase):
             self.assertIsNotNone(response.context["form"].errors)
             self.assertIn("name", response.context["form"].errors)
             self.assertIn("surname", response.context["form"].errors)
+
+class StaffListViewTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "east_london",
+            restaurant_cuisine = "italian",
+            capacity = 10
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.user,
+            restaurant_name = "Nandos",
+            date_opened = date.today() - timedelta(days = 200),
+            location = "east_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 20
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.user,
+            restaurant = self.restaurant1,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = datetime.now(),
+            work_right = "uk_passport",
+            position = "manager"
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.user,
+            restaurant = self.restaurant1,
+            name = "Dumitru",
+            surname = "Dumbravanu",
+            date_of_birth = date(2002,6,4),
+            date_time_employed = datetime.now(),
+            work_right = "uk_passport",
+            position = "waiter"
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.user,
+            restaurant = self.restaurant2,
+            name = "Marcel",
+            surname = "Dumbravanu",
+            date_of_birth = date(1972,10,8),
+            date_time_employed = datetime.now(),
+            work_right = "eu_passport",
+            position = "waiter"
+        )
+    
+    def test_page_opening_pass(self):
+        response = self.client.get(reverse("staff_list"))
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.context["members_of_staff"]),3)
+        self.assertEqual(Staff.objects.count(),3)
+        self.assertTemplateUsed(response,"staff_list.html")
+        self.assertIn("members_of_staff",response.context)
+
+    def test_query_set_order(self):
+        response = self.client.get(reverse("staff_list"))
+
+        self.assertEqual(response.context["members_of_staff"][0],self.staff1)
+        self.assertEqual(response.context["members_of_staff"][2],self.staff2)
+    
+    def test_empty_database_get(self):
+        Staff.objects.all().delete()
+
+        response = self.client.get(reverse("staff_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Staff.objects.count(),0)
+
+class StaffUpdateTests(TestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andy's",
+            date_opened = date.today(),
+            location = "south_london",
+            restaurant_cuisine = "italian",
+            capacity = 25
+        )
+
+        self.staff1 = Staff.objects.create(
+            restaurant = self.restaurant,
+            manager = self.owner,
+            name = "Bob",
+            surname = "Jordan",
+            date_of_birth = date(2000,5,1),
+            date_time_employed = timezone.now() - timedelta( hours = 10),
+            work_right = "temp_visa",
+            position = "waiter",
+            pay_per_hour = 12.50
+        )
+
+
+        self.staff2 = Staff.objects.create(
+            restaurant = self.restaurant,
+            manager = self.owner,
+            name = "Staff",
+            surname = "Lewis",
+            date_of_birth = date(2000,5,1),
+            date_time_employed = timezone.now(),
+            work_right = "student_visa",
+            position = "chief",
+            pay_per_hour = 10.00
+        )
+
+    def test_page_opening_pass(self):
+        response = self.client.get(reverse("staff_update", 
+                                        kwargs = {"pk" : self.staff1.pk}))
+
+        self.assertEqual(response.status_code,200)
+        self.assertIsInstance(response.context["form"],StaffForm)
+        self.assertTemplateUsed(response, "staff_update.html")
+        self.assertEqual(Staff.objects.count(),2)
+
+    def test_update_pass(self):
+        response = self.client.post(
+                                    reverse("staff_update",
+                                    kwargs = {"pk" : self.staff1.pk}),
+                                    {
+                                        "manager" : str(self.owner.pk),
+                                        "restaurant" : str(self.restaurant.pk),
+                                        "name" : "Bob_updated",
+                                        "surname" : "Dumbravanu",
+                                        "date_of_birth" : "2000-5-1",
+                                        "date_time_employed" : "2025-5-5 9:00:00",
+                                        "work_right" : "temp_visa",
+                                        "position" : "waiter",
+                                        "pay_per_hour" : "15.00"
+                                    }
+                                    )
+        
+        self.assertEqual(response.status_code, 302)
+        

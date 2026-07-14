@@ -792,13 +792,19 @@ Have a fk present even if purposely trying to enter an invalid POST request.
 e.g. Sort by Restaurant then for each restaurant sort by date
 <     def get_queryset(self):
         return super().get_queryset().order_by(
-            "restaurant",
+            "restaurant", ### This means by restaurant ID for restaurant message its restaurant__restaurant_name
             "date_added"
         ) >
 
 # Testing response.context and response.data
 For response.context : because CBV use templates the context can have a lot of info e.g. template, extra objects or info...
 For response.data : APIs do not use templates so it just has data which is a list of python serialized data e.g. array of Python dictionaries (If its a list API), for individual API (retrieve,delete,update) data is just one serialised dictionary.
+
+# AssertContains VS AssertIn
+AssertContains is used when wanting to check if the rendered HTML contains a string.
+AssertIn is used when wanting to check for something inside of the context.
+
+
 
 ## Main Request lifecycle methods:
 < objects.filter() > : returns a list of objects.

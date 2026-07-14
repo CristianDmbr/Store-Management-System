@@ -436,8 +436,12 @@ class StaffList(ListView):
     template_name = "staff_list.html"
     context_object_name = "members_of_staff"
 
+    def get_queryset(self):
+        return super().get_queryset().order_by(
+            "restaurant",
+            "position") # Alphabetical order of the roles
 
-class StaffUpdateView(UpdateView):
+class StaffUpdateView(UpdateView):  
     model = Staff
     form_class = StaffForm
     template_name = "staff_update.html"
