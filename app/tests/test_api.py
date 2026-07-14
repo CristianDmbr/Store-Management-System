@@ -20,7 +20,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase
 
-from app.models import Restaurant, Reservation, MenuItem
+from app.models import Restaurant, Reservation, MenuItem, Staff
 
 class RestaurantListCreateAPITests(APITestCase):
     def setUp(self):
@@ -577,3 +577,74 @@ class MenuItemRetrieveUpdateDestroyAPITests(APITestCase):
                                 )
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.data["name"],"Updated Andys Supreme")
+
+class StaffListCreateAPITests(APITestCase):
+    
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+    
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 25
+        )   
+
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 25
+        )  
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = timezone.now(),
+            work_right = "uk_passport",
+            position = "manager"
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Mihail",
+            surname = "Bostan",
+            date_of_birth = date(2001,1,22),
+            date_time_employed = timezone.now(),
+            work_right = "uk_passport",
+            position = "chief"
+        )
+
+        self.staff3 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Marcel",
+            surname = "Cazacu",
+            date_of_birth = date(2001,1,22),
+            date_time_employed = timezone.now(),
+            work_right = "uk_passport",
+            position = "chief"   
+        )
+    
+    def test_page_opening_pass(self):
+        response = self.client.get(reverse("staff_list_create_api"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data),3)
+    
+    def test_query_oder_pass(self):
+        response = self.client.get(reverse("staff_list_create_api"))
+
+        self.assertEqual(response.data[0]["name"],self.staff1.name)
+        self.assertEqual(response.data[1]["name"],self.staff2.name)
+        self.assertEqual(response.data[2]["name"],self.staff3.name)
+    

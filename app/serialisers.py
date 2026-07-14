@@ -67,7 +67,7 @@ class ReservationSerialiser(serializers.ModelSerializer):
 class StaffSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Staff
-    fields = ["pk","name","surname","manager","restaurant","date_of_birth","date_employed","work_right","position","pay_per_hour"]
+    fields = ["pk","name","surname","manager","restaurant","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
   
   def validate(self, attrs):
 

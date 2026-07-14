@@ -686,9 +686,97 @@ class StaffUpdateTests(TestCase):
                                         "date_time_employed" : "2025-5-5 9:00:00",
                                         "work_right" : "temp_visa",
                                         "position" : "waiter",
-                                        "pay_per_hour" : "15.00"
+                                        "pay_per_hour" : "20.00"
                                     }
                                     )
         
         self.assertEqual(response.status_code, 302)
+        staff = Staff.objects.get(pk = self.staff1.pk)
+        self.assertEqual(staff.name, "Bob_updated")
+        self.assertEqual(staff.pay_per_hour, 20.00)
+        self.assertRedirects(response,reverse("staff_list"))
+
+    def test_invalid_update_pass(self):
+        response = self.client.post(
+                                    reverse("staff_update",
+                                    kwargs = {"pk" : self.staff1.pk}),
+                                    {
+                                        "manager" : str(self.owner.pk),
+                                        "restaurant" : str(self.restaurant.pk),
+                                        # Missing Name
+                                        "surname" : "Dumbravanu",
+                                        "date_of_birth" : "2000-5-1",
+                                        "date_time_employed" : "2025-5-5 9:00:00",
+                                        "work_right" : "temp_visa",
+                                        "position" : "waiter",
+                                        "pay_per_hour" : "15.00"
+                                    }
+                                    )
+                                
+        staff = Staff.objects.get(pk = self.staff1.pk)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context["form"].errors)
+        self.assertIn("name",response.context["form"].errors)
+        self.assertEqual(staff.name, "Bob")
         
+
+class StaffDeleteViewTests(TestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+    
+        self.restaurant = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 25
+        )   
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = timezone.now(),
+            work_right = "uk_passport",
+            position = "manager"
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant,
+            name = "Mihail",
+            surname = "Bostan",
+            date_of_birth = date(2001,1,22),
+            date_time_employed = timezone.now(),
+            work_right = "uk_passport",
+            position = "chief"
+        )
+
+    def test_open_page_pass(self):
+        response = self.client.get(reverse("staff_delete",
+                                    kwargs = {"pk" : str(self.staff1.pk)}))
+        
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"staff_delete.html")
+        self.assertEqual(Staff.objects.count(),2)
+    
+    def test_valid_delete_pass(self):
+        response = self.client.post(reverse("staff_delete",
+                                    kwargs = {"pk" : str(self.staff1.pk)}))
+        
+        self.assertEqual(response.status_code,302)
+        self.assertRedirects(response,reverse("staff_list"))
+        self.assertEqual(Staff.objects.count(),1)
+    
+    def test_invalid_delete_pass(self):
+        response = self.client.post(reverse("staff_delete",
+                                    kwargs = {"pk" : 3}))
+                                    
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(Staff.objects.count(),2)
+    

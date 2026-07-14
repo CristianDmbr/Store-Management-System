@@ -804,7 +804,11 @@ For response.data : APIs do not use templates so it just has data which is a lis
 AssertContains is used when wanting to check if the rendered HTML contains a string.
 AssertIn is used when wanting to check for something inside of the context.
 
-
+# Django and DRG main methods
+Django CBV (CreateView,UpdateView,DeleteView,ListView) are designed around how HTML forms work in the browser so it only uses:
+1. GET : Display a page or form
+2. POST : Submit a form (create,update,delete)
+DRF follows the HTTP dematics more closely (GET,POST,PUT,PATCH,DELETE)
 
 ## Main Request lifecycle methods:
 < objects.filter() > : returns a list of objects.
