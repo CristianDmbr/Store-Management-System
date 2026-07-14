@@ -74,16 +74,16 @@ def validate_unique_name_and_surname(name, surname, instance = None):
         raise ValidationError(f"{name} {surname} is already in the system.")
 
     return name,surname
-    
-def validate_date_employed(date_employed):
+
+def validate_time_date_employed(date_time_employed):
 
     today = timezone.now()
     # Returns a date time
 
-    if today < date_employed:
+    if today < date_time_employed:
         raise ValidationError("Cannot have an employment date in the future.")
     
-    return date_employed
+    return date_time_employed
     
 def validate_date_of_birth(dob):
 

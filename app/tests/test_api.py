@@ -648,3 +648,148 @@ class StaffListCreateAPITests(APITestCase):
         self.assertEqual(response.data[1]["name"],self.staff2.name)
         self.assertEqual(response.data[2]["name"],self.staff3.name)
     
+    def test_create_valid_pass(self):
+        response = self.client.post(reverse("staff_list_create_api"),
+                                            {
+                                                "manager" : str(self.owner.pk),
+                                                "restaurant" : str(self.restaurant1.pk),
+                                                "name" : "Jordan",
+                                                "surname" : "James",
+                                                "date_of_birth" : "2001-1-12",
+                                                "date_time_employed" : "2026-2-10 9:00:00",
+                                                "work_right" : "uk_passport",
+                                                "position" : "chief",
+                                                "pay_per_hour" : "10.50"
+                                            })
+
+        self.assertEqual(response.status_code,201)
+        self.assertEqual(Staff.objects.count(),4)
+        self.assertEqual(response.data["name"],"Jordan")
+    
+    def test_create_invalid_pass(self):
+        response = self.client.post(reverse("staff_list_create_api"),
+                                                {
+                                                    "manager" : str(self.owner.pk),
+                                                    "restaurant" : str(self.restaurant1.pk),
+                                                    "date_of_birth" : "2001-1-12",
+                                                    "date_time_employed" : "2026-2-10 9:00:00",
+                                                    "work_right" : "uk_passport",
+                                                    "position" : "chief",
+                                                    "pay_per_hour" : "10.50"
+                                                }
+                                                )
+        self.assertEqual(response.status_code,400)
+        self.assertEqual(Staff.objects.count(),3)
+    
+    def test_delete_pass(self):
+        response = self.client.delete(reverse("staff_list_create_api"))
+
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Staff.objects.count(),0)
+    
+class StaffRetrieveUpdateDestroyAPITests(APITestCase):
+
+    def setUp(self):
+            self.owner = User.objects.create(username = "Cristian")
+        
+            self.restaurant1 = Restaurant.objects.create(
+                owner = self.owner,
+                restaurant_name = "Dominos",
+                date_opened = date.today(),
+                location = "north_london",
+                restaurant_cuisine = "fast_food",
+                capacity = 25
+            )   
+
+
+            self.restaurant2 = Restaurant.objects.create(
+                owner = self.owner,
+                restaurant_name = "Andys",
+                date_opened = date.today(),
+                location = "north_london",
+                restaurant_cuisine = "fast_food",
+                capacity = 25
+            )  
+
+            self.staff1 = Staff.objects.create(
+                manager = self.owner,
+                restaurant = self.restaurant1,
+                name = "Cristian",
+                surname = "Dumbravanu",
+                date_of_birth = date(2003,4,22),
+                date_time_employed = timezone.now(),
+                work_right = "uk_passport",
+                position = "manager"
+            )
+
+            self.staff2 = Staff.objects.create(
+                manager = self.owner,
+                restaurant = self.restaurant1,
+                name = "Mihail",
+                surname = "Bostan",
+                date_of_birth = date(2001,1,22),
+                date_time_employed = timezone.now(),
+                work_right = "uk_passport",
+                position = "chief"
+            )
+
+            self.staff3 = Staff.objects.create(
+                manager = self.owner,
+                restaurant = self.restaurant2,
+                name = "Marcel",
+                surname = "Cazacu",
+                date_of_birth = date(2001,1,22),
+                date_time_employed = timezone.now(),
+                work_right = "uk_passport",
+                position = "chief",   
+
+            )
+        
+    def test_valid_open_page_pass(self):
+        response = self.client.get(reverse("staff_retrieve_update_destroy",
+                                    kwargs = {"name" : self.staff1.name,
+                                               "surname" : self.staff1.surname})
+                                )
+        
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["name"],self.staff1.name)
+        self.assertEqual(Staff.objects.count(),3)
+
+    def test_invalid_open_page_pass(self):
+        response = self.client.get(reverse("staff_retrieve_update_destroy",
+                                    kwargs = {"name" : "DoesNotExist",
+                                               "surname" : self.staff1.surname})
+                                )
+        
+        self.assertEqual(response.status_code,404)
+        self.assertEqual(Staff.objects.count(),3)
+    
+    def test_valid_put_page_pass(self):
+        response = self.client.put(reverse("staff_retrieve_update_destroy",
+                                    kwargs = {"name" : self.staff1.name, "surname" : self.staff1.surname}),
+                                    {
+                                        "manager" : str(self.owner.pk),
+                                        "restaurant" : str(self.restaurant1.pk),
+                                        "name" : "Cristian_updated",
+                                        "surname" : "Dumbravanu_updated",
+                                        "date_of_birth" : "2003-4-22",
+                                        "date_time_employed" : "2025-1-1 9:00:00",
+                                        "work_right" : "uk_passport",
+                                        "position" : "chief",
+                                        "pay_per_hour" : "10.50"
+                                    }
+                                    )
+        
+        self.staff1.refresh_from_db()
+        
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["name"],"Cristian_updated")
+        self.assertEqual(response.data["surname"],"Dumbravanu_updated")
+
+    def test_valid_destroy_pass(self):
+        response = self.client.delete(reverse("staff_retrieve_update_destroy",
+                                        kwargs = {"name" : self.staff1.name, "surname" : self.staff1.surname})
+                                        )
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Staff.objects.count(),2)

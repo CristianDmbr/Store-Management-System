@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
                            validate_unique_restaurant_name_reservation, # Reservation
-                           validate_unique_name_and_surname, validate_date_of_birth, validate_date_employed, # Staff
+                           validate_unique_name_and_surname, validate_date_of_birth, validate_time_date_employed, # Staff
                            validate_shift_time, # Shift
                            validate_unique_menu_item_name, validate_calories # Menu Item
                            )
@@ -176,7 +176,6 @@ class Staff(models.Model):
     date_time_employed = models.DateTimeField(default = timezone.now)
     work_right = models.CharField(max_length = 200, choices = WORK_STATUS)
     position = models.CharField(max_length = 200, choices = ROLES, default = "waiter")
-
     pay_per_hour = models.DecimalField(
         max_digits = 6,
         decimal_places = 2,
@@ -186,7 +185,7 @@ class Staff(models.Model):
     def clean(self):
         validate_unique_name_and_surname(self.name,self.surname,instance = self)
         validate_date_of_birth(self.date_of_birth)
-        validate_date_employed(self.date_time_employed)
+        validate_time_date_employed(self.date_time_employed)
     
     @property
     def total_earned(self):

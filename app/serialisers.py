@@ -34,7 +34,7 @@ from rest_framework import serializers
 from .models import Restaurant, Reservation, Staff, Shift, MenuItem
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
                            validate_unique_restaurant_name_reservation, # Reservation
-                           validate_unique_name_and_surname, validate_date_of_birth, validate_date_employed, # Staff
+                           validate_unique_name_and_surname, validate_date_of_birth, validate_time_date_employed, # Staff
                            validate_shift_time, # Shift
                            validate_unique_menu_item_name, validate_calories # Menu Item
                            )
@@ -74,11 +74,11 @@ class StaffSerialiser(serializers.ModelSerializer):
     name = attrs.get("name")
     surname = attrs.get("surname")
     date_of_birth = attrs.get("date_of_birth")
-    date_employed = attrs.get("date_employed")
+    date_time_employed = attrs.get("date_time_employed")
 
     validate_unique_name_and_surname(name,surname,self.instance)
     validate_date_of_birth(date_of_birth)
-    validate_date_employed(date_employed)
+    validate_time_date_employed(date_time_employed)
 
     return attrs
   
