@@ -1,12 +1,9 @@
 # TODO
-1. Complete all test for Shift. (Make all of the shift time aware)
-2. Test every CBV that contains custom logic (Ignore standard CRUD view)
-3. Test every DRF API endpoint 
 
-4. View test
-5. API test
-6. Serializer tests
-7. API endpoint tests
+1. View test
+2. API test
+3. Serializer tests
+4. API endpoint tests
 - [ ] Plan for the Future and make a list of things this program shoud do
 - [ ] Fix the home page
 - [ ] ERD (Entity Relationship Diagram)

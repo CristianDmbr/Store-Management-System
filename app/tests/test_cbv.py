@@ -1168,6 +1168,7 @@ class AddIndividualShiftCreateView(TestCase):
 
         newest_shift = Shift.objects.latest("id")
         self.assertEqual(newest_shift.employee,self.staff1)
+        self.assertRedirects(response, reverse("staff_list"))
     
     def test_invalid_pk_create_pass(self):
         response = self.client.post(reverse("add_individual_shifts",
@@ -1192,6 +1193,7 @@ class AddIndividualShiftCreateView(TestCase):
                                             )
         self.assertEqual(response.status_code,200)
         self.assertIn("end_time",response.context["form"].errors)
+
     
 
 # python manage.py test app.tests.test_cbv

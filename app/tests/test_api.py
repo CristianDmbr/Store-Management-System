@@ -20,7 +20,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework.test import APITestCase
 
-from app.models import Restaurant, Reservation, MenuItem, Staff
+from app.models import Restaurant, Reservation, MenuItem, Staff, Shift
 
 class RestaurantListCreateAPITests(APITestCase):
     def setUp(self):
@@ -794,3 +794,239 @@ class StaffRetrieveUpdateDestroyAPITests(APITestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Staff.objects.count(),2)
 
+
+class ShiftListCreateAPITests(APITestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date(2020,4,10),
+            location = "west_london",
+            restaurant_cuisine = "indian",
+            capacity = 35
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 45
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = timezone.make_aware(datetime(2025,2,10, 9,00,00)),
+            work_right = "uk_passport",
+            position = "manager",
+            pay_per_hour = 15.25
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Marcel",
+            surname = "Dobzeu",
+            date_of_birth = date(1971,10,10),
+            date_time_employed = timezone.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 9.00
+        )
+
+        self.shift1 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.make_aware(datetime(2026,6,6,9,00,00)),
+            end_time = timezone.make_aware(datetime(2026,6,16,00,00)),
+            status = "completed"
+        )
+
+        self.shift2 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.now(),
+            end_time = timezone.now() + timedelta(hours = 8),
+            status = "planned"
+        )
+
+        self.shift3 = Shift.objects.create(
+            employee = self.staff2,
+            start_time = timezone.make_aware(datetime(2026,5,12,12,00,00)),
+            end_time = timezone.make_aware(datetime(2026,5,12,18,00,00)),
+            status = "completed"
+        )
+    
+    def test_page_opening_valid(self):
+        response = self.client.get(reverse("shift_list_create_api"))
+
+        self.assertEqual(response.status_code,200)
+    
+    def test_ordering_of_query_pass(self):
+        response = self.client.get(reverse("shift_list_create_api"))
+
+        self.assertEqual(response.data[0]["employee"],self.staff1.pk)
+        self.assertEqual(response.data[1]["employee"],self.staff1.pk)
+        self.assertEqual(response.data[2]["employee"],self.staff2.pk)
+
+    def test_create_valid_row_pass(self):
+        response = self.client.post(reverse("shift_list_create_api"),
+                                    {
+                                        "employee" : str(self.staff2.pk),
+                                        "start_time" : "2026-7-7 9:00:00",
+                                        "end_time" : "2026-7-7 18:00:00",
+                                        "status" : "completed"
+                                    })
+                                
+        self.assertEqual(response.status_code,201)    
+        self.assertEqual(Shift.objects.count(),4)
+    
+    def test_create_invalid_row_pass(self):
+        response = self.client.post(reverse("shift_list_create_api"),
+                                    {
+                                        "employee" : str(self.staff2.pk),
+                                        "end_time" : "2026-7-7 18:00:00",
+                                        "status" : "completed"
+                                    })
+        
+        self.assertEqual(response.status_code,400)
+        self.assertIn("start_time",response.data)
+        self.assertEqual(Shift.objects.count(),3)
+    
+    def test_delete_pass(self):
+        response = self.client.delete(reverse("shift_list_create_api"))
+
+        self.assertEqual(Shift.objects.count(),0)
+        self.assertEqual(response.status_code,204)
+
+class ShiftRetrieveUpdateDestroyAPITests(APITestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date(2020,4,10),
+            location = "west_london",
+            restaurant_cuisine = "indian",
+            capacity = 35
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 45
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = timezone.make_aware(datetime(2025,2,10, 9,00,00)),
+            work_right = "uk_passport",
+            position = "manager",
+            pay_per_hour = 15.25
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Marcel",
+            surname = "Dobzeu",
+            date_of_birth = date(1971,10,10),
+            date_time_employed = timezone.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 9.00
+        )
+
+        self.shift1 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.make_aware(datetime(2026,6,6,9,00,00)),
+            end_time = timezone.make_aware(datetime(2026,6,16,00,00)),
+            status = "completed"
+        )
+
+        self.shift2 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.now(),
+            end_time = timezone.now() + timedelta(hours = 8),
+            status = "planned"
+        )
+
+        self.shift3 = Shift.objects.create(
+            employee = self.staff2,
+            start_time = timezone.make_aware(datetime(2026,5,12,12,00,00)),
+            end_time = timezone.make_aware(datetime(2026,5,12,18,00,00)),
+            status = "completed"
+        )
+    
+    def test_valid_page_opening_pass(self):
+        response = self.client.get(reverse("shift_retrieve_update_destroy_api",
+                                            kwargs = {"pk" : str(self.shift1.pk)}))
+        
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.data["employee"],self.staff1.pk)
+                
+    def test_invalid_pk_pass(self):
+        response = self.client.get(reverse("shift_retrieve_update_destroy_api",
+                                            kwargs = {"pk" : "999"}))
+        
+        self.assertEqual(response.status_code,404)
+
+    def test_valid_update_row_pass(self):
+
+        response = self.client.put(reverse("shift_retrieve_update_destroy_api",
+                                            kwargs = {"pk" : str(self.shift1.pk)}),
+                                            {
+                                                "employee" : str(self.staff1.pk),
+                                                "start_time" : "2026-6-6 10:00:00",
+                                                "end_time" : "2026-6-6 17:00:00",
+                                                "status" : "completed"
+                                            })
+
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(
+            response.data["start_time"],
+            "2026-06-06T10:00:00Z"
+        )
+
+        self.assertEqual(
+            response.data["end_time"],
+            "2026-06-06T17:00:00Z"
+        )
+
+    def test_invalid_row_update_pass(self):
+        response = self.client.put(reverse("shift_retrieve_update_destroy_api",
+                                                kwargs = {"pk" : str(self.shift1.pk)}),
+                                                {
+                                                "employee" : str(self.staff1.pk),
+                                                "end_time" : "2026-6-6 17:00:00",
+                                                "status" : "completed"
+                                                }
+                                                )
+        
+        self.assertEqual(response.status_code,400)
+        self.assertIn("start_time",response.data)
+    
+    def test_valid_delete_row_pass(self):
+        response = self.client.delete(reverse("shift_retrieve_update_destroy_api",
+                                            kwargs = {"pk" : str(self.shift1.pk)}))
+                                        
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Shift.objects.filter(employee = self.staff1).count(), 1)
+        self.assertEqual(Shift.objects.count(), 2)
+
+    #python manage.py test app.tests.test_api

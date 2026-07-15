@@ -836,6 +836,32 @@ newest_shift = Shift.objects.latest("id")
 
 # Whenever working with FK make sure to add a verification of the get_object_or_404(Staff, pk=self.kwargs["pk"])
 
+# Difference between quering CBV and DRF for context["members_of_staff"] and data[]
+For CBV the response.context is a dictionary where the memebers_of_staff is actualy python objects so :
+{
+    "members_of_staff": <QuerySet [<Staff>, <Staff>, <Staff>]>,
+    "page_title": "...",
+    "view": <StaffListView>,
+}
+so we can do <response.context["members_of_staff"][0].name>
+
+For DRF serialiser outputs a python list of python dictionaries
+[
+    {
+        "name": "Cristian",
+        "surname": "Dumbravanu",
+        ...
+    },
+    {
+        ...
+    }
+]
+response.data[0]["name"]
+
+# Errors for CBV and DRF
+Since CBV have forms we can acess the erros with response.context["form"].errors
+For DRF its response.status_code 400 but also response.data is the error 
+
 ## Main Request lifecycle methods:
 < objects.filter() > : returns a list of objects.
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)

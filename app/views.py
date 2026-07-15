@@ -542,7 +542,8 @@ class ShiftListCreateAPI(generics.ListCreateAPIView):
         return Response(status = status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
-        return super().get_queryset().order_by("employee")
+        return super().get_queryset().order_by("employee",
+                                                "start_time")
 
 class ShiftRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Shift.objects.all()
