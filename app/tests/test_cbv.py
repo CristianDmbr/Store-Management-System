@@ -17,7 +17,7 @@ from django.utils import timezone
 from datetime import date, datetime, timedelta 
 
 from app.models import Restaurant, Reservation, MenuItem, Staff, Shift 
-from app.forms import RestaurantForm, ReservationForm, MenuItemForm, StaffForm, ShiftForm
+from app.forms import RestaurantForm, ReservationForm, MenuItemForm, StaffForm, ShiftForm, ShiftForEmployeeForm
 
 ######################################################____Restaurant___######################################################
 
@@ -575,7 +575,7 @@ class StaffListViewTests(TestCase):
             name = "Cristian",
             surname = "Dumbravanu",
             date_of_birth = date(2003,4,22),
-            date_time_employed = datetime.now(),
+            date_time_employed = timezone.now(),
             work_right = "uk_passport",
             position = "manager"
         )
@@ -586,7 +586,7 @@ class StaffListViewTests(TestCase):
             name = "Dumitru",
             surname = "Dumbravanu",
             date_of_birth = date(2002,6,4),
-            date_time_employed = datetime.now(),
+            date_time_employed = timezone.now(),
             work_right = "uk_passport",
             position = "waiter"
         )
@@ -597,7 +597,7 @@ class StaffListViewTests(TestCase):
             name = "Marcel",
             surname = "Dumbravanu",
             date_of_birth = date(1972,10,8),
-            date_time_employed = datetime.now(),
+            date_time_employed = timezone.now(),
             work_right = "eu_passport",
             position = "waiter"
         )
@@ -810,7 +810,7 @@ class ShiftCreateViewTests(TestCase):
             name = "Cristian",
             surname = "Dumbravanu",
             date_of_birth = date(2003,4,22),
-            date_time_employed = datetime(2025,2,10, 9,00,00),
+            date_time_employed = timezone.make_aware(datetime(2025,2,10, 9,00,00)),
             work_right = "uk_passport",
             position = "manager",
             pay_per_hour = 15.25
@@ -822,7 +822,7 @@ class ShiftCreateViewTests(TestCase):
             name = "Marcel",
             surname = "Dobzeu",
             date_of_birth = date(1971,10,10),
-            date_time_employed = datetime.now(),
+            date_time_employed = timezone.now(),
             work_right = "eu_passport",
             position = "waiter",
             pay_per_hour = 9.00
@@ -830,22 +830,22 @@ class ShiftCreateViewTests(TestCase):
 
         self.shift1 = Shift.objects.create(
             employee = self.staff1,
-            start_time = datetime(2026,6,6,9,00,00),
-            end_time = datetime(2026,6,16,00,00),
+            start_time = timezone.make_aware(datetime(2026,6,6,9,00,00)),
+            end_time = timezone.make_aware(datetime(2026,6,16,00,00)),
             status = "completed"
         )
 
         self.shift2 = Shift.objects.create(
             employee = self.staff1,
-            start_time = datetime.now(),
-            end_time = datetime.now() + timedelta(hours = 8),
+            start_time = timezone.now(),
+            end_time = timezone.now() + timedelta(hours = 8),
             status = "planned"
         )
 
         self.shift3 = Shift.objects.create(
             employee = self.staff2,
-            start_time = datetime(2026,5,12,12,00,00),
-            end_time = datetime(2026,5,12,18,00,00),
+            start_time = timezone.make_aware(datetime(2026,5,12,12,00,00)),
+            end_time = timezone.make_aware(datetime(2026,5,12,18,00,00)),
             status = "completed"
         )
 
@@ -881,8 +881,8 @@ class ShiftCreateViewTests(TestCase):
         self.assertEqual(Shift.objects.count(),3)
         self.assertIn("start_time",response.context["form"].errors)
         self.assertIn("end_time",response.context["form"].errors)
-    
 
+    
 class ShiftListViewTestst(TestCase):
 
     def setUp(self):
@@ -912,7 +912,7 @@ class ShiftListViewTestst(TestCase):
             name = "Cristian",
             surname = "Dumbravanu",
             date_of_birth = date(2003,4,22),
-            date_time_employed = datetime(2025,2,10, 9,00,00),
+            date_time_employed = timezone.make_aware(datetime(2025,2,10, 9,00,00)),
             work_right = "uk_passport",
             position = "manager",
             pay_per_hour = 15.25
@@ -924,7 +924,7 @@ class ShiftListViewTestst(TestCase):
             name = "Marcel",
             surname = "Dobzeu",
             date_of_birth = date(1971,10,10),
-            date_time_employed = datetime.now(),
+            date_time_employed = timezone.now(),
             work_right = "eu_passport",
             position = "waiter",
             pay_per_hour = 9.00
@@ -932,22 +932,22 @@ class ShiftListViewTestst(TestCase):
 
         self.shift1 = Shift.objects.create(
             employee = self.staff1,
-            start_time = datetime(2026,6,6,9,00,00,tzinfo=datetime.timezone.utc),
-            end_time = datetime(2026,6,16,00,00,tzinfo=datetime.timezone.utc),
+            start_time = timezone.make_aware(datetime(2026,6,6,9,00,00)),
+            end_time = timezone.make_aware(datetime(2026,6,16,00,00)),
             status = "completed"
         )
 
         self.shift2 = Shift.objects.create(
             employee = self.staff1,
-            start_time = datetime.now(),
-            end_time = datetime.now() + timedelta(hours = 8),
+            start_time = timezone.now(),
+            end_time = timezone.now() + timedelta(hours = 8),
             status = "planned"
         )
 
         self.shift3 = Shift.objects.create(
             employee = self.staff2,
-            start_time = datetime(2026,5,12,12,00,00),
-            end_time = datetime(2026,5,12,18,00,00),
+            start_time = timezone.make_aware(datetime(2026,5,12,12,00,00)),
+            end_time = timezone.make_aware(datetime(2026,5,12,18,00,00)),
             status = "completed"
         )
     
@@ -957,11 +957,241 @@ class ShiftListViewTestst(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,"shift_list.html")
         self.assertEqual(len(response.context["shifts"]),3)
+        self.assertIn("shifts",response.context)
     
     def test_order_pass(self):
         response = self.client.get(reverse("shift_list"))
 
-        self.assertEqual(response.context["shifts"][0].start_time,self.shift1.start_time)
-        self.assertEqual(response.context["shifts"][0].end_time,self.shift1.end_time)
+        shifts = response.context["shifts"]
+
+        self.assertEqual(Shift.objects.count(),3)
+        self.assertEqual(shifts[0],self.shift1)
+        self.assertEqual(shifts[1],self.shift2)
+        self.assertEqual(shifts[2],self.shift3)
+    
+class IndividualShiftListViewTests(TestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date(2020,4,10),
+            location = "west_london",
+            restaurant_cuisine = "indian",
+            capacity = 35
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 45
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = timezone.make_aware(datetime(2025,2,10, 9,00,00)),
+            work_right = "uk_passport",
+            position = "manager",
+            pay_per_hour = 15.25
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Marcel",
+            surname = "Dobzeu",
+            date_of_birth = date(1971,10,10),
+            date_time_employed = timezone.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 9.00
+        )
+
+        self.shift1 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.make_aware(datetime(2026,6,6,9,00,00)),
+            end_time = timezone.make_aware(datetime(2026,6,16,00,00)),
+            status = "completed"
+        )
+
+        self.shift2 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.now(),
+            end_time = timezone.now() + timedelta(hours = 8),
+            status = "planned"
+        )
+
+        self.shift3 = Shift.objects.create(
+            employee = self.staff2,
+            start_time = timezone.make_aware(datetime(2026,5,12,12,00,00)),
+            end_time = timezone.make_aware(datetime(2026,5,12,18,00,00)),
+            status = "completed"
+        )
+    
+    def test_page_valid_opening_pass(self):
+        response = self.client.get(reverse("individual_shifts",
+                                        kwargs = {"pk": str(self.staff1.pk)}))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "individual_shifts.html")
+        self.assertIn("individual_user_shifts",response.context)
+        self.assertEqual(len(response.context["individual_user_shifts"]),2)
+    
+    def test_invalid_page_opening_pass(self):
+        response = self.client.get(reverse("individual_shifts",
+                                        kwargs = {"pk" : "3"}))
+        
+        self.assertEqual(response.status_code,404)
+
+    def test_query_order_pass(self):
+        response = self.client.get(reverse("individual_shifts",
+                                        kwargs = {"pk":str(self.staff1.pk)}))
+                                    
+        shifts = response.context["individual_user_shifts"]
+
+        self.assertEqual(shifts[0],self.shift1)
+        self.assertEqual(shifts[1],self.shift2)
+    
+class AddIndividualShiftCreateView(TestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create(username = "Cristian")
+
+        self.restaurant1 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Andys",
+            date_opened = date(2020,4,10),
+            location = "west_london",
+            restaurant_cuisine = "indian",
+            capacity = 35
+        )
+
+        self.restaurant2 = Restaurant.objects.create(
+            owner = self.owner,
+            restaurant_name = "Dominos",
+            date_opened = date.today(),
+            location = "north_london",
+            restaurant_cuisine = "fast_food",
+            capacity = 45
+        )
+
+        self.staff1 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant2,
+            name = "Cristian",
+            surname = "Dumbravanu",
+            date_of_birth = date(2003,4,22),
+            date_time_employed = timezone.make_aware(datetime(2025,2,10, 9,00,00)),
+            work_right = "uk_passport",
+            position = "manager",
+            pay_per_hour = 15.25
+        )
+
+        self.staff2 = Staff.objects.create(
+            manager = self.owner,
+            restaurant = self.restaurant1,
+            name = "Marcel",
+            surname = "Dobzeu",
+            date_of_birth = date(1971,10,10),
+            date_time_employed = timezone.now(),
+            work_right = "eu_passport",
+            position = "waiter",
+            pay_per_hour = 9.00
+        )
+
+        self.shift1 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.make_aware(datetime(2026,6,6,9,00,00)),
+            end_time = timezone.make_aware(datetime(2026,6,16,00,00)),
+            status = "completed"
+        )
+
+        self.shift2 = Shift.objects.create(
+            employee = self.staff1,
+            start_time = timezone.now(),
+            end_time = timezone.now() + timedelta(hours = 8),
+            status = "planned"
+        )
+
+        self.shift3 = Shift.objects.create(
+            employee = self.staff2,
+            start_time = timezone.make_aware(datetime(2026,5,12,12,00,00)),
+            end_time = timezone.make_aware(datetime(2026,5,12,18,00,00)),
+            status = "completed"
+        )
+    
+    def test_page_opening_valid_pass(self):
+        response = self.client.get(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : str(self.staff1.pk)}))
+            
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,"add_individual_shift.html")
+    
+    def test_page_openong_invalid_pass(self):
+        response = self.client.get(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : "3"}))
+        
+        self.assertEqual(response.status_code,404)
+
+    def test_get_context_modification_pass(self):
+        response = self.client.get(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : str(self.staff1.pk)}))
+
+        self.assertEqual(response.context["employee"],self.staff1)
+
+    def test_get_form_modification_pass(self):
+        response = self.client.get(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : str(self.staff1.pk)}))
+
+        self.assertEqual(response.context["form"].instance.employee.pk, self.staff1.pk)
+    
+    def test_valid_create_pass(self):
+        response = self.client.post(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : str(self.staff1.pk)}),
+                                            {
+                                                "start_time" : "2026-7-1 9:00:00",
+                                                "end_time" : "2026-7-1 18:00:00",
+                                                "status" : "completed"
+                                            }
+                                            )
+        self.assertEqual(Shift.objects.filter(employee = self.staff1).count(),3)
+        self.assertEqual(Shift.objects.count(),4)
+
+        newest_shift = Shift.objects.latest("id")
+        self.assertEqual(newest_shift.employee,self.staff1)
+    
+    def test_invalid_pk_create_pass(self):
+        response = self.client.post(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : str(3)}),
+                                            {
+                                                "start_time" : "2026-7-1 9:00:00",
+                                                "end_time" : "2026-7-1 18:00:00",
+                                                "status" : "completed"
+                                            }
+                                            )
+
+        self.assertEqual(response.status_code,404)
+
+    def test_invalid_field_create_pass(self):
+        response = self.client.post(reverse("add_individual_shifts",
+                                            kwargs = {"pk" : str(self.staff1.pk)}),
+                                            {
+                                                "employee" : str(self.staff1.pk),
+                                                "start_time" : "2026-7-1 9:00:00",
+                                                "status" : "completed"
+                                            }
+                                            )
+        self.assertEqual(response.status_code,200)
+        self.assertIn("end_time",response.context["form"].errors)
+    
 
 # python manage.py test app.tests.test_cbv

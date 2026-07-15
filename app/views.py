@@ -520,6 +520,9 @@ class AddIndividualShiftView(CreateView):
         # Employee id is not present in the form.
         # This is a Shift method where you exclude field and set it in the background
     def get_form(self, form_class=None):
+
+        get_object_or_404(Staff, pk=self.kwargs["pk"])
+
         form = super().get_form()
         # Because get_form gets calles for both GET and POST, We insert this pk into both the instances but the POST is the one that matters.
         form.instance.employee_id = self.kwargs["pk"]

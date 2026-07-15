@@ -54,8 +54,6 @@ urlpatterns = [
 
     path('', views.home, name = "home_page"),
     path("menu/", views.MenuListView.as_view(), name = "menu_list"),
-    path("shift/", views.ShiftView.as_view(), name = "shift_view"),
-        path("shift_list/",views.ShiftListView.as_view(), name = "shift_list"),
 
     path("restaurants/", views.RestaurantList.as_view(), name = "restaurant_list"),
     path("restaurants_add",views.RestaurantCreate.as_view(), name = "restaurant_create"),
@@ -67,6 +65,9 @@ urlpatterns = [
     path("staff_list/",views.StaffList.as_view(), name = "staff_list"),
     path("staff/<int:pk>/edit",views.StaffUpdateView.as_view(), name = "staff_update"),
     path("staff/<int:pk>/delete", views.StaffDelete.as_view(), name = "staff_delete"),
+
+    path("shift/", views.ShiftView.as_view(), name = "shift_view"),
+    path("shift_list/",views.ShiftListView.as_view(), name = "shift_list"),
     path("staff/<int:pk>/shifts",views.IndividualShiftView.as_view(), name = "individual_shifts"),
     path("staff/<int:pk>/add_individual_shift",views.AddIndividualShiftView.as_view(),name = "add_individual_shifts"),
 

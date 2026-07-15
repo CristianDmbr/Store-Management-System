@@ -810,6 +810,32 @@ Django CBV (CreateView,UpdateView,DeleteView,ListView) are designed around how H
 2. POST : Submit a form (create,update,delete)
 DRF follows the HTTP dematics more closely (GET,POST,PUT,PATCH,DELETE)
 
+# Make a DateTime aware
+Naive = datetime(2026,5,12,18,00,00)
+Aware = timezone.make_aware(datetime(2026,5,12,18,00,00))
+
+# Status Code 404 has no context
+
+# Attributes of the context["form"]:
+response.context["form"]
+├── fields
+├── errors
+├── cleaned_data   (after validation)
+├── initial
+├── instance
+└── is_valid()
+
+# Get a specific query:
+< shifts = Shift.objects.filter(employee = self.staff1) >
+(We could also use .count on it) 
+
+# Extract the latest row in the DB using .latest()
+newest_shift = Shift.objects.latest("id")
+- If we use the id as the parameter it will bring out the later row because ID which is the biggest is the newest.
+- But if we use it for say Name, Date, Value it will bring out the biggest value, alphabetically, most recent
+
+# Whenever working with FK make sure to add a verification of the get_object_or_404(Staff, pk=self.kwargs["pk"])
+
 ## Main Request lifecycle methods:
 < objects.filter() > : returns a list of objects.
 < get_queryset() > : Controls what objects are retrieved from DB (ListView, DRF generics)
