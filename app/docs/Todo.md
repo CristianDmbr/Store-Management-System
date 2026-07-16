@@ -1,4 +1,7 @@
 # TODO
+1. Analyse what you did with the new Register, Login, Logout functions
+1. Learn Authentication & Permissions
+
 
 1. View test
 2. API test

@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path, include
 from app import views
 
@@ -50,7 +51,16 @@ urlpatterns = [
 
     # These are private/local urls.
     # Public URLs are accessible by anyone on the Internet
+
+
+    path("login/",LoginView.as_view(template_name = "login.html"),name="login"),
+    path("register",views.register, name = "register"),
+    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+
     path("api/",include("app.urls")),
+
+    path("general/",views.restaurant_general_list, name = "general_restaurant_list"),
+    path("specific/<int:restaurant_id>/",views.restaurant_detail, name = "restaurant_detail"),
 
     path('', views.home, name = "home_page"),
     path("menu/", views.MenuListView.as_view(), name = "menu_list"),

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant List</title>
+</head>
+<body>
+
+    <h1>Restaurants</h1>
+
+    {% if restaurants %}
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>
+                    <a href="{% url 'restaurant_detail' restaurant.id %}">
+                        {{ restaurant.restaurant_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No restaurants found.</p>
+    {% endif %}
+
+</body>
+</html>

@@ -7,6 +7,9 @@ from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+
 from rest_framework import generics,status
 from rest_framework.response import Response
 # Create custom API views
@@ -587,3 +590,29 @@ def combine_form_view(request):
         "restaurant_form" : restaurant_form,
         "menu_form" : menu_form,
     })
+
+@login_required
+def restaurant_general_list(request):
+    restaurants = Restaurant.objects.all()
+    context = {"restaurants" : restaurants}
+    return render(request, "restaurant_general_list.html" ,context)
+
+@login_required
+def restaurant_detail(request, restaurant_id):
+    restaurant = get_object_or_404(Restaurant, id = restaurant_id)
+    context = {"restaurant" : restaurant}
+    return render (request,"restaurant_detail.html",context)
+
+def register(request):
+
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect("login")
+    else:
+        form = UserCreationForm()
+    
+    context = {"form" : form}
+    return render(request,"register.html",context)

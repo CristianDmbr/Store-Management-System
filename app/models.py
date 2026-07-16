@@ -51,6 +51,7 @@ from .validators import  (  validate_unique_restaurant_name, validate_appropriat
 # By having validation in the model we have data protection everywhere whereas forms validation protects data inserted throught 
 # forms.
 
+
 class Restaurant(models.Model):
 
     owner = models.ForeignKey(

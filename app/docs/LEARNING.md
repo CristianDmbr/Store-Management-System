@@ -869,3 +869,99 @@ For DRF its response.status_code 400 but also response.data is the error
 < get_context_data() > : Extra variables to template.
 < get_initial() > : Prefill form default before rendering
 < get_form() > : Modify form object before validation,rendering (Hide fields, inject FK, disable fields, dynamic forms)  
+
+######################   Authentication & Permissions   ###################### 
+
+## Theory:
+
+Think of a web application as a building. Anyone can walk up to the building but the application has to answer two questions: 
+1. Who are you?
+2. What are you allowed to do?
+
+# Authentication : 
+Who is making this request? Identify the user (e.g. Username + Password, Google Login, etc...). Answers "This Request belongs to Cristian". NOT "Cristian can delete restaurants".
+
+Sessions: Once authenticated, Django remebers you (Otherwise you will have to log in at every page)
+Login -> Session Created -> Browser receives session cookie -> Browser sends cookie every request -> Django knows who you are.
+
+So <request.user> is available everywhere.
+
+If a use has not signed in, request.user is not None but intead its AnonymousUser so Django can treat guests consistently.
+
+# Authorisation (Permission):
+"What are you allowed to do?" (Independent)
+e.g.
+Owner can: Edit restaurant, Hire Staff, Delete shifts
+Manager can: Create Shifts, Update Reservation
+Waiter: Views His own shift
+
+# Django's Permission Layers
+1. Logged in?
+< LoginRequiredMixin > or < @login_required > : Checks if user is Authenticated else redirects to Login
+2. User Permissions: Every model gets permissions e.g. Restaurant can create_restaurant, change_restarant, delete_restaurant etc... Similarly you can give permissions to users.
+3. Groups
+Instead of having user Cristian have 50 Permissions, Change it to Manger has 50 permissions so its much easier.
+4. Object Permissions
+Sometimes permission also depends on the object e.g. Dominos's owner is Cristian, Nandos's owner is Marcel so Cristian can't edit Marcel's restaurant. So permission depends on Restaurant.owner.
+
+# Request Life cycle for both DRF and CBV:
+1. Click Create staff
+2. Request arrives and its asking who is this ? -> Cristian
+3. Permission Check -> Is Cristian allowed ? -> Yes
+4. View is executed and saved (Authentication happens before view is executed)
+
+# Why Authentication Exists?
+Without authentication anyone can do anything.
+
+# Cookies
+Small pieces of data that a website stores in your browser so it can remember information between requests.
+Every HTTP request is independent so say if you log with GET/login and then visit GET/restaurants, without cookies the browser has no idea your the same person who just logged in.
+
+# How Cookies Work
+1. You log in with username and password. Django verifies credentials and it creates a session on the server. e.g. Session ID : abc123xyz
+2. Django send a cookie to your browser with sessionid=abc123xyz
+3. Browser stores it
+4. Every future request automatically includes: Cookie: sessionid=abc123xyz
+5. Django can look up this id and know who make the request
+
+COOKIES DO NOT CONTAIN USERNAME AND PASSWORD
+Summary : 
+Cookies don’t hold your login details. Instead, they hold a session ID. Every time your browser makes a request, it automatically sends that session ID back to the server. Django uses that session ID to identify which logged-in user is making the request.
+
+# django.contrib.auth Core Models
+- User:
+  - Represents a single user in your application
+  - Stores username, password,email,active status
+  - Can be assigned permissions directly
+- Group:
+  - Organised users into collections
+  - Groups have users and we can add multiple users to a group
+  - Groups have permissions and users inherit permissions from their group
+
+# Permission:
+- Represents actions that a user can perform "add_document, change_document"
+- Permissions are assigend directly to users or to groups
+- Django creates view, add, change,  delete for every model
+- By default users are not assigned any permissions
+- SUPERUSERS BYPASS PERMISSIONS CHECKS
+  
+# Permissions are applied at the model level 
+Meaning permission are database level so when you run migrations Django has a table of id and the permission.
+Users DO NOT have Boolea like < user.can_edit_staff = True >.
+Instead its: 
+User
+------
+Cristian
+
+Permissions
+-----------
+change_staff
+delete_staff
+
+### Inside of the auth_permission database
+Every database model has a add,change,delete,view.
+There perissions are created but not assigned to any user, this is the job of an administrator.
+Inside of auth_user_user_permissions table allows a user to have many permission.
+
+# Decorators
+A function that wraps around another function to add extra behaviour before or after it runs without changing the original code.
