@@ -7,8 +7,10 @@ from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
+
+from django.http import HttpResponseForbidden
 
 from rest_framework import generics,status
 from rest_framework.response import Response
@@ -592,9 +594,12 @@ def combine_form_view(request):
     })
 
 @login_required
+#@permission_required('app.view_restaurant', raise_exception = True)
 def restaurant_general_list(request):
     restaurants = Restaurant.objects.all()
     context = {"restaurants" : restaurants}
+    if request.user.has_perm("app.view_restaurant"):
+        context["special_message"] = "Secret Text"
     return render(request, "restaurant_general_list.html" ,context)
 
 @login_required

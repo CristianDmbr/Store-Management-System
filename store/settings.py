@@ -129,10 +129,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
 # URL to redirect unauthenticated users to login
-LOGIN_URL = '/login/'
+LOGIN_URL = 'login'
 
 # URL to redirect users after successful login
 LOGIN_REDIRECT_URL = '/'

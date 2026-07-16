@@ -1,6 +1,7 @@
 # TODO
-1. Analyse what you did with the new Register, Login, Logout functions
-1. Learn Authentication & Permissions
+1. Adding Custom Permissions to a Django Model (Follow the video)
+2. Automate the process of giving permission to users.
+3. Learn Authentication & Permissions
 
 
 1. View test

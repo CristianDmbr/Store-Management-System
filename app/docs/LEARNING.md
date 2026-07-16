@@ -965,3 +965,81 @@ Inside of auth_user_user_permissions table allows a user to have many permission
 
 # Decorators
 A function that wraps around another function to add extra behaviour before or after it runs without changing the original code.
+
+# How LogIn function works?
+So because of the @login_required whenever we try to access a URL that uses a view like this, because of the <"LOGIN_URL = 'login'"> inside of the settings.py, it automatically takes us to the 
+< path("login/",LoginView.as_view(template_name = "login.html"),name="login"), > 
+The LoginView is prebuilt and imported from < from django.contrib.auth.views import LoginView > and we set the template to the one we made. Inside of the html file the form is just under form that comes from the LoginView which is the AuthenticationForm premade.
+
+# How does Register work?
+We have made a View which uses a premade UserCreationForm that has been premade. Once the form has been filled with valid data it redirects to the LogIn page.
+
+# How does LogOut works?
+LogoutView is also premade :
+< path("logout/", LogoutView.as_view(next_page="login"), name="logout"), >
+After loging the user out take him to the login page.
+
+< @login_required
+def restaurant_general_list(request):
+    restaurants = Restaurant.objects.all()
+    context = {"restaurants" : restaurants}
+    return render(request, "restaurant_general_list.html" ,context) >
+# Because of the @login_required it means anyone has acess to it if they are logged in (So no permission based restrictions yet)
+
+# Adding permission
+@login_required
+@permission_required('view_restaurant', raise_exception = True)
+This means that if a user wants to see the List of all Restaurants they need a permission of view_restaurant. (Super users bypass it.)
+To add permission you need to enter the admin page, select the user and add the view_restaurant permission manually and save.
+
+Now when we check the auth_user_user_permission table we see :
+id user_id permission_id
+1   4       40
+This means user_id 4 has permission id 40(View_restaurant)
+
+# Making groups
+Inside of the admin page create a Group with permission and add it to the user.
+Inside of the auth_group_permissions:
+id, group_id, permission_id:
+1   1        40
+
+so again we have a group id 1 with permission of 40.
+You can have endless amount of users in groups.
+Groups make management and control way easier and more efficient, than manually adding permission to each user.
+
+# How to make a section of a page accessible to users and not just block the whole page if no permission are present.
+<
+@login_required
+def restaurant_general_list(request):
+    if not request.user.has_perm("app.core.view_document"):
+        return HttpResponseForbidden(f'Sorry {request.user.username}, you do not have acess')
+
+    restaurants = Restaurant.objects.all()
+    context = {"restaurants" : restaurants}
+    return render(request, "restaurant_general_list.html" ,context) >
+
+or
+<def restaurant_general_list(request):
+    restaurants = Restaurant.objects.all()
+    context = {"restaurants" : restaurants}
+    if request.user.has_perm("app.view_restaurant"):
+        context["special_message"] = "Secret Text"
+    return render(request, "restaurant_general_list.html" ,context)>
+
+# When using permission make sure to write <app_name.permission> 
+# user.has_perm() checks for permissions.
+
+# CBV vs FBV
+FBV require mentioning of everything that gest passed through th URL e.g.:
+path("restaurant/<int:pk>/", views.restaurant_detail)
+def restaurant_detail(request, pk):
+    restaurant = get_object_or_404(Restaurant, pk=pk)
+    ...
+CBV has a kwargs which stores it.
+
+We can also add kwargs to a FBV as
+def restaurant_detail(request, **kwargs):
+    print(kwargs["pk"])
+
+Cristian, Cristi22
+Bob, Cristian22
