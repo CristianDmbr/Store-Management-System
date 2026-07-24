@@ -16,6 +16,8 @@
         <a href="{% url 'shift_list' %}">All shifts</a>
         <br>
         <a href="{% url 'general_restaurant_list' %}">General List of Restaurants</a>
+        <br>
+        <a href="{% url 'restaurant_detail' 2 %}">Management Restaurant Information</a>
 
         {% if user.is_authenticated %}
             <p>Welcome, {{ user.username }}</p>
@@ -25,7 +27,7 @@
                 <button type="submit">Logout</button>
             </form>
         {% else %}
-            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'login'  %}">Login</a>
         {% endif %}
     </body>
 </html>

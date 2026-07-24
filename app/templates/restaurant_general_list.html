@@ -6,6 +6,7 @@
 <body>
 
     <h1>Restaurants</h1>
+    <h2>Hello {{ user_info }}</h2>
 
     {% if restaurants %}
         <ul>
@@ -18,8 +19,15 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>No restaurants found.</p>
+        <p> {{ notice_message }}</p>
     {% endif %}
+
+    <a href="{% url 'login' %}">Log In</a>
+    <br>
+    <form action="{% url 'logout' %}" method = "post">
+        {% csrf_token %}
+        <button type = "submit">Logout</button>
+    </form>
 
 </body>
 </html>

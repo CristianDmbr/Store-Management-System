@@ -2,6 +2,7 @@
 1. Adding Custom Permissions to a Django Model (Follow the video)
 2. Automate the process of giving permission to users.
 3. Learn Authentication & Permissions
+4. Make a manager page of all their restaurants, staff.
 
 
 1. View test

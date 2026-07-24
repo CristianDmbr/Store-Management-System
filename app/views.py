@@ -387,7 +387,7 @@ class MenuListView(FormMixin, ListView):
         context["form"] = self.get_form()
         return context
     
-    # ListView by itself only handles GET requests so it can't process a submitted form.
+    # ListView by itself only handles GET requests so i t can't process a submitted form.
     # FormMixing offers the tools to make a POST, you then wrote your own post method because ListView is a GET - only so now 
     # because of the form method = "POST" it now calls your post method we just created.
     def post(self, request, *args, **kwargs):
@@ -593,14 +593,19 @@ def combine_form_view(request):
         "menu_form" : menu_form,
     })
 
-@login_required
+#@login_required
 #@permission_required('app.view_restaurant', raise_exception = True)
 def restaurant_general_list(request):
-    restaurants = Restaurant.objects.all()
-    context = {"restaurants" : restaurants}
-    if request.user.has_perm("app.view_restaurant"):
-        context["special_message"] = "Secret Text"
-    return render(request, "restaurant_general_list.html" ,context)
+    context = {}
+    
+    if request.user.is_authenticated:
+        context["restaurants"] = Restaurant.objects.all()
+        context["user_info"] = request.user.username
+    else:
+        context["notice_message"] = "Secret Test"
+        context["user_info"] = "Unknown"
+    
+    return render(request,"restaurant_general_list.html",context)
 
 @login_required
 def restaurant_detail(request, restaurant_id):

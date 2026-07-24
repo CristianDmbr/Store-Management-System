@@ -898,7 +898,7 @@ Waiter: Views His own shift
 # Django's Permission Layers
 1. Logged in?
 < LoginRequiredMixin > or < @login_required > : Checks if user is Authenticated else redirects to Login
-2. User Permissions: Every model gets permissions e.g. Restaurant can create_restaurant, change_restarant, delete_restaurant etc... Similarly you can give permissions to users.
+2. User Permissions: Every model gets permissions e.g. Restaurant can add_restaurant, change_restarant, delete_restaurant, view_restaurant ... Similarly you can give permissions to users.
 3. Groups
 Instead of having user Cristian have 50 Permissions, Change it to Manger has 50 permissions so its much easier.
 4. Object Permissions
@@ -1040,6 +1040,20 @@ CBV has a kwargs which stores it.
 We can also add kwargs to a FBV as
 def restaurant_detail(request, **kwargs):
     print(kwargs["pk"])
+
+# Buttons in HTML
+Always must be inside of a form.
+
+# Add Custom permissions
+{% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}!</p>
+{% else %}
+    <p>You are not logged in.</p>
+{% endif %}
+
+# How to check if a user request has that perimmision:
+Python : <request.user.has_pern("app.archive_restaurant)>
+HTML : <{% if perms.app.archive_restaurant %}> Django is checking the user associated with the current request.
 
 Cristian, Cristi22
 Bob, Cristian22
