@@ -149,6 +149,9 @@ class Reservation(models.Model):
         validate_unique_restaurant_name_reservation(
             self.restaurant, self.name_of_reservation, self
         )
+    
+    def __str__(self):
+        return f"{self.name_of_reservation} @ {self.restaurant.restaurant_name}"
 
     
 class Staff(models.Model):

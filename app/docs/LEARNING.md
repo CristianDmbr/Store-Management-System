@@ -1055,5 +1055,13 @@ Always must be inside of a form.
 Python : <request.user.has_pern("app.archive_restaurant)>
 HTML : <{% if perms.app.archive_restaurant %}> Django is checking the user associated with the current request.
 
+# Rule when to use __ or . in Django
+Use __ only in Django ORM queries:
+.filter(restaurant__restaurant_name = "Nando's")
+.order_by("restaurant__restaurant_name")
+Else:
+restaurant.restaurant_name
+
+
 Cristian, Cristi22
 Bob, Cristian22
