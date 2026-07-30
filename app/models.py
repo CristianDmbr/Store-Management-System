@@ -83,6 +83,7 @@ class Restaurant(models.Model):
     location = models.CharField( max_length = 200, choices = LOCATIONS_CHOICES)
     restaurant_cuisine = models.CharField( max_length = 200, choices = RESTAURANT_CUISINES )
     capacity = models.IntegerField()
+    number_of_tables = models.PositiveIntegerField(null = False, blank = False)
 
     class Meta:
         # Additional permissions on the default create, delete, update and view
@@ -152,7 +153,6 @@ class Reservation(models.Model):
     
     def __str__(self):
         return f"{self.name_of_reservation} @ {self.restaurant.restaurant_name}"
-
     
 class Staff(models.Model):
 
@@ -341,3 +341,66 @@ class MenuItem(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.restaurant})"
+
+    
+class Order(models.Model):
+
+    ORDER_STATUS = [
+        ("not_been_served", "Not served"),
+        ("waiting","Waiting"),
+        ("complete","Complete")
+    ]
+
+    restaurant = models.ForeignKey(
+        Restaurant,
+        on_delete = models.CASCADE,
+        related_name = "orders"
+        )
+    
+    staff = models.ForeignKey(
+        Staff,
+        on_delete = models.CASCADE,
+        related_name = "orders_taken"
+    )
+
+    # Optional
+    reservation = models.ForeignKey(
+        Reservation,
+        on_delete = models.CASCADE,
+        related_name = "orders",
+        null = True,
+        blank = True
+    )
+
+    date_time_of_order = models.DateTimeField(default = timezone.now())
+    status = models.CharField(max_length=100, choices = ORDER_STATUS)
+    note = models.TextField(max_length = 400, blank = True, null = True)
+
+    table_number = models.PositiveIntegerField(null = False, blank = False)
+
+    def __str__(self):
+        return f"Reservation at {self.restaurant.restaurant_name} : {self.date_time_of_order} for {self.reservation.name_of_reservation}."
+
+class OrderItem(models.Model):
+
+    order = models.ForeignKey(
+        Order,
+        on_delete = models.CASCADE,
+        related_name = "items"
+    )
+
+    menu_item = models.ForeignKey(
+        MenuItem,
+        on_delete = models.CASCADE,
+        related_name = "order_items"
+    )
+
+    quantity = models.PositiveIntegerField(default=1)
+    price_sold_at = models.DecimalField( max_digits = 8, decimal_places = 2)
+
+    def save(self,*args,**kwargs):
+        if not self.price_sold_at:
+            self.price_sold_at = self.menu_item.price
+        
+        super().save(*args,**kwargs)
+    

@@ -1,5 +1,7 @@
 # TODO
-1. Make a manager page of all their restaurants, staff.
+1. Add a Finance Model for Owners to see and analyse
+2. Make a ERD
+3. Make a manager page of all their restaurants, staff.
 
 
 - [ ] Learn PostgreSQL properly
