@@ -1062,6 +1062,106 @@ Use __ only in Django ORM queries:
 Else:
 restaurant.restaurant_name
 
+# Process of adding the role field for User registration
+1. In forms :
+< from django.contrib.auth.forms import UserCreationForm 
+
+class RegisterForm(UserCreationForm):
+
+    ROLE_CHOICES = [
+        ("Owner","Owner"),
+        ("Manager","Manager"),
+        ("Staff","Staff"),
+    ]
+
+    role = forms.ChoiceField(
+        choices = ROLE_CHOICES
+    )>
+
+UserCreationForm is a premade Django form which already has a Meta class and so on like a normal form.
+With class RegisterForm we inherit everything from that UserCreationForm.
+We just add the < role = forms.ChoiceField() >
+So Django now sees username, password1, password2 (to match Passwords) and a role field.
+My confusion is where did form fields come from and what they represent?
+Models have field like < models.CharField(), models.BooleanField(), models.ForeignKey() > which describe the database.
+Forms have their own field types :
+< form.CharField() > which creates <input type="text"> 
+< forms.EmailField() > which creates <input type="email">
+< forms.IntegerField() > which creates <input type="number">
+
+# Confusion "Does this add a role field into the database?"
+No. Once a Browser sends a request forms temporarily stores data:
+cleaned_data :
+{
+    "username": ...
+    "password1": ...
+    "password2": ...
+    "role": "Manager"
+}
+So role is inside the form not inside the User Model YET.
+Why doesn't the user get a ROLE collumn? Because it has a groups collumn inside of the auth_user_groups.
+
+views.py
+< def register(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            role = form.cleaned_data["role"]
+            group = Group.objects.get(name = role)
+            user.groups.add(group)
+            return redirect("login")
+    else:
+        form = RegisterForm()
+    
+    context = {"form" : form}
+    return render(request,"register.html",context)>
+
+1. Confusion : " Is role validated? since its in cleaned_data?"
+Forms doesn't validate against the DB first first it validates its own fields (e.g. role cannot be dog since its not mentioned in the ChoiceField)
+2. Why is role inside of the cleaned_data?
+Browser sends data about username, role etc... we store it all using RegistrationForm(request.POST)
+After is_valid Django has validated every form field.
+CLEANED_DATA CONTAINS EVERY FORM FIELD NOT EVERY DATABASE FIELD.
+3. What does <form.save()> do?
+It doesnt save the form, it saves the User object inside of the User DB. Meaning create and save a User object NOT save every field in the form.
+So if my form has username, password1, password2, role and my model has username, password when we do form.save() it only copies username and password into the user Object so it ignores role because there is no where to store it.
+4. Why no error if role is not in the DB fields?
+Role is simply an extra field of the form it ignores it.
+5. Why does role not dissapear then?
+After < form.is_valid()> the form object still exists and so does cleaned_data which is why we can do form.cleaned_data.get["role"]
+6. AFTER form.save() THE USER IS IN THE DATABASE
+7. Modifying the user row
+After user.groups.add(group) we do not modify the auth_user table. Instead it inserts it inot auth_user_groups
+8. If a user has multiple permissions the auth_user_permissinos will have many rows with different id's but the same user ID and a different group id based on the permission.
+
+# Form validation VS Model validation
+When running form.is_valid()
+We run the form validators and we then run the model's clean functions.
+# MODEL VALIDATORS GET USED ONLY WHEN WE HAVE A forms.ModelForm and we mention the model inside of the class Meta
+
+# .groups is the Django interface to many to many relationships between User and Group
+
+# COMMANDS :
+# Checking if a User belongs to a group:
+< if request.user.groups.filter(name = "Manager").exists():
+    print("User is a manager") >
+# Get all groups a user belongs to:
+< request.user.groups.all() >
+# Check if a User has a permission:
+< request.user.has_perm("app.change_restaurant") >
+# Get all groups:
+< Group.objects.all() >
+# Get all permisions in a group:
+< manager = Group.objects.get(name = "Manager")
+  manager.permissions.all() >
+# Add a user to a group
+< manager = Group.objects.get(name = "Manager") 
+ user.groups.add(manager)>
+# Remove a user from a group:
+< user.groups.remove(manager) >
+
+
 
 Cristian, Cristi22
 Bob, Cristian22

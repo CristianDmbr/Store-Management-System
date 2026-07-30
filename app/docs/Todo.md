@@ -1,19 +1,7 @@
 # TODO
-1. Implement the different group of permissions when registering
-2. Automate the process of giving permission to users.
-3. Learn Authentication & Permissions
-4. Make a manager page of all their restaurants, staff.
+1. Make a manager page of all their restaurants, staff.
 
 
-1. View test
-2. API test
-3. Serializer tests
-4. API endpoint tests
-- [ ] Plan for the Future and make a list of things this program shoud do
-- [ ] Fix the home page
-- [ ] ERD (Entity Relationship Diagram)
-- [ ] For each employee you can see how much they earned and how much they are predicted to earn, add tax, add hours per week.
-- [ ] Review that the website all makes sense and make a diagram
 - [ ] Learn PostgreSQL properly
 
 - [ ] Understand

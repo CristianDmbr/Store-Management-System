@@ -3,6 +3,8 @@ from .models import Restaurant, MenuItem, Staff, Shift, Reservation
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from django.contrib.auth.forms import UserCreationForm
+
 from .validators import (validate_unique_restaurant_name, validate_appropriate_restaurant_name, 
                         validate_unique_restaurant_name_reservation)
 
@@ -38,6 +40,18 @@ from .validators import (validate_unique_restaurant_name, validate_appropriate_r
 # In a update  CBV Django uses the instance and knows which row we are currently working on to update so we can exclude from validation
 # but with the first version it doesnt know so when we try to update a row it will crash since the row exists and Django doesnt ignore it.
 # (Second is more professional and since it handels both CREATE and UPDATE safer)
+
+class RegisterForm(UserCreationForm):
+
+    ROLE_CHOICES = [
+        ("Owner","Owner"),
+        ("Manager","Manager"),
+        ("Staff","Staff"),
+    ]
+
+    role = forms.ChoiceField(
+        choices = ROLE_CHOICES
+    )
 
 class RestaurantForm(forms.ModelForm):
 

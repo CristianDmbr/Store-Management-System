@@ -1,14 +1,15 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, RegisterForm
 from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.forms import UserCreationForm
+
+from django.contrib.auth.models import Group
 
 from django.http import HttpResponseForbidden
 
@@ -616,13 +617,21 @@ def restaurant_detail(request, restaurant_id):
 def register(request):
 
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            
+            user = form.save()
+
+            role = form.cleaned_data["role"]
+
+            group = Group.objects.get(name = role)
+
+            user.groups.add(group)
+
             return redirect("login")
     else:
-        form = UserCreationForm()
+        form = RegisterForm()
     
     context = {"form" : form}
     return render(request,"register.html",context)
