@@ -1,7 +1,7 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, RegisterForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm
 from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required
 
 from django.contrib.auth.models import Group
+from django.contrib.auth.forms import UserCreationForm
 
 from django.http import HttpResponseForbidden
 
@@ -17,6 +18,8 @@ from rest_framework import generics,status
 from rest_framework.response import Response
 # Create custom API views
 from rest_framework.views import APIView
+
+
 
 # Client is anything that sends request to a server e.g. Browser, Mobile App
 
@@ -617,24 +620,59 @@ def restaurant_detail(request, restaurant_id):
 def register(request):
 
     if request.method == "POST":
-        form = RegisterForm(request.POST)
+        form = UserRoleCreationForm(request.POST)
 
         if form.is_valid():
-            
             user = form.save()
-
             role = form.cleaned_data["role"]
-
+            print(role)
+            print(Group.objects.all())
             group = Group.objects.get(name = role)
 
             user.groups.add(group)
-
-            return redirect("login")
+            
+            return redirect("login_page")
     else:
-        form = RegisterForm()
+        form = UserRoleCreationForm()
     
     context = {"form" : form}
+
     return render(request,"register.html",context)
 
-def hello(self):
-    pass
+@login_required
+def dashboard_router(request):
+
+    if request.user.groups.filter(name = "Owner").exists():
+        return redirect("manager_dashboard_home")
+    
+    elif request.user.groups.filter(name = "Supervisor").exists():
+        return redirect("supervisor_dashboard_home")
+    
+    elif request.user.groups.filter(name = "Staff").exists():
+        return redirect("staff_dashboard_home")
+    
+@login_required
+def manager_dashboard_home(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+
+    return render(request,"manager_templates/manager_home_page.html")
+
+@login_required
+def supervisor_dashboard_home(request):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+
+    return render(request, "supervisor_templates/supervisor_home_page.html")
+
+@login_required
+def staff_dashboard_home(request):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+
+    return render(request, "staff_templates/staff_home_page.html")
+
+## Add @permission required() somewhere

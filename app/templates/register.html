@@ -1,24 +1,42 @@
 <!DOCTYPE html>
-<html>
 <head>
-    <title>Register</title>
+    <title>Registration Page</title>
 </head>
-<body>
+<Body>
+    <h1>Registration Page</h1>
 
-<h1>Create an Account</h1>
+    <form method="post">
+        {% csrf_token %}
 
-<form method="post">
-    {% csrf_token %}
+        <p>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.username.errors }}
+        </p>
 
-    {{ form.as_p }}
+        <p>
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </p>
 
-    <button type="submit">Register</button>
-</form>
+        <p>
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+        </p>
 
-<p>
-    Already have an account?
-    <a href="{% url 'login' %}">Login here</a>
-</p>
+        <p>
+            {{ form.role.label_tag }}
+            {{ form.role }}
+            {{ form.role.errors }}
+        </p>
 
-</body>
-</html>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <form action = "{% url 'login_page' %}" method = "GET">
+        <button type="submit">Already Have an Account?</button>
+    </form>
+</Body>

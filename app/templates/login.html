@@ -5,8 +5,7 @@
 </head>
 <body>
 
-    <h1>Restaurant Management System</h1>
-    <h2>Login</h2>
+    <h1>Login page</h1>
 
     {% if form.errors %}
         <p style="color:red;">
@@ -22,8 +21,9 @@
         <button type="submit">Login</button>
     </form>
 
-    <a href= "{% url 'register' %}">Register here</a>
-    
+    <form action="{% url 'register_page' %}" method = "get">
+        <button type="submit" > Register </button>
+    </form>
 
 </body>
 </html>

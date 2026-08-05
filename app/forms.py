@@ -41,17 +41,14 @@ from .validators import (validate_unique_restaurant_name, validate_appropriate_r
 # but with the first version it doesnt know so when we try to update a row it will crash since the row exists and Django doesnt ignore it.
 # (Second is more professional and since it handels both CREATE and UPDATE safer)
 
-class RegisterForm(UserCreationForm):
+class UserRoleCreationForm(UserCreationForm):
 
-    ROLE_CHOICES = [
+    CHOICES = [
         ("Owner","Owner"),
-        ("Manager","Manager"),
-        ("Staff","Staff"),
+        ("Supervisor","Supervisor"),
+        ("Staff","Staff")
     ]
-
-    role = forms.ChoiceField(
-        choices = ROLE_CHOICES
-    )
+    role = forms.ChoiceField(choices = CHOICES)
 
 class RestaurantForm(forms.ModelForm):
 

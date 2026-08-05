@@ -1166,7 +1166,13 @@ Models are for nouns.
 Simple statistics are for property.
 More complex calculations are done in views.
 
+< user.groups manages the relationships between user and groups >
 
 
-Cristian, Cristi22
+Cristian, Cristi22 SupUser 
 Bob, Cristian22
+
+Molea, Cristi22 Owner
+Kevin, Cristi22 Supervisor
+Adam, Cristi22 Staff
+ 
