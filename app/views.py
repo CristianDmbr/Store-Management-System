@@ -635,3 +635,7 @@ def register(request):
     
     context = {"form" : form}
     return render(request,"register.html",context) 
+
+
+def hello2():
+    pass
