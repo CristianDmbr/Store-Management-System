@@ -55,12 +55,13 @@ class RestaurantForm(forms.ModelForm):
     class Meta:
         model = Restaurant
         fields = [
-            "owner",
+            #"owner",
             "restaurant_name",
             "date_opened",
             "location",
             "restaurant_cuisine",
             "capacity",
+            "number_of_tables"
         ]
         widgets = {
             "date_opened": forms.DateInput(attrs={"type": "date"})

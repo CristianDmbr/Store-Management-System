@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant List</title>
+</head>
+<body>
+
+    <h1>Hello {{ user.username }}! List of all your Restaurants:</h1>
+
+    {% if restaurants %}
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>
+                    {{ restaurant.restaurant_name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You don't own any restaurants yet.</p>
+    {% endif %}
+
+    <form action="{% url 'owner_dashboard_home' %}" method = "get">
+        <button type="submit">DashBoard</button>
+    </form>
+
+</body>
+</html>

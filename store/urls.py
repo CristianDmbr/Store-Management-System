@@ -45,15 +45,20 @@ urlpatterns = [
     path("", LoginView.as_view(template_name = "login.html"),name = "login_page"),
     path("register",views.register,name = "register_page"),
     path("dashboard_router/", views.dashboard_router, name = "dashboard_router"),
+    path("logout",LogoutView.as_view(next_page = "login_page"),name = "logout"),
 
     # Manager
-    path("manager/home_dashboard",views.manager_dashboard_home, name = "manager_dashboard_home"),
+    path("owner/home_dashboard",views.owner_dashboard_home, name = "owner_dashboard_home"),
 
     # Supervisor
     path("supervisor/home_dashboard", views.supervisor_dashboard_home, name ="supervisor_dashboard_home"),
 
     # Staff
     path("staff/home_dashboard",views.staff_dashboard_home, name = "staff_dashboard_home"),
+
+    # Restaurants
+    path("restaurant_lists",views.display_all_restaurants, name = "display_all_owned_restaurants"),
+    path("add_new_restaurant",views.add_new_restaurant, name = "add_new_restaurant"),
 
 ]
  

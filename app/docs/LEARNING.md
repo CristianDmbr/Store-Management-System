@@ -1168,6 +1168,12 @@ More complex calculations are done in views.
 
 < user.groups manages the relationships between user and groups >
 
+# Prefill fields:
+< 
+            restaurant = form.save(commit=False)
+            restaurant.owner = request.user
+            restaurant.save() >
+Commit=False means it creates the Restaurant instance but does not save it yet
 
 Cristian, Cristi22 SupUser 
 Bob, Cristian22

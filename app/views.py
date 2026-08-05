@@ -617,6 +617,8 @@ def restaurant_detail(request, restaurant_id):
     context = {"restaurant" : restaurant}
     return render (request,"restaurant_detail.html",context)
 
+########################################################################################## Role based backend
+
 def register(request):
 
     if request.method == "POST":
@@ -643,7 +645,7 @@ def register(request):
 def dashboard_router(request):
 
     if request.user.groups.filter(name = "Owner").exists():
-        return redirect("manager_dashboard_home")
+        return redirect("owner_dashboard_home")
     
     elif request.user.groups.filter(name = "Supervisor").exists():
         return redirect("supervisor_dashboard_home")
@@ -652,27 +654,72 @@ def dashboard_router(request):
         return redirect("staff_dashboard_home")
     
 @login_required
-def manager_dashboard_home(request):
+def owner_dashboard_home(request):
 
     if not request.user.groups.filter(name = "Owner").exists():
         return HttpResponseForbidden("You do not have permission to access this page")
 
-    return render(request,"manager_templates/manager_home_page.html")
+    context = {"user" : request.user}
+
+    return render(request,"owner_templates/owner_home_page.html")
 
 @login_required
 def supervisor_dashboard_home(request):
 
     if not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have permission to access this page")
+    
+    context = {"user" : request.user}
 
-    return render(request, "supervisor_templates/supervisor_home_page.html")
+    return render(request, "supervisor_templates/supervisor_home_page.html", context)
 
 @login_required
 def staff_dashboard_home(request):
 
     if not request.user.groups.filter(name = "Staff").exists():
         return HttpResponseForbidden("You do not have permission to access this page")
+    
+    context = {"user" : request.user}
 
-    return render(request, "staff_templates/staff_home_page.html")
+    return render(request, "staff_templates/staff_home_page.html", context)
+
+############################################# Restaurant #############################################
+
+@login_required
+def display_all_restaurants(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+    
+    restaurants = request.user.restaurants_owned.all()
+
+    context = {"restaurants" : restaurants}
+
+    return render(request, "restaurant_templates/restaurant_list.html", context)
+
+@login_required
+def add_new_restaurant(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+    
+    if request.method == "POST":
+        form = RestaurantForm(request.POST)
+        if form.is_valid():
+            # Commit=False means it creates the Restaurant instance but does not save it yet
+            restaurant = form.save(commit=False)
+            restaurant.owner = request.user
+            restaurant.save()
+
+            return redirect("display_all_owned_restaurants")
+
+    else: 
+        form = RestaurantForm()
+
+    context = {"form" : form}
+
+    return render(request, "restaurant_templates/restaurant_add.html",context)
+
+
 
 ## Add @permission required() somewhere

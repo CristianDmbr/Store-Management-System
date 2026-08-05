@@ -9,6 +9,8 @@
 4. Chars for analysis for managers Charts.js
 5. README with screenshots and instructions
 
+##### ADD A Remove, Edit, Info button next to each of the restaurants in the List
+
 Permissions :
 Manager :
 - [ ] View the restaurants they own.
