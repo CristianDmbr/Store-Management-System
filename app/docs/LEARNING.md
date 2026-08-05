@@ -1161,6 +1161,11 @@ We run the form validators and we then run the model's clean functions.
 # Remove a user from a group:
 < user.groups.remove(manager) >
 
+### Rules:
+Models are for nouns.
+Simple statistics are for property.
+More complex calculations are done in views.
+
 
 
 Cristian, Cristi22

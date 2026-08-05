@@ -372,14 +372,24 @@ class Order(models.Model):
         blank = True
     )
 
-    date_time_of_order = models.DateTimeField(default = timezone.now())
-    status = models.CharField(max_length=100, choices = ORDER_STATUS)
+    date_time_of_order = models.DateTimeField(default = timezone.now)
+    status = models.CharField(max_length=100, choices = ORDER_STATUS, default = "not_been_served")
     note = models.TextField(max_length = 400, blank = True, null = True)
 
     table_number = models.PositiveIntegerField(null = False, blank = False)
 
+
+    @property
+    def total_price(self):
+        total = 0
+        for item in self.items.all():
+            total += item.total_cost
+        return total
+
     def __str__(self):
-        return f"Reservation at {self.restaurant.restaurant_name} : {self.date_time_of_order} for {self.reservation.name_of_reservation}."
+        if self.reservation:
+            return f"Reservation at {self.restaurant.restaurant_name} : {self.date_time_of_order} for {self.reservation.name_of_reservation}."
+        return f"Reservation at {self.restaurant.restaurant_name} : {self.date_time_of_order} for Guess User"
 
 class OrderItem(models.Model):
 
@@ -401,6 +411,13 @@ class OrderItem(models.Model):
     def save(self,*args,**kwargs):
         if not self.price_sold_at:
             self.price_sold_at = self.menu_item.price
-        
+            
         super().save(*args,**kwargs)
+    
+    @property
+    def total_cost(self):
+        return self.quantity * self.price_sold_at
+        
+        
+        
     

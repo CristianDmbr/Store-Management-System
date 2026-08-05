@@ -634,4 +634,4 @@ def register(request):
         form = RegisterForm()
     
     context = {"form" : form}
-    return render(request,"register.html",context)
+    return render(request,"register.html",context) 

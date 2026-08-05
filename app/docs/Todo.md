@@ -1,76 +1,48 @@
 # TODO
-1. Add a Finance Model for Owners to see and analyse
-2. Make a ERD
-3. Make a manager page of all their restaurants, staff.
 
+### FIND DJANGO VIEW CREATION DOCUMENTATION STRUCTURE
 
-- [ ] Learn PostgreSQL properly
+1. Plan what each role can see and what permissions they have.
+1. Make a ERD
+2. Make a manager page of all their restaurants, staff.
+3. Learn Pagimation
+4. Chars for analysis for managers Charts.js
+5. README with screenshots and instructions
 
-- [ ] Understand
-- [ ] < @api_view(['POST'])
-@permission_classes([AllowAny])
-def create_post(request):
-    try:
-        user_id = request.headers.get('x-user-id')
+Permissions :
+Manager :
+- [ ] View the restaurants they own.
+- [ ] Add a new restaurant they own
+- [ ] Delete a restaurant they own
+- [ ] How much their restaurant earns.
+- [ ] A dash board of what percent of what type of food item gets sold.
+- [ ] View how many staff are working for each of their restaurant.
+- [ ] Be able to modify the menu table
+- [ ] See list of all staff
+- [ ] See how much each member of staff works and how much they earn.
+- [ ] A brief list of all shifts.
+- [ ] I want to have a table to display all the restaurants and their menus
+- [ ] List of reservations
+- [ ] List of orders
+- [ ] All all permissions to modify database
+Supervisors : 
+- [ ] View all their staff
+- [ ] How much each staff earns
+- [ ] View and modify shifts 
+- [ ] View menu only 
+- [ ] View and modify reservations.
+- [ ] View and modify orders. 
+Staff :
+- [ ] View their shifts 
+- [ ] View the menu of the restaurant
+- [ ] Request a holiday
+- [ ] View and modify orders 
 
-        if not user_id:
-            return Response(
-                {'message': 'Not authenticated'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+Add Holiday or Leave time for employees Model
+Have the general home page have a log in button but also a separate instruction or instroduction on how this app works 
+Have a function to determine if a shift is elibible for a break 
+Before rewriting the backend save the current one somewhere to be able to show progress
+   
 
-        data = request.data.copy()
-
-        # Required fields
-        title = data.get('title')
-        content = data.get('content')
-        category = data.get('category')
-
-        if not title or not content or not category:
-            return Response(
-                {'message': 'Title, content, and category are required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Auto excerpt
-        if not data.get('excerpt'):
-            data['excerpt'] = content[:150]
-
-        # Tags fallback
-        if data.get('tags') is None:
-            data['tags'] = []
-
-        # Read time auto calc
-        data['read_time'] = max(1, len(content.split()) // 200)
-
-        # Create post
-        post = Post.objects.create(
-            title=title,
-            content=content,
-            excerpt=data['excerpt'],
-            category=category,
-            tags=data['tags'],
-            read_time=data['read_time'],
-            author_id=user_id
-        )
-
-        return Response({
-            'message': 'Post created successfully',
-            'post': {
-                'id': post.id,
-                'title': post.title,
-                'content': post.content,
-                'excerpt': post.excerpt,
-                'category': post.category,
-                'tags': post.tags,
-                'read_time': post.read_time,
-                'published': post.published
-            }
-        }, status=status.HTTP_201_CREATED)
-
-    except Exception as e:
-        print(f'Create post error: {e}')
-        return Response(
-            {'message': 'Server error creating post'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        ) >
+# Plan
+Owners need to:
