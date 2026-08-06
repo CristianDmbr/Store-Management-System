@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        Restaurant Delete Page
+    </title>
+</head>
+<body>
+
+    <p> 
+        Are you sure you want to delete <strong>{{ restaurant.restaurant_name }}</strong>?
+    </p>
+
+    <form method = "post">
+        {% csrf_token %}
+        <button type = "submit">YES, Delete</button>
+    </form>
+    <br>
+    <form action="{% url 'display_all_owned_restaurants' %}" method = 'get'>
+        <button type = "submit">No</button>
+    </form>
+</body>

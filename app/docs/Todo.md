@@ -13,12 +13,8 @@
 
 Permissions :
 Manager :
-- [ ] View the restaurants they own.
-- [ ] Add a new restaurant they own
-- [ ] Delete a restaurant they own
-- [ ] How much their restaurant earns.
+- [ ] How much their restaurant earns (Finance of Restaurant )
 - [ ] A dash board of what percent of what type of food item gets sold.
-- [ ] View how many staff are working for each of their restaurant.
 - [ ] Be able to modify the menu table
 - [ ] See list of all staff
 - [ ] See how much each member of staff works and how much they earn.

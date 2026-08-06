@@ -7,6 +7,12 @@
 
     <h1>Login page</h1>
 
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     {% if form.errors %}
         <p style="color:red;">
             Invalid username or password.

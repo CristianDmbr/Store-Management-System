@@ -6,13 +6,11 @@
     <h1> Hello {{ user.username }}! This is your Owner Dashboard</h1>
 
     <form action = "{% url 'display_all_owned_restaurants' %}" method = "get" >
-        <button type = "submit"> Restaurants Owned </button>
+        <button type = "submit"> Manage Restaurants </button>
     </form>
 
-    <form action="{% url 'add_new_restaurant' %}" method = "get">
-        <button type = "submit">Add Restaurant</button>
-    </form>
-
+    <br>
+    <br>
     <form action = "{% url 'logout' %}" method = "post">
 
         {% csrf_token %}

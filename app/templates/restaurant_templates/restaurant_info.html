@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<head>
+    <title>Info Page</title>
+</head>
+<body>
+    <h1>{{ restaurant.restaurant_name }}'s Info</h1>
+    
+    <hr>
+    <h1><strong>General Information</strong></h1>
+
+    <p>
+        <strong>Restaurant Name : </strong> 
+        {{ restaurant.restaurant_name }}
+    </p>
+
+    <p>
+        <strong>Date Opened : </strong>
+        {{ restaurant.date_opened }}
+    </p>
+
+    <p>
+        <strong>Location : </strong>
+        {{ restaurant.location }}
+    </p>
+
+    <p>
+        <strong>Restaurant Cuisine :</strong>
+        {{ restaurant.restaurant_cuisine }}
+    </p>
+
+    <p>
+        <strong>Capacity : </strong>
+        {{ restaurant.capacity }}
+    </p>
+
+    <p>
+        <strong>Number of Tables</strong>
+        {{ restaurant.number_of_tables }}
+    </p>
+
+    <hr>
+    <h1><strong>Live Information</strong></h1>
+
+    <p>
+        {{ restaurant.restaurant_name }} full :    
+          {{ restaurant.is_full }}
+    </p>
+
+    <p>
+        Current Occupancy :
+        {{ restaurant.current_occupancy }}
+    </p>
+
+    <p>
+        Remaining Spots : 
+        {{ restaurant.remaining_spots }}
+    </p>
+
+    <p>
+        Innactive Reservations :
+        {{ restaurant.innactive_reservations }}
+    </p>
+
+    <p>
+        Number of Staff : 
+        {{ staff_count }}
+    </p>
+
+    <p>
+        Total Labour Hours :
+        {{ total_labour_hours }}
+    </p>
+
+    <p>
+        Total Labour Hours this Week :
+        {{ total_labour_hours_last_week }}
+    </p>
+
+    <p>
+        Total Labour Hours this Month :
+        {{ total_hours_worked_last_month }}
+    </p>
+
+    <p>
+        Total Labour Hours this Year :
+        {{ total_hours_worked_last_year }}
+    </p>
+
+    <p>
+        Total Menu Items :
+        {{ total_menu_items }}
+    </p>
+
+    <p>
+        Number of orders :
+        {{ number_of_orders }}
+    </p>
+
+    <p>
+        Total Earned from orders : 
+        {{ total_earned_from_orders }}
+    </p>
+
+    <hr>
+    
+    <form action="{% url 'display_all_owned_restaurants' %}">
+        <button type = "submit" > Back </button>
+    </form>
+    <form action="{% url 'update_restaurant' restaurant.pk %}">
+        <button type="submit" > Edit </button>
+    </form>
+    <form action="{% url 'delete_restaurant' restaurant.pk %}">
+        <button type = "submit"> Delete </button>
+    </form>
+
+</body>
+

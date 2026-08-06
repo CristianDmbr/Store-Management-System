@@ -7,8 +7,9 @@ from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required 
 
+from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.contrib.auth.forms import UserCreationForm
 
@@ -627,11 +628,11 @@ def register(request):
         if form.is_valid():
             user = form.save()
             role = form.cleaned_data["role"]
-            print(role)
-            print(Group.objects.all())
             group = Group.objects.get(name = role)
 
             user.groups.add(group)
+
+            messages.success(request, "Sucessfully Registered !")
             
             return redirect("login_page")
     else:
@@ -692,7 +693,6 @@ def display_all_restaurants(request):
         return HttpResponseForbidden("You do not have permission to access this page")
     
     restaurants = request.user.restaurants_owned.all()
-
     context = {"restaurants" : restaurants}
 
     return render(request, "restaurant_templates/restaurant_list.html", context)
@@ -710,7 +710,7 @@ def add_new_restaurant(request):
             restaurant = form.save(commit=False)
             restaurant.owner = request.user
             restaurant.save()
-
+            messages.success(request,"New restaurant added succesffuly !")
             return redirect("display_all_owned_restaurants")
 
     else: 
@@ -720,6 +720,80 @@ def add_new_restaurant(request):
 
     return render(request, "restaurant_templates/restaurant_add.html",context)
 
+@login_required
+def delete_restaurant(request, restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have the permission to delete a restaurant.")
+
+    restaurant = get_object_or_404(Restaurant,pk = restaurant_pk, owner = request.user)
+
+
+    if request.method == "POST":
+        
+        restaurant.delete()
+        messages.success(request, f"{restaurant.restaurant_name} has been deleted!")
+        return redirect("display_all_owned_restaurants")
+    
+    context = {"restaurant" : restaurant}
+
+    return render(request, "restaurant_templates/restaurant_delete.html",context)
+
+@login_required
+def update_restaurant(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("No permission to modify restaurant")
+    
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+
+    if request.method == "POST":
+        form = RestaurantForm(request.POST, instance = restaurant)
+        if form.is_valid():
+            restaurant = form.save(commit = False)
+            restaurant.owner = request.user
+            restaurant.save()
+            messages.success(request,f'{restaurant.restaurant_name} has been updated.')
+            return redirect("display_all_owned_restaurants")
+    else:
+        form = RestaurantForm(instance = restaurant)
+
+    context = {"form" : form,
+               "restaurant" : restaurant}
+
+    return render(request, "restaurant_templates/restaurant_update.html", context)
+
+@login_required
+def restaurant_full_info(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to view this restaurant")
+
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+    staff_count = len(restaurant.who_works_here.all())
+    total_labour_hours = sum(staff.total_hours_worked for staff in restaurant.who_works_here.all())
+    total_labour_hours_last_week = sum(staff.total_hours_worked_last_week for staff in restaurant.who_works_here.all())
+    total_hours_worked_last_month = sum(staff.total_hours_worked_last_month for staff in restaurant.who_works_here.all())
+    total_hours_worked_last_year = sum(staff.total_hours_worked_last_year for staff in restaurant.who_works_here.all())
+
+    total_menu_items = len(restaurant.menu_items.all())
+
+    number_of_orders = len(restaurant.orders.all())
+    total_earned_from_orders = sum(order.total_price for order in restaurant.orders.all())
+
+
+    context = {"restaurant" : restaurant, 
+               "staff_count" : staff_count,
+               "total_labour_hours" : total_labour_hours,
+               "total_labour_hours_last_week" : total_labour_hours_last_week,
+               "total_hours_worked_last_month" : total_hours_worked_last_month,
+               "total_hours_worked_last_year" : total_hours_worked_last_year,
+               "total_menu_items" : total_menu_items,
+               "number_of_orders" : number_of_orders,
+               "total_earned_from_orders" : total_earned_from_orders }
+
+
+    return render(request, "restaurant_templates/restaurant_info.html",context)
 
 
 ## Add @permission required() somewhere

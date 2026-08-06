@@ -59,6 +59,9 @@ urlpatterns = [
     # Restaurants
     path("restaurant_lists",views.display_all_restaurants, name = "display_all_owned_restaurants"),
     path("add_new_restaurant",views.add_new_restaurant, name = "add_new_restaurant"),
+    path("delete_restaurant/<int:restaurant_pk>/",views.delete_restaurant, name = "delete_restaurant"),
+    path("update_restaurant/<int:restaurant_pk>/", views.update_restaurant, name = "update_restaurant"),
+    path("view_restaurant/<int:restaurant_pk>",views.restaurant_full_info, name = "restaurant_info"),
 
 ]
  
