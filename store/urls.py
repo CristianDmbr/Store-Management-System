@@ -42,45 +42,30 @@ from app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # When a request matches the patter of api/ 
-    # Include delegates routing to another file, dont handle the rest of the url here go to another URL configuration located at app.url
-    # Why not urls.py? because Python uses module path not file path
+    path("", LoginView.as_view(template_name = "login.html"),name = "login_page"),
+    path("register",views.register,name = "register_page"),
+    path("dashboard_router/", views.dashboard_router, name = "dashboard_router"),
+    path("logout",LogoutView.as_view(next_page = "login_page"),name = "logout"),
 
-    # The URLs are created by the backend / servers.
-    # Clients (browser, mobile app) sends requests to these URLs
+    # Manager Role
+    path("owner/home_dashboard",views.owner_dashboard_home, name = "owner_dashboard_home"),
 
-    # These are private/local urls.
-    # Public URLs are accessible by anyone on the Internet
+    # Supervisor
+    path("supervisor/home_dashboard", views.supervisor_dashboard_home, name ="supervisor_dashboard_home"),
 
+    # Staff Role
+    path("staff/home_dashboard",views.staff_dashboard_home, name = "staff_dashboard_home"),
 
-    path("login/",LoginView.as_view(template_name = "login.html"),name="login"),
-    path("register",views.register, name = "register"),
-    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    # Restaurants
+    path("restaurant_lists",views.display_all_restaurants, name = "display_all_owned_restaurants"),
+    path("add_new_restaurant",views.add_new_restaurant, name = "add_new_restaurant"),
+    path("delete_restaurant/<int:restaurant_pk>/",views.delete_restaurant, name = "delete_restaurant"),
+    path("update_restaurant/<int:restaurant_pk>/", views.update_restaurant, name = "update_restaurant"),
+    path("view_restaurant/<int:restaurant_pk>",views.restaurant_full_info, name = "restaurant_info"),
 
-    path("api/",include("app.urls")),
-
-    path("general/",views.restaurant_general_list, name = "general_restaurant_list"),
-    path("specific/<int:restaurant_id>/",views.restaurant_detail, name = "restaurant_detail"),
-
-    path('', views.home, name = "home_page"),
-    path("menu/", views.MenuListView.as_view(), name = "menu_list"),
-
-    path("restaurants/", views.RestaurantList.as_view(), name = "restaurant_list"),
-    path("restaurants_add",views.RestaurantCreate.as_view(), name = "restaurant_create"),
-    path("restaurant/<int:pk>/edit",views.RestaurantUpdate.as_view(), name = "restaurant_edit"),
-    path("restaurant/<int:pk>/delete",views.RestaurantDelete.as_view(),name = "restaurant_delete"),
-    path("reservation/<int:restaurant_id>/create",views.ReservationCreateView.as_view(), name = "create_reservation"),
-
-    path("staff/",views.StaffView.as_view(), name = "staff_view"),  
-    path("staff_list/",views.StaffList.as_view(), name = "staff_list"),
-    path("staff/<int:pk>/edit",views.StaffUpdateView.as_view(), name = "staff_update"),
-    path("staff/<int:pk>/delete", views.StaffDelete.as_view(), name = "staff_delete"),
-
-    path("shift/", views.ShiftView.as_view(), name = "shift_view"),
-    path("shift_list/",views.ShiftListView.as_view(), name = "shift_list"),
-    path("staff/<int:pk>/shifts",views.IndividualShiftView.as_view(), name = "individual_shifts"),
-    path("staff/<int:pk>/add_individual_shift",views.AddIndividualShiftView.as_view(),name = "add_individual_shifts"),
-
-    path("combined/", views.combine_form_view, name = "combined_form"),
+    # Staff Model
+    path("general_staff_list",views.display_all_staff, name = "display_all_staff"),
+    path("delete_staff/<int:staff_pk>",views.delete_staff, name = "delete_staff"),
+    path("add_staff>",views.add_staff, name = "add_staff"),
 ]
  

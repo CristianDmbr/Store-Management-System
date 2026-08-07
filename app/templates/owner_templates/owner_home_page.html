@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<head>
+    <title>Owner DashBoard</title>
+</head>
+<body>
+    <h1> Hello {{ user.username }}! This is your Owner Dashboard</h1>
+
+    <form action = "{% url 'display_all_owned_restaurants' %}" method = "get" >
+        <button type = "submit"> Manage Restaurants </button>
+    </form>
+
+    <form action="{% url 'display_all_staff' %}" method = "get">
+        <button type = "submit"> Manage Staff </button>
+    </form>
+
+    <br>
+    <br>
+    <form action = "{% url 'logout' %}" method = "post">
+
+        {% csrf_token %}
+
+        <button type="submit"> Logout </button>
+    </form>
+
+</body>

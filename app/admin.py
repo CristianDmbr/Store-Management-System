@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Restaurant, Staff, Shift, MenuItem, Reservation
+from .models import Restaurant, Staff, Shift, MenuItem, Reservation, Order, OrderItem
 
 @admin.register(Restaurant)
 class RestaurantAdmin(admin.ModelAdmin):
@@ -23,7 +23,10 @@ class ReservationReservation(admin.ModelAdmin):
         "is_active",
         "kids",
         "teens",
-        "adults"
+        "adults",
+        "reservation_date_time",
+        "phone_number",
+        "created_at",
     )
 
 @admin.register(Staff)
@@ -59,4 +62,25 @@ class MenuItemAdmin(admin.ModelAdmin):
         "category",
         "availability",
         "date_added",
+    )
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        "restaurant",
+        "staff",
+        "reservation",
+        "date_time_of_order",
+        "status",
+        "note",
+        "table_number",
+    )
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = (
+        "order",
+        "menu_item",
+        "quantity",
+        "price_sold_at",
     )

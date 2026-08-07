@@ -9,22 +9,23 @@
 4. Chars for analysis for managers Charts.js
 5. README with screenshots and instructions
 
+##### ADD A Remove, Edit, Info button next to each of the restaurants in the List
+
 Permissions :
 Manager :
-- [ ] View the restaurants they own.
-- [ ] Add a new restaurant they own
-- [ ] Delete a restaurant they own
-- [ ] How much their restaurant earns.
-- [ ] A dash board of what percent of what type of food item gets sold.
-- [ ] View how many staff are working for each of their restaurant.
-- [ ] Be able to modify the menu table
+INFO PAGE : < 
+
+- [ ] ADD staff info page
+- [ ] Add staff update page
+
 - [ ] See list of all staff
 - [ ] See how much each member of staff works and how much they earn.
+- [ ] Be able to view and modify the menu table
 - [ ] A brief list of all shifts.
 - [ ] I want to have a table to display all the restaurants and their menus
 - [ ] List of reservations
 - [ ] List of orders
-- [ ] All all permissions to modify database
+  
 Supervisors : 
 - [ ] View all their staff
 - [ ] How much each staff earns

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<head>
+    <title>Staff Home Page</title>
+</head>
+<body>
+    <h1>Hello {{ user.username }}! This is your Staff Dashboard</h1>
+
+    <form action="{% url 'logout' %}" method = 'post'>
+        <button type = "submit">Logout</button>
+    </form>
+</body>

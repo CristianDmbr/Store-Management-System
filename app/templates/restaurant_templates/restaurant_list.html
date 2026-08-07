@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant List</title>
+</head>
+<body>
+
+    <h1>Hello {{ user.username }}! List of all your Restaurants:</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% if restaurants %}
+        <ul>
+            {% for restaurant in restaurants %}
+                <li>
+                    {{ restaurant.restaurant_name }}
+                    <form action="{% url 'delete_restaurant' restaurant.pk %}">
+                        <button type = "submit" > Delete </button>
+                    </form>
+                    <form action="{% url 'update_restaurant' restaurant.pk %}">
+                        <button type = "submit" > Edit </button>
+                    </form>
+                    <form action="{% url 'restaurant_info' restaurant.pk %}">
+                        <button type="submit">Info</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You don't own any restaurants yet.</p>
+    {% endif %}
+
+    <form action="{% url 'add_new_restaurant' %}">
+        <button type = "submit" >New Restaurant</button>
+    </form>
+
+    <form action="{% url 'owner_dashboard_home' %}" method = "get">
+        <button type="submit">DashBoard</button>
+    </form>
+
+</body>
+</html>

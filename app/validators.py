@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from datetime import timedelta
 
 # Confusion about instance = None
 # When we use this Validation for a CREATE we dont pass the object we want to create since its new meaning instance by default is None,
@@ -61,6 +62,18 @@ def validate_unique_restaurant_name_reservation(restaurant, reservation_name, in
         raise ValidationError(f"{reservation_name} already has an active reservation at {restaurant}.")
     
     return reservation_name
+
+def validate_reservation_date_time_not_being_in_the_past_or_late(reservation_date_time):
+    current_date_time = timezone.now()
+    earliest_booking = current_date_time - timedelta(minutes=30)
+
+    if reservation_date_time < current_date_time:
+        raise ValidationError("Cannot make a reservation in the past.")
+    
+    if reservation_date_time < earliest_booking:
+        raise ValidationError("Reservations must be made at least 30 minutes in advance.")
+
+    return reservation_date_time
 
 def validate_unique_name_and_surname(name, surname, instance = None):
 
@@ -140,7 +153,7 @@ def validate_unique_menu_item_name(name,restaurant, instance = None):
 
 def validate_calories(calories):
 
-    if calories is not None and calories > 1000:
-        raise ValidationError(f" Cannot have an item exceed 1000kcal (this item has {calories}kcal).")
+    if calories is not None and calories > 3000:
+        raise ValidationError(f" Cannot have an item exceed 3000kcal (this item has {calories}kcal).")
     
     return calories

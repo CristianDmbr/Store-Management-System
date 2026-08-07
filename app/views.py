@@ -1,15 +1,17 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, RegisterForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm
 from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required 
 
+from django.contrib import messages
 from django.contrib.auth.models import Group
+from django.contrib.auth.forms import UserCreationForm
 
 from django.http import HttpResponseForbidden
 
@@ -17,6 +19,10 @@ from rest_framework import generics,status
 from rest_framework.response import Response
 # Create custom API views
 from rest_framework.views import APIView
+from datetime import date, timedelta, datetime
+from django.utils import timezone
+
+
 
 # Client is anything that sends request to a server e.g. Browser, Mobile App
 
@@ -614,28 +620,469 @@ def restaurant_detail(request, restaurant_id):
     context = {"restaurant" : restaurant}
     return render (request,"restaurant_detail.html",context)
 
+########################################################################################## Role based backend
+
 def register(request):
 
     if request.method == "POST":
-        form = RegisterForm(request.POST)
+        form = UserRoleCreationForm(request.POST)
 
         if form.is_valid():
-            
             user = form.save()
-
             role = form.cleaned_data["role"]
-
             group = Group.objects.get(name = role)
 
             user.groups.add(group)
 
-            return redirect("login")
+            messages.success(request, "Sucessfully Registered !")
+            
+            return redirect("login_page")
     else:
-        form = RegisterForm()
+        form = UserRoleCreationForm()
     
     context = {"form" : form}
-    return render(request,"register.html",context) 
+
+    return render(request,"register.html",context)
+
+@login_required
+def dashboard_router(request):
+
+    if request.user.groups.filter(name = "Owner").exists():
+        return redirect("owner_dashboard_home")
+    
+    elif request.user.groups.filter(name = "Supervisor").exists():
+        return redirect("supervisor_dashboard_home")
+    
+    elif request.user.groups.filter(name = "Staff").exists():
+        return redirect("staff_dashboard_home")
+    
+@login_required
+def owner_dashboard_home(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+
+    context = {"user" : request.user}
+
+    return render(request,"owner_templates/owner_home_page.html")
+
+@login_required
+def supervisor_dashboard_home(request):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+    
+    context = {"user" : request.user}
+
+    return render(request, "supervisor_templates/supervisor_home_page.html", context)
+
+@login_required
+def staff_dashboard_home(request):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+    
+    context = {"user" : request.user}
+
+    return render(request, "staff_templates/staff_home_page.html", context)
+
+############################################# Restaurant #############################################
+
+@login_required
+def display_all_restaurants(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+    
+    restaurants = request.user.restaurants_owned.all()
+    context = {"restaurants" : restaurants}
+
+    return render(request, "restaurant_templates/restaurant_list.html", context)
+
+@login_required
+def add_new_restaurant(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to access this page")
+    
+    if request.method == "POST":
+        form = RestaurantForm(request.POST)
+        if form.is_valid():
+            # Commit=False means it creates the Restaurant instance but does not save it yet
+            restaurant = form.save(commit=False)
+            restaurant.owner = request.user
+            restaurant.save()
+            messages.success(request,"New restaurant added succesffuly !")
+            return redirect("display_all_owned_restaurants")
+
+    else: 
+        form = RestaurantForm()
+
+    context = {"form" : form}
+
+    return render(request, "restaurant_templates/restaurant_add.html",context)
+
+@login_required
+def delete_restaurant(request, restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have the permission to delete a restaurant.")
+
+    restaurant = get_object_or_404(Restaurant,pk = restaurant_pk, owner = request.user)
 
 
-def hello2():
-    pass
+    if request.method == "POST":
+        
+        restaurant.delete()
+        messages.success(request, f"{restaurant.restaurant_name} has been deleted!")
+        return redirect("display_all_owned_restaurants")
+    
+    context = {"restaurant" : restaurant}
+
+    return render(request, "restaurant_templates/restaurant_delete.html",context)
+
+@login_required
+def update_restaurant(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("No permission to modify restaurant")
+    
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+
+    if request.method == "POST":
+        form = RestaurantForm(request.POST, instance = restaurant)
+        if form.is_valid():
+            restaurant = form.save(commit = False)
+            restaurant.owner = request.user
+            restaurant.save()
+            messages.success(request,f'{restaurant.restaurant_name} has been updated.')
+            return redirect("display_all_owned_restaurants")
+    else:
+        form = RestaurantForm(instance = restaurant)
+
+    context = {"form" : form,
+               "restaurant" : restaurant}
+
+    return render(request, "restaurant_templates/restaurant_update.html", context)
+
+@login_required
+def restaurant_full_info(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to view this restaurant")
+
+    # Times :
+    today = timezone.now().date()
+    this_week = timezone.now() - timedelta(days= 7)
+    this_month = timezone.now() - timedelta(days= 31)
+    this_year = timezone.now() - timedelta(days = 365)    
+
+    # Restaurant Info
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+    restaurant_location = restaurant.get_location_display()
+    restaurant_cuisine = restaurant.get_restaurant_cuisine_display()
+
+    #Menu
+    total_menu_items = len(restaurant.menu_items.all())
+
+    # __date means ignore all time focus just on data
+    # Earnings
+    total_earned_from_orders = sum(order.total_price for order in restaurant.orders.all())
+    today_earned = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__date = today))
+    this_week_earned = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__gte = this_week))
+    this_month_earned = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__gte = this_month))
+    this_year_earned = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__gte = this_year))
+    # Orders Info:
+    number_of_orders = len(restaurant.orders.all())
+    orders_today = len(restaurant.orders.filter(date_time_of_order = today))
+    orders_this_week = len(restaurant.orders.filter(date_time_of_order__gte = this_week))
+    orders_this_month = len(restaurant.orders.filter(date_time_of_order__gte = this_month))
+    orders_this_year = len(restaurant.orders.filter(date_time_of_order__gte = this_year))
+
+    average_transaction_cost = total_earned_from_orders // number_of_orders
+
+    # Labour Info:
+    staff_count = len(restaurant.who_works_here.all())
+
+    chief_staff = restaurant.who_works_here.filter(position = "chief")
+    waiter_staff = restaurant.who_works_here.filter(position = "waiter")
+    manager_staff = restaurant.who_works_here.filter(position = "manager")
+
+    total_labour_hours = sum(staff.total_hours_worked for staff in restaurant.who_works_here.all())
+    total_labour_hours_last_week = sum(staff.total_hours_worked_last_week for staff in restaurant.who_works_here.all())
+    total_hours_worked_last_month = sum(staff.total_hours_worked_last_month for staff in restaurant.who_works_here.all())
+    total_hours_worked_last_year = sum(staff.total_hours_worked_last_year for staff in restaurant.who_works_here.all())
+
+    # Labour Costs
+    total_labour_cost = sum(employee.total_earned for employee in restaurant.who_works_here.all())
+    labour_cost_this_week = sum(employee.total_earned_this_week for employee in restaurant.who_works_here.all())
+    labour_cost_this_month = sum(employee.total_earned_last_month for employee in restaurant.who_works_here.all())
+    labour_cost_this_year = sum(employee.total_earned_last_year for employee in restaurant.who_works_here.all())
+
+    # Food Permformance
+    all_starters = restaurant.menu_items.filter( category = "starter" )
+    number_of_starters = len(all_starters)
+    number_of_starters_ordered = 0
+    for starter in all_starters:
+        for starter_ordered in starter.order_items.all():
+            number_of_starters_ordered += starter_ordered.quantity
+
+
+    all_mains = restaurant.menu_items.filter( category = "main" )
+    number_of_mains = len(all_mains)
+    number_of_mains_ordered = 0
+    for main_ordered in all_mains:
+        for order_item in main_ordered.order_items.all():
+            number_of_mains_ordered += order_item.quantity
+    
+
+    all_deserts = restaurant.menu_items.filter( category = "dessert" )
+    number_of_deserts = len(all_deserts)
+    number_of_deserts_ordered = 0
+    for desert in all_deserts:
+        for desert_ordered in desert.order_items.all():
+            number_of_deserts_ordered += desert_ordered.quantity
+
+    all_drinks = restaurant.menu_items.filter( category = "drink" )
+    number_of_drinks = len(all_drinks)
+    number_of_drinks_ordered = 0
+    for drink in all_drinks:
+        for drink_ordered in drink.order_items.all():
+            number_of_drinks_ordered += drink_ordered.quantity
+        
+    all_snacks = restaurant.menu_items.filter( category = "snack" )
+    number_of_snacks = len(all_snacks)
+    number_of_snacks_ordered = 0
+    for snack in all_snacks:
+        for snack_ordered in snack.order_items.all():
+            number_of_snacks_ordered += snack_ordered.quantity
+        
+    category_sales = {
+        "Starter": number_of_starters_ordered,
+        "Main": number_of_mains_ordered,
+        "Dessert": number_of_deserts_ordered,
+        "Drink": number_of_drinks_ordered,
+        "Snack": number_of_snacks_ordered,
+    }
+
+    most_popular_category = max(
+        category_sales,
+        key = category_sales.get
+    )
+
+        
+    total_items_sold = (
+    number_of_starters_ordered
+    + number_of_mains_ordered
+    + number_of_deserts_ordered
+    + number_of_drinks_ordered
+    + number_of_snacks_ordered
+        )
+    
+    if total_items_sold > 0:
+        starters_percent = (number_of_starters_ordered / total_items_sold) * 100
+        mains_percent = (number_of_mains_ordered / total_items_sold) * 100
+        desserts_percent = (number_of_deserts_ordered / total_items_sold) * 100
+        drinks_percent = (number_of_drinks_ordered / total_items_sold) * 100
+        snacks_percent = (number_of_snacks_ordered / total_items_sold) * 100
+    else:   
+        starters_percent = 0
+        mains_percent = 0
+        desserts_percent = 0
+        drinks_percent = 0
+        snacks_percent = 0
+        
+    starter_revenue = 0
+    for starter in all_starters:
+        for starter_ordered in starter.order_items.all():
+            starter_revenue += starter_ordered.total_cost
+
+
+    main_revenue = 0
+    for main in all_mains:
+        for main_ordered in main.order_items.all():
+            main_revenue += main_ordered.total_cost
+
+
+    dessert_revenue = 0
+    for dessert in all_deserts:
+        for dessert_ordered in dessert.order_items.all():
+            dessert_revenue += dessert_ordered.total_cost
+
+
+    drink_revenue = 0
+    for drink in all_drinks:
+        for drink_ordered in drink.order_items.all():
+            drink_revenue += drink_ordered.total_cost
+
+
+    snack_revenue = 0
+    for snack in all_snacks:
+        for snack_ordered in snack.order_items.all():
+            snack_revenue += snack_ordered.total_cost
+
+    category_revenue = {
+        "Starter": starter_revenue,
+        "Main": main_revenue,
+        "Dessert": dessert_revenue,
+        "Drink": drink_revenue,
+        "Snack": snack_revenue,
+    }
+
+    highest_earning_category = max(
+        category_revenue,
+        key = category_revenue.get
+    )
+
+    lowest_earning_category = min(
+        category_revenue,
+        key = category_revenue.get
+    )
+    
+    # Reservations
+    all_reservations = restaurant.reservations.all()
+    reservations_for_today = restaurant.reservations.filter(reservation_date_time__date = today)
+    reservations_this_week = restaurant.reservations.filter(reservation_date_time__gte = this_week)
+    reservations_this_month = restaurant.reservations.filter(reservation_date_time__gte = this_month)
+    reservations_this_year = restaurant.reservations.filter(reservation_date_time__gte = this_year)
+
+    active_reservations = restaurant.reservations.filter(is_active = True)
+    inactive_reservations = restaurant.reservations.filter(is_active = False)
+
+
+
+    context = {# General Information :
+               "restaurant" : restaurant, 
+               "restaurant_location" : restaurant_location,
+               "restaurant_cuisine": restaurant_cuisine,
+
+                # Finances
+                "average_transaction_cost" : average_transaction_cost,
+                "total_earned_from_orders" : total_earned_from_orders,
+                "today_earned" : today_earned,
+                "this_week_earned" : this_week_earned,
+                "this_month_earned" : this_month_earned,
+                "this_year_earned" : this_year_earned,
+
+                # Orders : 
+                "number_of_orders" : number_of_orders,
+                "orders_today": orders_today,
+                "orders_this_week" : orders_this_week,
+                "orders_this_month" : orders_this_month ,
+                "orders_this_year" : orders_this_year,
+
+                # Menu 
+                "total_menu_items" : total_menu_items,
+
+                # Labour Info
+                "staff_count" : staff_count,
+                "chief_count" : chief_staff.count(),
+                "waiter_count" : waiter_staff.count(),
+                "manager_count" : manager_staff.count(),
+
+                "total_labour_hours" : total_labour_hours,
+                "total_labour_hours_last_week" : total_labour_hours_last_week,
+                "total_hours_worked_last_month" : total_hours_worked_last_month,
+                "total_hours_worked_last_year" : total_hours_worked_last_year,
+
+                # Labour Cost
+                "total_labour_cost": total_labour_cost,
+                "labour_cost_this_week": labour_cost_this_week,
+                "labour_cost_this_month" : labour_cost_this_month,
+                "labour_cost_this_year" : labour_cost_this_year,
+
+                # Food Information
+                "most_popular_category" : most_popular_category,
+                "highest_earning_category" : highest_earning_category,
+                "lowest_earning_category" : lowest_earning_category,
+                "number_of_starters": number_of_starters,
+                "number_of_starters_ordered": number_of_starters_ordered,
+                "number_of_mains": number_of_mains,
+                "number_of_mains_ordered": number_of_mains_ordered,
+                "number_of_deserts": number_of_deserts,
+                "number_of_deserts_ordered": number_of_deserts_ordered,
+                "number_of_drinks": number_of_drinks,
+                "number_of_drinks_ordered": number_of_drinks_ordered,
+                "number_of_snacks": number_of_snacks,
+                "number_of_snacks_ordered": number_of_snacks_ordered,
+
+                "starters_percent": starters_percent,
+                "mains_percent": mains_percent,
+                "desserts_percent": desserts_percent,
+                "drinks_percent": drinks_percent,
+                "snacks_percent": snacks_percent,
+
+                # Reservations
+                "number_of_total_reservations": all_reservations.count(),
+                "reservations_today": reservations_for_today.count(),
+                "reservations_this_week": reservations_this_week.count(),
+                "reservations_this_month": reservations_this_month.count(),
+                "reservations_this_year": reservations_this_year.count(),
+                "active_reservations" : active_reservations.count(),
+                "inactive_reservations" : inactive_reservations.count()
+                }
+
+
+
+    return render(request, "restaurant_templates/restaurant_info.html",context)
+
+############################################# Staff #############################################
+
+@login_required
+def display_all_staff(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to view Staff List.")
+
+    all_restaurants = Restaurant.objects.filter(owner = request.user)
+
+    restaurant_staff = {}
+    for restaurant in all_restaurants:
+        restaurant_staff[restaurant] = restaurant.who_works_here.all()
+    
+    context = {
+        "restaurant_staff" : restaurant_staff
+    }
+
+    return render(request,"staff_templates/staff_list.html",context)
+
+@login_required
+def delete_staff(request,staff_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have the permission to delete a memeber of staff")
+    
+    staff = get_object_or_404(Staff,pk = staff_pk)
+
+    if request.method == "POST":
+        staff.delete()
+        messages.success(request,f'{staff.name} was fired from {staff.restaurant.restaurant_name}')
+        return redirect("display_all_staff")
+
+    context = {"staff" : staff}
+
+    return render(request,"staff_templates/staff_delete.html",context)
+
+@login_required
+def add_staff(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to add new staff.")
+
+    if request.method == "POST":
+        form = StaffForm(request.POST)
+        if form.is_valid():
+            form.save()
+            name = form.cleaned_data["name"]
+            restaurant = form.cleaned_data["restaurant"]
+            messages.success(request, f'{name} has been employed to {restaurant}!')
+            return redirect("display_all_staff")
+            
+    
+    form = StaffForm()
+
+    context = {
+        "form" : form
+    }
+
+    return render(request, "staff_templates/staff_add.html", context)

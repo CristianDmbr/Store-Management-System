@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Information</title>
+</head>
+
+<body>
+
+    <h1>{{ restaurant.restaurant_name }}'s Information</h1>
+
+    <hr>
+
+    <h1><strong>General Information</strong></h1>
+
+    <p>
+        <strong>Restaurant Name:</strong>
+        {{ restaurant.restaurant_name }}
+    </p>
+
+    <p>
+        <strong>Date Opened:</strong>
+        {{ restaurant.date_opened }}
+    </p>
+
+    <p>
+        <strong>Location:</strong>
+        {{ restaurant_location }}
+    </p>
+
+    <p>
+        <strong>Restaurant Cuisine:</strong>
+        {{ restaurant_cuisine }}
+    </p>
+
+    <p>
+        <strong>Capacity:</strong>
+        {{ restaurant.capacity }}
+    </p>
+
+    <p>
+        <strong>Number of Tables:</strong>
+        {{ restaurant.number_of_tables }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Live Information</strong></h1>
+
+    <p>
+        <strong>Restaurant Full:</strong>
+        {{ restaurant.is_full }}
+    </p>
+
+    <p>
+        <strong>Current Occupancy:</strong>
+        {{ restaurant.current_occupancy }}
+    </p>
+
+    <p>
+        <strong>Remaining Spots:</strong>
+        {{ restaurant.remaining_spots }}
+    </p>
+
+    <p>
+        <strong>Inactive Reservations:</strong>
+        {{ restaurant.innactive_reservations }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Financial Statistics</strong></h1>
+
+    <p>
+        Average Order Value :
+        {{ average_transaction_cost }}
+    </p>
+
+    <p>
+        <strong>Total Revenue:</strong>
+        £{{ total_earned_from_orders }}
+    </p>
+
+    <p>
+        <strong>Today's Revenue:</strong>
+        £{{ today_earned }}
+    </p>
+
+    <p>
+        <strong>This Week's Revenue:</strong>
+        £{{ this_week_earned }}
+    </p>
+
+    <p>
+        <strong>This Month's Revenue:</strong>
+        £{{ this_month_earned }}
+    </p>
+
+    <p>
+        <strong>This Year's Revenue:</strong>
+        £{{ this_year_earned }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Order Statistics</strong></h1>
+
+    <p>
+        <strong>Total Orders:</strong>
+        {{ number_of_orders }}
+    </p>
+
+    <p>
+        <strong>Orders Today:</strong>
+        {{ orders_today }}
+    </p>
+
+    <p>
+        <strong>Orders This Week:</strong>
+        {{ orders_this_week }}
+    </p>
+
+    <p>
+        <strong>Orders This Month:</strong>
+        {{ orders_this_month }}
+    </p>
+
+    <p>
+        <strong>Orders This Year:</strong>
+        {{ orders_this_year }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Menu Statistics</strong></h1>
+
+    <p>
+        <strong>Total Menu Items:</strong>
+        {{ total_menu_items }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Labour Information</strong></h1>
+
+    <p>
+        <strong>Total Staff:</strong>
+        {{ staff_count }}
+    </p>
+
+    <p>
+        <strong>Chefs:</strong>
+        {{ chief_count }}
+    </p>
+
+    <p>
+        <strong>Waiters:</strong>
+        {{ waiter_count }}
+    </p>
+
+    <p>
+        <strong>Managers:</strong>
+        {{ manager_count }}
+    </p>
+
+    <p>
+        <strong>Total Labour Hours:</strong>
+        {{ total_labour_hours }}
+    </p>
+
+    <p>
+        <strong>Labour Hours This Week:</strong>
+        {{ total_labour_hours_last_week }}
+    </p>
+
+    <p>
+        <strong>Labour Hours This Month:</strong>
+        {{ total_hours_worked_last_month }}
+    </p>
+
+    <p>
+        <strong>Labour Hours This Year:</strong>
+        {{ total_hours_worked_last_year }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Labour Costs</strong></h1>
+
+    <p>
+        <strong>Total Labour Cost:</strong>
+        £{{ total_labour_cost }}
+    </p>
+
+    <p>
+        <strong>Labour Cost This Week:</strong>
+        £{{ labour_cost_this_week }}
+    </p>
+
+    <p>
+        <strong>Labour Cost This Month:</strong>
+        £{{ labour_cost_this_month }}
+    </p>
+
+    <p>
+        <strong>Labour Cost This Year:</strong>
+        £{{ labour_cost_this_year }}
+    </p>
+
+    <hr>
+
+    <h1><strong>Food Statistics</strong></h1>
+    
+    <p>
+        <strong>Most Popular Category:</strong>
+        {{ most_popular_category }}
+    </p>
+    
+    <p>
+        <strong>Highest Revenue Category:</strong>
+        {{ highest_earning_category }}
+    </p>
+    
+    <p>
+        <strong>Lowest Revenue Category:</strong>
+        {{ lowest_earning_category }}
+    </p>
+    
+    <hr>
+    
+    <h2>Starters</h2>
+    
+    <p><strong>Number of Starters:</strong> {{ number_of_starters }}</p>
+    <p><strong>Starters Sold:</strong> {{ number_of_starters_ordered }}</p>
+    <p><strong>Share of Sales:</strong> {{ starters_percent|floatformat:1 }}%</p>
+    
+    <hr>
+    
+    <h2>Mains</h2>
+    
+    <p><strong>Number of Mains:</strong> {{ number_of_mains }}</p>
+    <p><strong>Mains Sold:</strong> {{ number_of_mains_ordered }}</p>
+    <p><strong>Share of Sales:</strong> {{ mains_percent|floatformat:1 }}%</p>
+    
+    <hr>
+    
+    <h2>Desserts</h2>
+    
+    <p><strong>Number of Desserts:</strong> {{ number_of_deserts }}</p>
+    <p><strong>Desserts Sold:</strong> {{ number_of_deserts_ordered }}</p>
+    <p><strong>Share of Sales:</strong> {{ desserts_percent|floatformat:1 }}%</p>
+    
+    <hr>
+    
+    <h2>Drinks</h2>
+    
+    <p><strong>Number of Drinks:</strong> {{ number_of_drinks }}</p>
+    <p><strong>Drinks Sold:</strong> {{ number_of_drinks_ordered }}</p>
+    <p><strong>Share of Sales:</strong> {{ drinks_percent|floatformat:1 }}%</p>
+    
+    <hr>
+    
+    <h2>Snacks</h2>
+    
+    <p><strong>Number of Snacks:</strong> {{ number_of_snacks }}</p>
+    <p><strong>Snacks Sold:</strong> {{ number_of_snacks_ordered }}</p>
+    <p><strong>Share of Sales:</strong> {{ snacks_percent|floatformat:1 }}%</p>
+
+    <h1><strong>Reservation Statistics</strong></h1>
+
+    <p>
+        <strong>Total Reservations:</strong>
+        {{ number_of_total_reservations }}
+    </p>
+
+    <p>
+        <strong>Active Reservations:</strong>
+        {{ active_reservations }}
+    </p>
+
+    <p>
+        <strong>Inactive Reservations:</strong>
+        {{ inactive_reservations }}
+    </p>
+
+    <p>
+        <strong>Reservations Today:</strong>
+        {{ reservations_today }}
+    </p>
+
+    <p>
+        <strong>Reservations This Week:</strong>
+        {{ reservations_this_week }}
+    </p>
+
+    <p>
+        <strong>Reservations This Month:</strong>
+        {{ reservations_this_month }}
+    </p>
+
+    <p>
+        <strong>Reservations This Year:</strong>
+        {{ reservations_this_year }}
+    </p>
+
+    <hr>
+
+    <form action="{% url 'display_all_owned_restaurants' %}">
+        <button type="submit">Back</button>
+    </form>
+
+    <form action="{% url 'update_restaurant' restaurant.pk %}">
+        <button type="submit">Edit Restaurant</button>
+    </form>
+
+    <form action="{% url 'delete_restaurant' restaurant.pk %}">
+        <button type="submit">Delete Restaurant</button>
+    </form>
+
+</body>
+</html>
