@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<head>
+    <title>Add Staff Page</title>
+</head>
+<body>
+    <h1>Add a new Staff Member</h1>
+    <form method = "post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <button type="submit">Add</button>
+    </form>
+    <hr>
+    <form action="{% url 'display_all_staff' %}" method = 'get'>
+        <button type = 'submit'>Back</button>
+    </form>
+</body>

@@ -47,13 +47,13 @@ urlpatterns = [
     path("dashboard_router/", views.dashboard_router, name = "dashboard_router"),
     path("logout",LogoutView.as_view(next_page = "login_page"),name = "logout"),
 
-    # Manager
+    # Manager Role
     path("owner/home_dashboard",views.owner_dashboard_home, name = "owner_dashboard_home"),
 
     # Supervisor
     path("supervisor/home_dashboard", views.supervisor_dashboard_home, name ="supervisor_dashboard_home"),
 
-    # Staff
+    # Staff Role
     path("staff/home_dashboard",views.staff_dashboard_home, name = "staff_dashboard_home"),
 
     # Restaurants
@@ -63,5 +63,9 @@ urlpatterns = [
     path("update_restaurant/<int:restaurant_pk>/", views.update_restaurant, name = "update_restaurant"),
     path("view_restaurant/<int:restaurant_pk>",views.restaurant_full_info, name = "restaurant_info"),
 
+    # Staff Model
+    path("general_staff_list",views.display_all_staff, name = "display_all_staff"),
+    path("delete_staff/<int:staff_pk>",views.delete_staff, name = "delete_staff"),
+    path("add_staff>",views.add_staff, name = "add_staff"),
 ]
  

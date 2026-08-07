@@ -9,6 +9,10 @@
         <button type = "submit"> Manage Restaurants </button>
     </form>
 
+    <form action="{% url 'display_all_staff' %}" method = "get">
+        <button type = "submit"> Manage Staff </button>
+    </form>
+
     <br>
     <br>
     <form action = "{% url 'logout' %}" method = "post">

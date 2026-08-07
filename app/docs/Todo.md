@@ -15,6 +15,9 @@ Permissions :
 Manager :
 INFO PAGE : < 
 
+- [ ] ADD staff info page
+- [ ] Add staff update page
+
 - [ ] See list of all staff
 - [ ] See how much each member of staff works and how much they earn.
 - [ ] Be able to view and modify the menu table

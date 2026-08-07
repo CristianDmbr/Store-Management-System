@@ -1025,3 +1025,64 @@ def restaurant_full_info(request,restaurant_pk):
 
 
     return render(request, "restaurant_templates/restaurant_info.html",context)
+
+############################################# Staff #############################################
+
+@login_required
+def display_all_staff(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to view Staff List.")
+
+    all_restaurants = Restaurant.objects.filter(owner = request.user)
+
+    restaurant_staff = {}
+    for restaurant in all_restaurants:
+        restaurant_staff[restaurant] = restaurant.who_works_here.all()
+    
+    context = {
+        "restaurant_staff" : restaurant_staff
+    }
+
+    return render(request,"staff_templates/staff_list.html",context)
+
+@login_required
+def delete_staff(request,staff_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have the permission to delete a memeber of staff")
+    
+    staff = get_object_or_404(Staff,pk = staff_pk)
+
+    if request.method == "POST":
+        staff.delete()
+        messages.success(request,f'{staff.name} was fired from {staff.restaurant.restaurant_name}')
+        return redirect("display_all_staff")
+
+    context = {"staff" : staff}
+
+    return render(request,"staff_templates/staff_delete.html",context)
+
+@login_required
+def add_staff(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to add new staff.")
+
+    if request.method == "POST":
+        form = StaffForm(request.POST)
+        if form.is_valid():
+            form.save()
+            name = form.cleaned_data["name"]
+            restaurant = form.cleaned_data["restaurant"]
+            messages.success(request, f'{name} has been employed to {restaurant}!')
+            return redirect("display_all_staff")
+            
+    
+    form = StaffForm()
+
+    context = {
+        "form" : form
+    }
+
+    return render(request, "staff_templates/staff_add.html", context)

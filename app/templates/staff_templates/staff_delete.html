@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <title>Staff Delete Page</title>
+</head>
+<body>
+    <h1>Are you sure you want to fire {{ staff.name }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">FIRE</button>
+    </form>
+    <form action="{% url 'display_all_staff' %}">
+        <button type="submit">No</button>
+    </form>
+</body>
