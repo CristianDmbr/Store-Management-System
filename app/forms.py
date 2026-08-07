@@ -70,7 +70,7 @@ class RestaurantForm(forms.ModelForm):
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
-        fields = ["name_of_reservation","restaurant","kids","teens","adults"]
+        fields = ["name_of_reservation","restaurant","kids","teens","adults","reservation_date_time","phone_number"]
 
 class StaffForm(forms.ModelForm):
     class Meta:

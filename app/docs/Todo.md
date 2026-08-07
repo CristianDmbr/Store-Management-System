@@ -13,16 +13,16 @@
 
 Permissions :
 Manager :
-- [ ] How much their restaurant earns (Finance of Restaurant )
-- [ ] A dash board of what percent of what type of food item gets sold.
-- [ ] Be able to modify the menu table
+INFO PAGE : < 
+
 - [ ] See list of all staff
 - [ ] See how much each member of staff works and how much they earn.
+- [ ] Be able to view and modify the menu table
 - [ ] A brief list of all shifts.
 - [ ] I want to have a table to display all the restaurants and their menus
 - [ ] List of reservations
 - [ ] List of orders
-- [ ] All all permissions to modify database
+  
 Supervisors : 
 - [ ] View all their staff
 - [ ] How much each staff earns

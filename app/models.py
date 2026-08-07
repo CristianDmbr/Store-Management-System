@@ -8,7 +8,7 @@ from datetime import date, timedelta, datetime
 from django.core.exceptions import ValidationError
 
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
-                           validate_unique_restaurant_name_reservation, # Reservation
+                           validate_unique_restaurant_name_reservation, validate_reservation_date_time_not_being_in_the_past_or_late,  # Reservation
                            validate_unique_name_and_surname, validate_date_of_birth, validate_time_date_employed, # Staff
                            validate_shift_time, # Shift
                            validate_unique_menu_item_name, validate_calories # Menu Item
@@ -141,6 +141,9 @@ class Reservation(models.Model):
     kids = models.PositiveIntegerField(default = 0)
     teens = models.PositiveIntegerField(default = 0)
     adults = models.PositiveIntegerField(default = 1)
+    reservation_date_time = models.DateTimeField(null=False, blank= False)
+    phone_number = models.CharField(max_length = 8, null = True, blank = True)
+    created_at = models.DateTimeField(default = timezone.now)
 
     @property
     def total_people(self):
@@ -150,6 +153,11 @@ class Reservation(models.Model):
         validate_unique_restaurant_name_reservation(
             self.restaurant, self.name_of_reservation, self
         )
+        validate_reservation_date_time_not_being_in_the_past_or_late(
+            self.reservation_date_time
+        )
+        
+        
     
     def __str__(self):
         return f"{self.name_of_reservation} @ {self.restaurant.restaurant_name}"
@@ -313,7 +321,6 @@ class MenuItem(models.Model):
         ("dessert","Desert"),
         ("drink","Drink"),
         ("snack","Snack"),
-        ("side","Side"),
     ]
     
     restaurant = models.ForeignKey(
