@@ -4,7 +4,7 @@
 </head>
 <body>
     <h1> Hello {{ user.username }}! This is your Owner Dashboard</h1>
-
+    <hr>
     <form action = "{% url 'display_all_owned_restaurants' %}" method = "get" >
         <button type = "submit"> Manage Restaurants </button>
     </form>
@@ -13,8 +13,14 @@
         <button type = "submit"> Manage Staff </button>
     </form>
 
-    <br>
-    <br>
+    <form action="{% url 'list_restaurants_menu_items' %}" method = "get" >
+        <button type="submit">Manage Menu</button>
+    </form>
+
+    <form action="{% url 'shift_list_brief' %}" type = "get">
+        <button type ="submit">Shifts</button>
+    </form>
+    <hr>
     <form action = "{% url 'logout' %}" method = "post">
 
         {% csrf_token %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+    <title>Update Menu Item</title>
+</head>
+<body>
+    <h1>Update {{ menu_item.name }}</h1>
+    <hr>
+
+    <form method = "POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <button type = "submit"> Update </button>
+    </form>
+    <hr>
+    <form action="{% url 'list_restaurants_menu_items' %}" method = "get">
+        <button type = "get" >Menu List</button>
+    </form>
+</body>

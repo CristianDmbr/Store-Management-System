@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shift List</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .shift {
+            background: white;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .shift p {
+            margin: 7px 0;
+        }
+
+        .restaurant {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .employee {
+            font-size: 18px;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>All Restaurant Shifts</h1>
+
+    <hr>
+
+    {% for shift in all_shifts %}
+
+        <div class="shift">
+
+            <p class="restaurant">
+                {{ shift.employee.restaurant.restaurant_name }}
+            </p>
+
+            <p class="employee">
+                <strong>Employee:</strong>
+                {{ shift.employee.name }} {{ shift.employee.surname }}
+            </p>
+
+            <p>
+                <strong>Position:</strong>
+                {{ shift.employee.get_position_display }}
+            </p>
+
+            <p>
+                <strong>Start:</strong>
+                {{ shift.start_time }}
+            </p>
+
+            <p>
+                <strong>End:</strong>
+                {{ shift.end_time }}
+            </p>
+
+            <p>
+                <strong>Hours:</strong>
+                {{ shift.duration_hours }}
+            </p>
+
+            <p>
+                <strong>Earnings:</strong>
+                £{{ shift.earnings }}
+            </p>
+
+            <p class="status">
+                <strong>Status:</strong>
+                {{ shift.get_status_display }}
+            </p>
+
+        </div>
+
+    {% empty %}
+
+        <div class="empty">
+            <p>You currently have no shifts.</p>
+        </div>
+
+    {% endfor %}
+
+    <hr>
+
+    <form action="{% url 'owner_dashboard_home' %}">
+        <button type="submit">Back to Dashboard</button>
+    </form>
+
+</body>
+</html>

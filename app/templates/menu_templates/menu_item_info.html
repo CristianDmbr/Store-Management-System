@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<head>
+    <title>Menu Item Info Page</title>
+</head>
+<body>
+    <h1>Info about {{ menu_item.name }} from {{ restaurant.restaurant_name }}'s Menu</h1>
+
+    <form method="get">
+        {{ form.as_p }}
+    </form>
+    <hr>
+    <form action="{% url 'list_restaurants_menu_items' %}">
+        <button type = 'submit'>Menu Item List</button>
+    </form>
+    
+</body>

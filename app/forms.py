@@ -107,5 +107,6 @@ class ShiftForEmployeeForm(forms.ModelForm):
 class MenuItemForm(forms.ModelForm):
     class Meta:
         model = MenuItem
-        fields = ["restaurant", "name", "description", "price", "category","calories","availability","ingredience"]
+        # Dynamically add the restaurant
+        fields = ["name", "description", "price", "category","calories","availability","ingredience"]
     

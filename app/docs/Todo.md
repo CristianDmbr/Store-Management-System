@@ -12,14 +12,6 @@
 ##### ADD A Remove, Edit, Info button next to each of the restaurants in the List
 
 Permissions :
-Manager :
-
-- [ ] Be able to view and modify the menu table
-- [ ] A brief list of all shifts.
-- [ ] I want to have a table to display all the restaurants and their menus
-- [ ] List of reservations
-- [ ] List of orders
-  
 Supervisors : 
 - [ ] View all their staff
 - [ ] How much each staff earns
@@ -38,7 +30,7 @@ Add Holiday or Leave time for employees Model
 Have the general home page have a log in button but also a separate instruction or instroduction on how this app works 
 Have a function to determine if a shift is elibible for a break 
 Before rewriting the backend save the current one somewhere to be able to show progress
-   
+Dynamic Greetings messages based on time.
 
 # Plan
 Owners need to:

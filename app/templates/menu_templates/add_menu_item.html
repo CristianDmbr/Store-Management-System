@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<head>
+    <title>Add Menu Item</title>
+</head>
+<body>
+    <h1>Add new menu item for {{ restaurant.restaurant_name }}</h1>
+    <hr>
+    <form method = "post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <button type = "submit">Add</button>
+    </form>
+    <hr>
+    <form action ="{% url 'list_restaurants_menu_items' %}" method = "get">
+        <button type="submit">Menu List</button>
+    </form>
+</body>

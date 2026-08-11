@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<head>
+    <title>Delete Menu Item</title>
+</head>
+<body>
+    <h1>Are you sure you want remove {{ menu_item.name }} from {{ restaurant.restaurant_name }}</h1>
+    <hr>
+    <form method = "post">
+
+        {% csrf_token %}
+
+        <button type = "submit"><strong>Delete</strong></button>
+    </form>
+
+    <form action="{% url 'list_restaurants_menu_items' %}">
+        <button type = "submit">No</button>
+    </form>
+</body>

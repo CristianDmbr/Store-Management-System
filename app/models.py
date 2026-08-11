@@ -281,6 +281,8 @@ class Shift(models.Model):
         related_name="shifts"
     )
 
+    
+
     STATUS_CHOICES = [
         ("planned", "Planned"),
         ("active", "Active"),

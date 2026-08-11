@@ -1094,7 +1094,7 @@ def add_staff(request):
 def staff_info(request, staff_pk):
     
     if not request.user.groups.filter(name = "Owner").exists():
-        return HttpResponseForbidden
+        return HttpResponseForbidden("You do not have permission to Access Staff Info")
     
     staff = get_object_or_404(Staff, pk = staff_pk)
 
@@ -1108,7 +1108,7 @@ def staff_info(request, staff_pk):
 def update_staff_info(request, staff_pk):
 
     if not request.user.groups.filter(name = "Owner").exists():
-        return HttpResponseForbidden
+        return HttpResponseForbidden("You do not have access to Update Staff Info")
     
     staff = get_object_or_404(Staff, pk = staff_pk)
 
@@ -1134,7 +1134,7 @@ def update_staff_info(request, staff_pk):
 def display_all_restaurant_and_menuitems(request):
 
     if not request.user.groups.filter(name = "Owner").exists():
-        return HttpResponseForbidden
+        return HttpResponseForbidden("You do not have acess to View Restaurant Menu Items")
     
     all_owned_restaurants = Restaurant.objects.filter(owner = request.user)
 
@@ -1147,4 +1147,112 @@ def display_all_restaurant_and_menuitems(request):
         "restaurant_menu_items" : restaurant_menu_items
     }
 
-    return render(request, "")
+    return render(request, "menu_templates/restaurant_menu_list.html",context)
+
+@login_required
+def add_new_menu_item(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to Add new menu Item")
+    
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    # Because of the validator which needs the restaurant field we need to set the instance restaurant instead after validating
+    if request.method == "POST":
+        form = MenuItemForm(request.POST)
+        form.instance.restaurant = restaurant
+        if form.is_valid():
+            form.save()
+            messages.success(request,f'Sucessfully added for {restaurant.restaurant_name}')
+            return redirect("list_restaurants_menu_items")
+    else:
+        form = MenuItemForm()
+
+    context = {
+        "restaurant" : restaurant,
+        "form"  : form
+    }
+
+    return render(request,"menu_templates/add_menu_item.html",context)
+
+@login_required
+def delete_menu_item(request,menu_item_pk,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do no have permission to delete menu item.")
+    
+    menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+    restaurant = get_object_or_404(Restaurant,pk = restaurant_pk)
+
+    if request.method == "POST":
+        menu_item.delete()
+        messages.success(request,f'Sucessfully removed {menu_item.name} from {restaurant.restaurant_name}s menu list !')
+        return redirect("list_restaurants_menu_items")
+
+    context = {
+        "restaurant" : restaurant,
+        "menu_item" : menu_item
+    }
+
+    return render(request,"menu_templates/delete_menu_item.html",context)
+
+@login_required
+def menu_item_info(request,menu_item_pk,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have permission to check menu item information")
+    
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+    menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+
+    form = MenuItemForm(instance = menu_item)
+    form.instance.restaurant = restaurant
+
+    context = {
+        "restaurant" : restaurant,
+        "menu_item" : menu_item,
+        "form" : form
+    }
+
+    return render(request, "menu_templates/menu_item_info.html",context)
+
+@login_required
+def update_menu_item(request,menu_item_pk,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You do not have access to Update Menu Items")
+    
+    menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    if request.method == "POST":
+        form = MenuItemForm(request.POST, instance = menu_item)
+        form.instance.restaurant = restaurant
+        if form.is_valid():
+            form.save()
+            messages.success(request,f"Sucessfully updated {menu_item.name}.")
+            return redirect("list_restaurants_menu_items")
+    else:
+        form = MenuItemForm(instance = menu_item)
+    
+    context = {
+        "menu_item" : menu_item,
+        "restaurant" : restaurant,
+        "form" : form
+    }
+    
+    return render(request, "menu_templates/menu_item_update.html", context)
+
+@login_required
+def shift_list_brief(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden("You have no permissions to view all shifts")
+    
+    all_shifts = Shift.objects.filter(employee__restaurant__owner = request.user).order_by("employee__restaurant","start_time")
+
+    context = {
+        "all_shifts" : all_shifts
+    }
+
+    return render(request, "shift_templates/shift_list.html",context)    

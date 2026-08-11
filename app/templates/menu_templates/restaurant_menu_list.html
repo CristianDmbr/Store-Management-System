@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<head>
+    <title>List of all menu items from each Restaurants</title>
+</head>
+<body>
+    <h1>List of all Menu Item from each Restaurant</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
+    {% endif %}
+    
+    {% for restaurant, menu_items in restaurant_menu_items.items %}
+        {% if restaurant %} 
+            <hr>
+            <p><strong>{{ restaurant.restaurant_name }}'s menu items {{ menu_items.count }}:</strong></p>
+            {% if menu_items %}
+                {% for item in menu_items %}
+                    <p>
+                        {{ item.name }} - £{{ item.price }}
+                        <form action="{% url 'delete_menu_item' item.pk restaurant.pk %}" method = "get">
+                            <button type="submit" >Delete</button>
+                        </form>
+                        <form action="{% url 'menu_item_info' item.pk restaurant.pk %}" method = "get">
+                            <button type="submit">Info</button>
+                        </form>
+                        <form action="{% url 'update_menu_item' item.pk restaurant.pk %}" method = "get">
+                            <button type="submit">Update</button>
+                        </form>
+                    </p>
+                {% endfor %}
+            {% else %}
+                <p>No menu items yet</p>
+            {% endif %}
+            <form action="{% url 'add_menu_item' restaurant.pk %}">
+                <button type="submit" >Add restaurantMenu Item</button>
+            </form>
+        {% else %} 
+        <hr>
+        <p>You do not own any restaurants yet : </p>
+        <form action="{% url 'add_new_restaurant' %}">
+            <button type="submit">Add Restaurant</button>
+        </form>
+        {% endif %}
+    {% endfor %}
+    <hr>
+    <form action="{% url 'owner_dashboard_home' %}">
+        <button type="submit" >DashBoard</button>
+    </form>
+</body>

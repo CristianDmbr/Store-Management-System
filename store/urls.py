@@ -69,5 +69,15 @@ urlpatterns = [
     path("add_staff>",views.add_staff, name = "add_staff"),
     path("staff_info/<int:staff_pk>",views.staff_info, name = "staff_info"),
     path("update_staff/<int:staff_pk>",views.update_staff_info, name = "update_staff"),
+
+    # MenuItem Model
+    path("list_restaurants_menu_items",views.display_all_restaurant_and_menuitems, name = "list_restaurants_menu_items"),
+    path("add_menu_item/<int:restaurant_pk>",views.add_new_menu_item, name = "add_menu_item"),
+    path("delete_menu_item/<int:menu_item_pk>/<int:restaurant_pk>",views.delete_menu_item, name = "delete_menu_item"),
+    path("menu_item_info/<int:menu_item_pk>/<int:restaurant_pk>",views.menu_item_info, name = "menu_item_info"),
+    path("update_menu_item/<int:menu_item_pk>/<int:restaurant_pk>",views.update_menu_item, name = "update_menu_item"),
+    
+    # Shift Model
+    path("list_all_shifts_brief", views.shift_list_brief, name = "shift_list_brief"),
 ]
  
