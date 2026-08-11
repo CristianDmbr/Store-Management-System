@@ -29,6 +29,12 @@
                         <form action="{% url 'delete_staff' member.pk %}" method = "GET">
                             <button type="submit">Delete</button>
                         </form>
+                        <form action="{% url 'staff_info' member.pk %}" method = "GET">
+                            <button type = "submit">Info</button>
+                        </form>
+                        <form action="{% url 'update_staff' member.pk %}" method = "GET">
+                            <button type = "submit">Update</button>
+                        </form>
                     </li>
                 {% endfor %}
             </ul>

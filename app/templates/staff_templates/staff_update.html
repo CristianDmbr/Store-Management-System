@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+    <title>Update Staff Page</title>
+</head>
+<body>
+    <h1>Update {{ staff.name }}'s details.</h1>
+    <hr>
+    <form method = "POST" { staff.pk }>
+        {% csrf_token %}
+
+        <p>{{ form.as_p }}</p>
+        <button type = "submit"> Update </button>
+    </form>
+    <hr>
+    <form action="{% url 'staff_info' staff.pk %}">
+        <button type = "submit">Back to Info </button>
+    </form>
+    <form action="{% url 'display_all_staff'%}">
+        <button type = "submit">Staff List</button>
+    </form>
+    <form action="{% url 'owner_dashboard_home' %}">
+        <button type = "submit">Dashboard</button>
+    </form>
+</body> 

@@ -799,7 +799,10 @@ def restaurant_full_info(request,restaurant_pk):
     orders_this_month = len(restaurant.orders.filter(date_time_of_order__gte = this_month))
     orders_this_year = len(restaurant.orders.filter(date_time_of_order__gte = this_year))
 
-    average_transaction_cost = total_earned_from_orders // number_of_orders
+    if total_earned_from_orders > 0 and number_of_orders > 0:
+        average_transaction_cost = total_earned_from_orders // number_of_orders
+    else:
+        average_transaction_cost = 0
 
     # Labour Info:
     staff_count = len(restaurant.who_works_here.all())
@@ -1087,4 +1090,61 @@ def add_staff(request):
 
     return render(request, "staff_templates/staff_add.html", context)
 
-## Hello
+@login_required
+def staff_info(request, staff_pk):
+    
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden
+    
+    staff = get_object_or_404(Staff, pk = staff_pk)
+
+    context = {
+        "staff" : staff
+    }
+
+    return render(request,"staff_templates/staff_info.html",context)
+
+@login_required
+def update_staff_info(request, staff_pk):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden
+    
+    staff = get_object_or_404(Staff, pk = staff_pk)
+
+    if request.method == "POST":
+        form = StaffForm(request.POST, instance = staff)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Sucessfully updated {staff.name} info.')
+            return redirect("staff_info", staff_pk = staff.pk)
+    else:
+        form = StaffForm(instance = staff)
+    
+    context = {
+        "staff" : staff,
+        "form" : form
+    }
+
+    return render(request,"staff_templates/staff_update.html",context)
+
+############################################# Menu Item #############################################
+
+@login_required
+def display_all_restaurant_and_menuitems(request):
+
+    if not request.user.groups.filter(name = "Owner").exists():
+        return HttpResponseForbidden
+    
+    all_owned_restaurants = Restaurant.objects.filter(owner = request.user)
+
+    restaurant_menu_items = {}
+
+    for restaurant in all_owned_restaurants:
+        restaurant_menu_items[restaurant] = restaurant.menu_items.all()
+    
+    context = {
+        "restaurant_menu_items" : restaurant_menu_items
+    }
+
+    return render(request, "")

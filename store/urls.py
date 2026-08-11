@@ -67,5 +67,7 @@ urlpatterns = [
     path("general_staff_list",views.display_all_staff, name = "display_all_staff"),
     path("delete_staff/<int:staff_pk>",views.delete_staff, name = "delete_staff"),
     path("add_staff>",views.add_staff, name = "add_staff"),
+    path("staff_info/<int:staff_pk>",views.staff_info, name = "staff_info"),
+    path("update_staff/<int:staff_pk>",views.update_staff_info, name = "update_staff"),
 ]
  

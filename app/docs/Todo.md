@@ -13,13 +13,7 @@
 
 Permissions :
 Manager :
-INFO PAGE : < 
 
-- [ ] ADD staff info page
-- [ ] Add staff update page
-
-- [ ] See list of all staff
-- [ ] See how much each member of staff works and how much they earn.
 - [ ] Be able to view and modify the menu table
 - [ ] A brief list of all shifts.
 - [ ] I want to have a table to display all the restaurants and their menus
@@ -33,6 +27,7 @@ Supervisors :
 - [ ] View menu only 
 - [ ] View and modify reservations.
 - [ ] View and modify orders. 
+- [ ] Holiday request system where staff request Holliday and supervisors can accept or decline 
 Staff :
 - [ ] View their shifts 
 - [ ] View the menu of the restaurant

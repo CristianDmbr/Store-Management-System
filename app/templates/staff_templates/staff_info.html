@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<head>
+    <title>Staff Info Page</title>
+</head>
+<body>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p><strong>{{ message }}</strong></p>
+        {% endfor %}
+    {% endif %}
+
+
+    <h1>{{ staff.name }}'s info</h1>
+    <hr>
+    <p><strong>General</strong></p>
+    <p>
+        Name : 
+        {{ staff.name }}
+    </p>
+
+    <p>
+        Surname :
+        {{ staff.surname }}
+    </p>
+
+    <p>
+        Primary Work Store : 
+        {{ staff.restaurant }}
+    </p>
+    
+    <p>
+        Manager in Charge :
+        {{ staff.manager }}
+    </p>
+
+    <p>
+        Date Of Birth :
+        {{ staff.date_of_birth }}
+    </p>
+
+    <p>
+        Age :
+        {{ staff.age }}
+    </p>
+
+    <p>
+        Date and Time employeed : 
+        {{ staff.date_time_employed }}
+    </p>
+    <p>
+        Work Right : 
+        {{ staff.get_work_right_display }}
+    </p>
+    <p>
+        Position : 
+        {{ staff.get_position_display }}
+    </p>
+    <p>
+        Hourly Contract Pay : 
+        {{ staff.pay_per_hour }}
+    </p>
+
+    <hr>
+    <h1>Financial Info : </h1>
+
+    <p>
+        Total Earnings : 
+        {{ staff.total_earned }}
+    </p>
+
+    <p>
+        Earnings this Week :
+        {{ staff.total_earned_this_week }}
+    </p>
+
+    <p>
+        Earnings this Month :
+        {{ staff.total_earned_last_month }}
+    </p>
+
+    <p>
+        Earnings this Year :
+        {{ staff.total_earned_last_year }} 
+    </p>
+
+    <hr>
+    <h1>Labour Info :</h1>
+    <p>
+        Total Hours Worked :
+        {{ staff.total_hours_worked_last_week }}
+    </p>
+
+    <p>
+        Hours Worked in Last Month :
+        {{ staff.total_hours_worked_last_month }}
+    </p>
+
+    <p>
+        Hours Worked Last Year :
+        {{ staff.total_hours_worked_last_year }}
+    </p>
+
+    <hr>
+    <form action="{% url 'update_staff' staff.pk %}">
+        <button type="submit">Update {{ staff.name }}'s info</button>
+    </form>
+    <form action="{% url 'display_all_staff' %}" method = "GET" >
+        <button type="submit">Staff List</button>
+    </form>
+    <form action="{% url 'owner_dashboard_home' %}" method = "GET">
+        <button type="submit">DashBoard</button>
+    </form>
+
+</body>
