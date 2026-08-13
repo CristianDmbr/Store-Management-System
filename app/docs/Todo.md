@@ -10,8 +10,7 @@
 5. README with screenshots and instructions
 
 Supervisors : 
-
-- [ ] View and modify reservations.
+- [ ] View and modify reservations. (Continue)
 - [ ] View and modify orders. 
 - [ ] Holiday request system where staff request Holliday and supervisors can accept or decline 
 Staff :

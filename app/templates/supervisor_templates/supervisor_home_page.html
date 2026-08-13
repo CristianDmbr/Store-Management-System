@@ -11,11 +11,15 @@
     </form>
 
     <form action="{% url 'list_restaurants_menu_items' %}" method = "GET">
-        <button type = "submit">Menu Item List</button>
+        <button type = "submit">Menu Items</button>
     </form>
 
     <form action="{% url 'shift_list_full' %}" method = "GET">
         <button type="submit">Manage Shifts</button>
+    </form>
+
+    <form action="{% url 'reservation_list' %}">
+        <button type = "submit">Manage Reservations</button>
     </form>
 
     <hr>

@@ -1434,3 +1434,25 @@ def update_shift(request, shift_pk, staff_pk):
     return render(request, "shift_templates/update_shift.html", context)
 
 ############################################# Reservations #############################################
+
+@login_required
+def display_all_reservations(request):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to view reservations")
+    
+    all_restaurants = Restaurant.objects.filter(supervisor = request.user)
+
+    all_reservations = {}
+
+    for restaurant in all_restaurants:
+        all_reservations[restaurant] = restaurant.reservations.all()
+    
+    if request.method == "POST":
+        pass
+    
+    context = {
+        "all_reservations" : all_reservations
+    }
+
+    return render(request, "reservation_templates/reservation_list.html",context)
