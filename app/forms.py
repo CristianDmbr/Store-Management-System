@@ -94,7 +94,11 @@ class StaffFormSupervisor(forms.ModelForm):
 class ShiftForm(forms.ModelForm):
     class Meta:
         model = Shift
-        fields = ["employee","start_time","end_time"]
+        fields = [
+                "employee",
+                "start_time",
+                "end_time"
+                ]
 
         widgets = {
             "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
@@ -104,7 +108,10 @@ class ShiftForm(forms.ModelForm):
 class ShiftForEmployeeForm(forms.ModelForm):
     class Meta:
         model = Shift
-        fields = ["start_time", "end_time", "status"]
+        fields = [
+            "start_time",
+             "end_time",
+              "status"]
 
         widgets = {
             "start_time": forms.DateTimeInput(

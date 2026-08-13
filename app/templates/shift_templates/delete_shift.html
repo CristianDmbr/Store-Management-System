@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <title>Delete Shift Page</title>
+</head>
+<body>
+    <h1> Do you want to delete {{staff}}'s shift ({{ shift.start_time }} - {{ shift.end_time }} )?</h1>
+
+    <form method = "POST">
+        {% csrf_token %}
+        <button type = "submit">YES</button>
+    </form>
+    <form action="{% url 'shift_list_full' %}" method = "GET">
+        <button type = "submit">No</button>
+    </form>
+</body>

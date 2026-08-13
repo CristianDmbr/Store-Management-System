@@ -11,10 +11,6 @@
 
 Supervisors : 
 
-- [ ] View menu only 
-
-- [ ] View and modify shifts 
-- [ ] View menu only 
 - [ ] View and modify reservations.
 - [ ] View and modify orders. 
 - [ ] Holiday request system where staff request Holliday and supervisors can accept or decline 

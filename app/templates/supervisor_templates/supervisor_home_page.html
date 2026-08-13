@@ -6,16 +6,23 @@
     <h1>Hello {{ user.username }}! This is your Supervisor Dashboard</h1>
     <hr>
 
-    <form action="{% url 'display_all_staff' %}" method = "get">
+    <form action="{% url 'display_all_staff' %}" method = "GET">
         <button type = 'submit'>Manage Staff</button>
     </form>
 
+    <form action="{% url 'list_restaurants_menu_items' %}" method = "GET">
+        <button type = "submit">Menu Item List</button>
+    </form>
+
+    <form action="{% url 'shift_list_full' %}" method = "GET">
+        <button type="submit">Manage Shifts</button>
+    </form>
+
     <hr>
-    <form action="{% url 'logout' %}" method = "post">
+    <form action="{% url 'logout' %}" method = "POST">
         {% csrf_token %}
 
         <button type = "submit"> Logout</button>
-
     </form>
 
 </body>

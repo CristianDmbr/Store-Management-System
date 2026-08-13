@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+    <title>Shifts for Supervisors to See</title>
+</head>
+
+<body>
+
+    <h1>All Shifts</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p><strong>{{ message }}</strong></p>
+        {% endfor %}
+    {% endif %}
+
+    <hr>
+
+    {% for staff, shifts in all_staff_shifts.items %}
+
+        <strong>{{ staff.name }} {{ staff.surname }} ({{ shifts.count }})</strong>
+
+
+        {% if shifts %}
+
+            <ul>
+                {% for shift in shifts %}
+                    <li>
+                        {{ shift.start_time }} -
+                        {{ shift.end_time }}
+                        ({{ shift.duration_hours }} hrs)
+                        ({{ shift.get_status_display }})
+
+                        <form action="{% url 'delete_shift' shift.pk staff.pk %}" method="GET">
+                            <button type = "submit" >Delete</button>
+                        </form>
+                        <form action="{% url 'update_shift' shift.pk staff.pk %}" method = "GET">
+                            <button type = "submit">Update</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        {% else %}
+
+            <p>
+                {{ staff.name }} has no shifts!
+            </p>
+
+        {% endif %}
+
+        <form action="{% url 'add_shift' staff.pk %}" method="GET">
+            <button type="submit">Add Shift</button>
+        </form>
+
+        <hr>
+
+    {% endfor %}
+
+    <form action="{% url 'display_all_staff' %}" method="GET">
+        <button type="submit">Staff List</button>
+    </form>
+
+    <form action="{% url 'supervisor_dashboard_home' %}" method="GET">
+        <button type="submit">Dashboard</button>
+    </form>
+
+</body>

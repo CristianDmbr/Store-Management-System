@@ -1208,8 +1208,13 @@ def display_all_restaurant_and_menuitems(request):
 
     if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor"):
         return HttpResponseForbidden("You do not have acess to View Restaurant Menu Items")
-    
-    all_owned_restaurants = Restaurant.objects.filter(owner = request.user)
+
+    if request.user.groups.filter(name = "Owner").exists():
+        all_owned_restaurants = Restaurant.objects.filter(owner = request.user)
+        role = "Owner"
+    elif request.user.groups.filter(name = "Supervisor").exists():
+        all_owned_restaurants = Restaurant.objects.filter(supervisor = request.user)
+        role = "Supervisor"
 
     restaurant_menu_items = {}
 
@@ -1217,7 +1222,8 @@ def display_all_restaurant_and_menuitems(request):
         restaurant_menu_items[restaurant] = restaurant.menu_items.all()
     
     context = {
-        "restaurant_menu_items" : restaurant_menu_items
+        "restaurant_menu_items" : restaurant_menu_items,
+        "role" : role
     }
 
     return render(request, "menu_templates/restaurant_menu_list.html",context)
@@ -1272,7 +1278,7 @@ def delete_menu_item(request,menu_item_pk,restaurant_pk):
 @login_required
 def menu_item_info(request,menu_item_pk,restaurant_pk):
 
-    if not request.user.groups.filter(name = "Owner").exists():
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have permission to check menu item information")
     
     restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
@@ -1331,3 +1337,100 @@ def shift_list_brief(request):
     }
 
     return render(request, "shift_templates/shift_list.html",context) 
+
+@login_required
+def shift_list_full(request):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have acess to view the Shift List")
+    
+    all_staff = Staff.objects.filter(manager = request.user)
+
+    all_staff_shifts = {}
+    for staff in all_staff:
+        all_staff_shifts[staff] = staff.shifts.all()
+    
+    context = {
+        "all_staff_shifts" : all_staff_shifts
+    }
+
+    return render(request, "shift_templates/shift_list_supervisor.html",context)
+
+@login_required
+def add_shift(request, staff_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have acess to add new shifts")
+    
+    staff = get_object_or_404(Staff,pk = staff_pk)
+
+    if request.method == "POST":
+        form = ShiftForEmployeeForm(request.POST)
+        form.instance.employee = staff
+        if form.is_valid():
+            shift = form.save(commit = False)
+            shift.employee = staff
+            shift.save()
+            messages.success(request, f'Successfully added {staff.name} for a shift.')
+            return redirect("shift_list_full")
+    else:
+        form = ShiftForEmployeeForm()
+
+    context = {
+        "form" : form,
+        "staff" : staff
+    }
+
+    return render(request, "shift_templates/add_shift.html",context)
+
+@login_required
+def delete_shift(request,shift_pk,staff_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have access to delete a shift.")
+    
+    shift = get_object_or_404(Shift, pk = shift_pk)
+    staff = get_object_or_404(Staff, pk = staff_pk)
+
+    if request.method == "POST":
+        shift.delete()
+        messages.success(request, f'Successfully delete {staff.name} shift.')
+        return redirect("shift_list_full")
+
+    context = {
+        "shift" : shift,
+        "staff" : staff
+    }
+
+    return render(request,"shift_templates/delete_shift.html",context)
+
+@login_required
+def update_shift(request, shift_pk, staff_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to update a shift.")
+    
+    shift = get_object_or_404(Shift, pk = shift_pk)
+    staff = get_object_or_404(Staff, pk = staff_pk)
+
+    if request.method == "POST":
+        form = ShiftForEmployeeForm(request.POST, instance = shift)
+        if form.is_valid():
+            shift = form.save(commit = False)
+            shift.employee = staff
+            shift.save()
+            messages.success(request, f'Sucessfully updated {staff.name}s shift !')
+            return redirect("shift_list_full")
+    
+    else:
+        form = ShiftForEmployeeForm(instance = shift)
+    
+    context = {
+        "form" : form,
+        "shift" : shift,
+        "staff" : staff
+    }
+
+    return render(request, "shift_templates/update_shift.html", context)
+
+############################################# Reservations #############################################

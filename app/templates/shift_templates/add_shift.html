@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <title>Add Shift</title>
+</head>
+<body>
+    <h1>Add Shift</h1>
+    <hr>
+    <form method = "POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <form method = "POST">
+            <button type = "submit"> Add </button>
+        </form>
+    </form>
+
+    <hr>
+    <form action="{% url 'shift_list_full' %}">
+        <button type = "submit">Shift List</button>
+    </form>
+</body>

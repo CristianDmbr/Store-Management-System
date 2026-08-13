@@ -79,5 +79,9 @@ urlpatterns = [
     
     # Shift Model
     path("list_all_shifts_brief", views.shift_list_brief, name = "shift_list_brief"),
+    path("list_all_shifts_full",views.shift_list_full, name = "shift_list_full"),
+    path("add_shift/<int:staff_pk>", views.add_shift, name = "add_shift"),
+    path("delete_shift/<int:shift_pk>/<int:staff_pk>", views.delete_shift, name = "delete_shift"),
+    path("update_shift/<int:shift_pk>/<int:staff_pk>", views.update_shift, name = "update_shift"),
 ]
  
