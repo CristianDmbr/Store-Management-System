@@ -60,6 +60,14 @@ class Restaurant(models.Model):
         related_name = "restaurants_owned"
     )
 
+    supervisor = models.ForeignKey(
+        User,
+        on_delete = models.SET_NULL,
+        blank = True,
+        null = True,
+        related_name = "restaurants_supervised"
+    )
+
     LOCATIONS_CHOICES = [
         ("east_london", "East London"),
         ("south_london", "South London"),
@@ -281,8 +289,6 @@ class Shift(models.Model):
         related_name="shifts"
     )
 
-    
-
     STATUS_CHOICES = [
         ("planned", "Planned"),
         ("active", "Active"),
@@ -427,6 +433,3 @@ class OrderItem(models.Model):
     def total_cost(self):
         return self.quantity * self.price_sold_at
         
-        
-        
-    

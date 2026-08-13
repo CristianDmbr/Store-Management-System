@@ -1,7 +1,7 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor
 from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
@@ -1034,25 +1034,35 @@ def restaurant_full_info(request,restaurant_pk):
 @login_required
 def display_all_staff(request):
 
-    if not request.user.groups.filter(name = "Owner").exists():
-        return HttpResponseForbidden("You do not have permission to view Staff List.")
-
-    all_restaurants = Restaurant.objects.filter(owner = request.user)
-
-    restaurant_staff = {}
-    for restaurant in all_restaurants:
-        restaurant_staff[restaurant] = restaurant.who_works_here.all()
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to view Staff")
     
+    restaurant_staff = {}
+
+    if request.user.groups.filter(name = "Owner").exists():
+
+        all_restaurants = Restaurant.objects.filter(owner = request.user)
+
+        for restaurant in all_restaurants:
+            restaurant_staff[restaurant] = restaurant.who_works_here.all()
+        
+    elif request.user.groups.filter(name = "Supervisor").exists():
+
+        all_staff = Staff.objects.filter(manager = request.user)
+
+        for staff in all_staff:
+            restaurant_staff.setdefault(staff.restaurant, []).append(staff)
+
     context = {
-        "restaurant_staff" : restaurant_staff
-    }
+            "restaurant_staff" : restaurant_staff
+        }
 
     return render(request,"staff_templates/staff_list.html",context)
 
 @login_required
 def delete_staff(request,staff_pk):
 
-    if not request.user.groups.filter(name = "Owner").exists():
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists() :
         return HttpResponseForbidden("You do not have the permission to delete a memeber of staff")
     
     staff = get_object_or_404(Staff,pk = staff_pk)
@@ -1069,31 +1079,67 @@ def delete_staff(request,staff_pk):
 @login_required
 def add_staff(request):
 
-    if not request.user.groups.filter(name = "Owner").exists():
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have permission to add new staff.")
 
-    if request.method == "POST":
-        form = StaffForm(request.POST)
-        if form.is_valid():
-            form.save()
-            name = form.cleaned_data["name"]
-            restaurant = form.cleaned_data["restaurant"]
-            messages.success(request, f'{name} has been employed to {restaurant}!')
-            return redirect("display_all_staff")
-            
+    is_owner = request.user.groups.filter(name = "Owner").exists()
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+    if is_owner:
+
+        if request.method == "POST":
+
+            form = StaffForm(request.POST)
+
+            if form.is_valid():
+                form.save()
+                name = form.cleaned_data["name"]
+                surname = form.cleaned_data["surname"]
+                restaurant = form.cleaned_data["restaurant"]
+                messages.success(request, f'{name} {surname} was hired at {restaurant}.')
+                return redirect("display_all_staff")
+        else:
+
+            form = StaffForm()
+
+        context = {
+            "form" : form
+        }
+
+        return render(request, "staff_templates/staff_add.html",context)
     
-    form = StaffForm()
+    elif is_supervisor:
 
-    context = {
-        "form" : form
-    }
+        if request.method == "POST":
 
-    return render(request, "staff_templates/staff_add.html", context)
+            form = StaffFormSupervisor(request.POST)
+
+            form.instance.manager = request.user
+
+            if form.is_valid():
+                form.save()
+                name = form.cleaned_data["name"]
+                surname = form.cleaned_data["surname"]
+                restaurant = form.cleaned_data["restaurant"]
+                messages.success(request, f'{name} {surname} was hired at {restaurant}.')
+                return redirect("display_all_staff")
+        else:
+
+            form = StaffFormSupervisor()
+        
+        context = {
+            "form" : form
+        }
+
+        return render(request, "staff_templates/staff_add.html",context)
+        
+
+
 
 @login_required
 def staff_info(request, staff_pk):
     
-    if not request.user.groups.filter(name = "Owner").exists():
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have permission to Access Staff Info")
     
     staff = get_object_or_404(Staff, pk = staff_pk)
@@ -1107,33 +1153,60 @@ def staff_info(request, staff_pk):
 @login_required
 def update_staff_info(request, staff_pk):
 
-    if not request.user.groups.filter(name = "Owner").exists():
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have access to Update Staff Info")
     
+
+    is_owner = request.user.groups.filter(name = "Owner").exists()
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
     staff = get_object_or_404(Staff, pk = staff_pk)
 
-    if request.method == "POST":
-        form = StaffForm(request.POST, instance = staff)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Sucessfully updated {staff.name} info.')
-            return redirect("staff_info", staff_pk = staff.pk)
-    else:
-        form = StaffForm(instance = staff)
-    
-    context = {
-        "staff" : staff,
-        "form" : form
-    }
+    if is_owner:
+        
+        if request.method == "POST":
+            form = StaffForm(request.POST, instance = staff)
+            if form.is_valid():
+                form.save()
+                messages.success(request, f'Sucessfully updated {staff.name} info.')
+                return redirect("staff_info", staff_pk = staff.pk)
+        else:
+            form = StaffForm(instance = staff)
+        
+        context = {
+            "staff" : staff,
+            "form" : form
+        }
 
-    return render(request,"staff_templates/staff_update.html",context)
+        return render(request,"staff_templates/staff_update.html",context)
+    
+    elif is_supervisor:
+
+        if request.method == "POST":
+            form = StaffFormSupervisor(request.POST, instance = staff)
+            if form.is_valid():
+                staff = form.save(commit = False)
+                staff.manager = request.user
+                staff.save()
+                messages.success(request,f'Sucessfully updates {staff.name} info.')
+                return redirect("display_all_staff")
+        else:
+            form = StaffFormSupervisor(instance = staff)
+
+        context = {
+            "staff" : staff,
+            "form" : form
+        }
+
+        return render(request, "staff_templates/staff_update.html", context )
+
 
 ############################################# Menu Item #############################################
 
 @login_required
 def display_all_restaurant_and_menuitems(request):
 
-    if not request.user.groups.filter(name = "Owner").exists():
+    if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor"):
         return HttpResponseForbidden("You do not have acess to View Restaurant Menu Items")
     
     all_owned_restaurants = Restaurant.objects.filter(owner = request.user)
@@ -1243,6 +1316,8 @@ def update_menu_item(request,menu_item_pk,restaurant_pk):
     
     return render(request, "menu_templates/menu_item_update.html", context)
 
+############################################# Shift #############################################
+
 @login_required
 def shift_list_brief(request):
 
@@ -1255,4 +1330,4 @@ def shift_list_brief(request):
         "all_shifts" : all_shifts
     }
 
-    return render(request, "shift_templates/shift_list.html",context)    
+    return render(request, "shift_templates/shift_list.html",context) 

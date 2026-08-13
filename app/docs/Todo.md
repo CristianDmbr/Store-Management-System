@@ -9,12 +9,10 @@
 4. Chars for analysis for managers Charts.js
 5. README with screenshots and instructions
 
-##### ADD A Remove, Edit, Info button next to each of the restaurants in the List
-
-Permissions :
 Supervisors : 
-- [ ] View all their staff
-- [ ] How much each staff earns
+
+- [ ] View menu only 
+
 - [ ] View and modify shifts 
 - [ ] View menu only 
 - [ ] View and modify reservations.

@@ -4,7 +4,13 @@
 </head>
 <body>
     <h1>Hello {{ user.username }}! This is your Supervisor Dashboard</h1>
+    <hr>
 
+    <form action="{% url 'display_all_staff' %}" method = "get">
+        <button type = 'submit'>Manage Staff</button>
+    </form>
+
+    <hr>
     <form action="{% url 'logout' %}" method = "post">
         {% csrf_token %}
 

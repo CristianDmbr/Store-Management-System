@@ -72,6 +72,7 @@ class ReservationForm(forms.ModelForm):
         model = Reservation
         fields = ["name_of_reservation","restaurant","kids","teens","adults","reservation_date_time","phone_number"]
 
+# Used by Owners
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
@@ -80,6 +81,15 @@ class StaffForm(forms.ModelForm):
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})
         }    
+
+class StaffFormSupervisor(forms.ModelForm):
+    class Meta:
+        model = Staff
+        fields = ["name","surname","date_of_birth","date_time_employed","position","restaurant","pay_per_hour"]
+
+        widgets = {
+            "date_of_birth": forms.DateInput(attrs={"type": "date"})
+        } 
 
 class ShiftForm(forms.ModelForm):
     class Meta:
@@ -109,4 +119,5 @@ class MenuItemForm(forms.ModelForm):
         model = MenuItem
         # Dynamically add the restaurant
         fields = ["name", "description", "price", "category","calories","availability","ingredience"]
+    
     

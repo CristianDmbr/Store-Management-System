@@ -108,8 +108,19 @@
     <form action="{% url 'display_all_staff' %}" method = "GET" >
         <button type="submit">Staff List</button>
     </form>
-    <form action="{% url 'owner_dashboard_home' %}" method = "GET">
-        <button type="submit">DashBoard</button>
+
+    {% if user.groups.all.0.name == "Owner" %}
+
+        <form action="{% url 'owner_dashboard_home' %}" method = "GET">
+            <button type="submit">Dashboard</button>
+        </form>
+
+    {% elif user.groups.all.0.name == "Supervisor" %}
+
+    <form action="{% url 'supervisor_dashboard_home' %}" method = "GET">
+        <button type = "submit">Dashboard</button>
     </form>
+        
+    {% endif %}
 
 </body>
