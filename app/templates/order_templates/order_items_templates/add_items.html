@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <title>Add Item to Order</title>
+</head>
+<body>
+    <h1>Add items to order</h1>
+
+    <form method = "POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <button type = "submit">Add</button>
+    </form>
+    <hr>
+    {% if is_supervisor %}
+        <form action="{% url 'all_orders_list' %}" method = "GET">
+            <button method = "submit">Back</button>
+        </form>
+    {% endif %}
+
+</body>

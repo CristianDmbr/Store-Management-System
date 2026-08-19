@@ -1,7 +1,7 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Restaurant, Staff, Shift, MenuItem, Reservation
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor
+from .models import Restaurant, Staff, Shift, MenuItem, Reservation, Order,OrderItem
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor, OrderForm, OrderItemForm
 from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
@@ -1541,3 +1541,142 @@ def update_reservation(request, reservation_pk, restaurant_pk):
         }
 
     return render(request, "reservation_templates/update_reservation.html", context)
+
+############################################# Order #############################################
+
+@login_required
+def order_list(request):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to look at the order list.")
+    
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+    all_restaurants = Restaurant.objects.filter(supervisor = request.user)
+
+    restaurant_orders = {}
+
+    for restaurant in all_restaurants:
+        restaurant_orders[restaurant] = restaurant.orders.all().order_by("status","date_time_of_order")
+
+
+    context = {
+        "is_supervisor" : is_supervisor,
+        "restaurant_orders" : restaurant_orders
+   }
+
+    return render(request, "order_templates/order_list.html",context)
+    
+@login_required
+def add_order(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to add a order")
+    
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    if request.method == "POST":
+        form = OrderForm(request.POST, restaurant = restaurant)
+        form.restaurant = restaurant
+        if form.is_valid():
+            order = form.save(commit = False)
+            order.restaurant = restaurant
+            order.save()
+            messages.success(request, "Sucessfully added a new Order")
+            return redirect("all_orders_list")
+
+    else:
+        form = OrderForm(restaurant = restaurant)
+    
+    form.instance.restaurant = restaurant
+
+    context = {
+        "is_supervisor" : is_supervisor,
+        "restaurant" : restaurant,
+        "form" : form
+    }
+
+    return render(request, "order_templates/add_order.html",context)
+
+@login_required
+def delete_order(request, order_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("No permission to delete order")
+    
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+    order = Order.objects.filter(pk = order_pk)
+
+    if request.method == "POST":
+        order.delete()
+        messages.success(request, "Sucessfully delete an order")
+        return redirect("all_orders_list")
+
+    context = {
+        "order" : order,
+        "is_supervisor" : is_supervisor
+    }
+
+    return render(request, "order_templates/delete_order.html",context)
+    
+
+############################################# Order Items #############################################
+
+@login_required
+def add_order_items(request,order_pk,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to add item to order")
+    
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+    order = get_object_or_404(Order, pk = order_pk)
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    if request.method == "POST":
+        form = OrderItemForm(request.POST, restaurant = restaurant)
+        form.instance.order = order
+        if form.is_valid():
+            order_item = form.save(commit = False)
+            order_item.order = order
+            messages.success(request, "Sucessfully added new item to order !")
+            return redirect("all_orders_list")
+    else:
+        form = OrderItemForm(restaurant = restaurant)
+    
+    form.instance = order
+    
+    context = {
+        "order" : order,
+        "restaurant" : restaurant,
+        "form" : form,
+        "is_supervisor" : is_supervisor
+    }    
+
+    return render(request, "order_templates/order_items_templates/add_items.html",context)
+
+@login_required
+def list_all_order_items(request,order_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to add item to order")
+    
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+    order = get_object_or_404(Order, pk = order_pk)
+
+    all_items_by_category = {}
+    for item in order.items.all():
+        category = item.menu_item.category
+
+        if category not in all_items_by_category.keys():
+            all_items_by_category[category] = []
+        
+        all_items_by_category[category].append(item)
+
+    context = {
+        "is_supervisor" : is_supervisor,
+        "order" : order,
+        "all_items_by_category" : all_items_by_category
+    }
+
+    return render(request, "order_templates/order_items_templates/all_items.html",context)

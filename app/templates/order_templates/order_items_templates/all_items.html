@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        All order items
+    </title>
+</head>
+<body>
+    <h1>Full Order Details :</h1>
+
+    {% for category, items in all_items_by_category.items() %}
+
+        {{ category : }}
+
+        {% for item in items %}
+
+            <p>item.menu_item</p>
+
+        {% endfor %}
+
+    {% end for %}
+
+</body>

@@ -89,5 +89,14 @@ urlpatterns = [
     path("add_reservation/<int:restaurant_pk>",views.add_reservation, name = "add_reservation"),
     path("delete_reservation/<int:reservation_pk>/<int:restaurant_pk>",views.delete_reservation, name = "delete_reservation"),
     path("update_reservation/<int:reservation_pk>/<int:restaurant_pk>", views.update_reservation, name = "update_reservation"),
+
+    # Order Model
+    path("list_all_orders",views.order_list, name = "all_orders_list"),
+    path("add_order/<int:restaurant_pk>", views.add_order, name = "add_order"),
+    path("delete_order/<int:order_pk>",views.delete_order, name = "delete_order"),
+
+    # Order Item Model
+    path("add_order_item/<int:order_pk>/<int:restaurant_pk>",views.add_order_items, name = "add_item_to_order"),
+    path("all_items_in_order/<int:order_pk>",views.list_all_order_items, name = "all_order_items"),
 ]
  

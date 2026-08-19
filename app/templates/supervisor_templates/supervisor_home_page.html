@@ -18,8 +18,12 @@
         <button type="submit">Manage Shifts</button>
     </form>
 
-    <form action="{% url 'reservation_list' %}">
+    <form action="{% url 'reservation_list' %}" method = "GET">
         <button type = "submit">Manage Reservations</button>
+    </form>
+
+    <form action="{% url 'all_orders_list' %}" method = "GET">
+        <button type="submit">Manage Orders</button>
     </form>
 
     <hr>

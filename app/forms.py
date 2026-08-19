@@ -1,5 +1,5 @@
 from django import forms
-from .models import Restaurant, MenuItem, Staff, Shift, Reservation
+from .models import Restaurant, MenuItem, Staff, Shift, Reservation, Order, OrderItem
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -75,11 +75,9 @@ class ReservationForm(forms.ModelForm):
 
         widgets = {
             "reservation_date_time": forms.DateTimeInput(
-
                 attrs={"type": "datetime-local"}
             )
         }
-
 
 # Used by Owners
 class StaffForm(forms.ModelForm):
@@ -136,4 +134,35 @@ class MenuItemForm(forms.ModelForm):
         # Dynamically add the restaurant
         fields = ["name", "description", "price", "category","calories","availability","ingredience"]
     
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        # Restaurant added dynamically
+        fields = ["staff","reservation","date_time_of_order","status","note","table_number"]
+
+        widgets = {
+            "date_time_of_order": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}
+            )
+        }
+
+    def __init__(self, *args, restaurant = None, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+
+            self.fields["staff"].queryset = Staff.objects.filter(
+                restaurant = restaurant, position = "waiter"
+            )
+
+            self.fields["reservation"].queryset = Reservation.objects.filter( restaurant = restaurant)
+
+class OrderItemForm(forms.ModelForm):
+    class Meta:
+        model = OrderItem
+        # Order added dynamically
+        fields = ["menu_item","quantity","price_sold_at"]
+    
+    def __init__(self, *args, restaurant = None, **kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.fields["menu_item"].queryset = MenuItem.objects.filter( restaurant = restaurant )
     
