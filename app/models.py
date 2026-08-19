@@ -164,8 +164,7 @@ class Reservation(models.Model):
         validate_reservation_date_time_not_being_in_the_past_or_late(
             self.reservation_date_time
         )
-        
-        
+    
     
     def __str__(self):
         return f"{self.name_of_reservation} @ {self.restaurant.restaurant_name}"

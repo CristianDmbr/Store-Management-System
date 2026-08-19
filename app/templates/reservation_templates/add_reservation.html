@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <title>Add Reservation</title>
+</head>
+<body>
+    <h1>Add reservation at {{ restaurant.restaurant_name }}</h1>
+
+    <form method = "POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <form method = "POST">
+            <button type="submit">Add</button>
+        </form>
+    </form>
+
+    <hr>
+    <form action="{% url 'reservation_list' %}" method = "GET">
+        <button type="submit"> DashBoard</button>
+    </form>
+
+</body>

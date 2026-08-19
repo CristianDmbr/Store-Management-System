@@ -70,7 +70,16 @@ class RestaurantForm(forms.ModelForm):
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
-        fields = ["name_of_reservation","restaurant","kids","teens","adults","reservation_date_time","phone_number"]
+        # Dynamically add restaurant
+        fields = ["name_of_reservation","kids","teens","adults","reservation_date_time","phone_number"]
+
+        widgets = {
+            "reservation_date_time": forms.DateTimeInput(
+
+                attrs={"type": "datetime-local"}
+            )
+        }
+
 
 # Used by Owners
 class StaffForm(forms.ModelForm):

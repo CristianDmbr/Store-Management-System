@@ -1441,18 +1441,103 @@ def display_all_reservations(request):
     if not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have permission to view reservations")
     
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+    
     all_restaurants = Restaurant.objects.filter(supervisor = request.user)
 
     all_reservations = {}
 
     for restaurant in all_restaurants:
-        all_reservations[restaurant] = restaurant.reservations.all()
-    
-    if request.method == "POST":
-        pass
-    
+        all_reservations[restaurant] = restaurant.reservations.all().order_by("reservation_date_time")
+        
     context = {
+        "is_supervisor": is_supervisor,
         "all_reservations" : all_reservations
     }
 
     return render(request, "reservation_templates/reservation_list.html",context)
+
+@login_required
+def add_reservation(request,restaurant_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have access to adding reservations")
+    
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk )
+
+    if request.method == "POST":
+        form = ReservationForm(request.POST)
+        form.instance.restaurant = restaurant
+        if form.is_valid():
+            reservation = form.save(commit = False)
+            reservation.restaurant = restaurant
+            reservation.save()
+            messages.success(request,f'New reservation added to {restaurant.restaurant_name}')
+            return redirect("reservation_list")
+    else:
+        form = ReservationForm()
+
+    context = {
+        "restaurant" : restaurant,
+        "form" : form
+    }
+
+    return render(request,"reservation_templates/add_reservation.html",context)
+
+@login_required
+def delete_reservation(request, reservation_pk, restaurant_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to delete reservation")
+
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+    
+    reservation = get_object_or_404(Reservation, pk = reservation_pk)
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    if request.method == "POST":
+        reservation.delete()
+        messages.success(request, f'Deleted {reservation.name_of_reservation} reservation from {restaurant.restaurant_name}')
+        return redirect("reservation_list")
+
+    context = {
+        "is_supervisor": is_supervisor,
+        "reservation" : reservation,
+        "restaurant" : restaurant,
+    }
+
+    return render(request, "reservation_templates/delete_reservation.html",context)
+
+@login_required
+def update_reservation(request, reservation_pk, restaurant_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("No permission to update reservation")
+    
+    is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+    reservation = get_object_or_404(Reservation, pk = reservation_pk)
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    if request.method == "POST":
+        form = ReservationForm(request.POST, instance = reservation)
+        form.instance.restaurant = restaurant
+        if form.is_valid():
+            reservation = form.save(commit = False)
+            reservation.restaurant = restaurant
+            reservation.save()
+            messages.success(request,f'Sucessfully update the reservation at {restaurant.restaurant_name}')
+            return redirect("reservation_list")
+    else:
+        form = ReservationForm(instance = reservation)
+    
+    form.instance.restaurant = restaurant
+
+    context = {
+        "is_supervisor" : is_supervisor,
+        "reservation" : reservation,
+        "restaurant" : restaurant,
+        "form" : form
+        }
+
+    return render(request, "reservation_templates/update_reservation.html", context)

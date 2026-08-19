@@ -86,5 +86,8 @@ urlpatterns = [
 
     # Reservation Model
     path("list_all_reservations",views.display_all_reservations, name = "reservation_list"),
+    path("add_reservation/<int:restaurant_pk>",views.add_reservation, name = "add_reservation"),
+    path("delete_reservation/<int:reservation_pk>/<int:restaurant_pk>",views.delete_reservation, name = "delete_reservation"),
+    path("update_reservation/<int:reservation_pk>/<int:restaurant_pk>", views.update_reservation, name = "update_reservation"),
 ]
  

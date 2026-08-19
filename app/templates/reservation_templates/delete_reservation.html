@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+    <title>
+        Delete Restaurant
+    </title>
+</head>
+<body>
+    <h1>Delete Reservation from {{ restaurant.restaurant_name }} ?</h1>
+    <hr>
+    <form method = "POST">
+        {% csrf_token %}
+        <button type = "submit">Delete</button>
+    </form>
+
+    {% if is_supervisor %}
+        <form action ="{% url 'reservation_list' %}" method = "GET">
+            <button type="submit">No</button>
+        </form>
+    {% endif %}
+</body>

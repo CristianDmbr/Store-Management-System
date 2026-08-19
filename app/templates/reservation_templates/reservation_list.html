@@ -5,5 +5,60 @@
 <body>
     <h1>All Reservations : </h1>
 
-    {{}}
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+
+
+    {% for restaurant, reservations in all_reservations.items %}
+
+    {% if restaurant %}
+
+        <hr>
+        <p>{{ restaurant }} : </p>
+
+        {% if reservations %}
+            {% for reservation in reservations %}
+                <p>
+                    - {{ reservation.name_of_reservation }}
+                    - {{ reservation.reservation_date_time }}
+                    - {{ reservation.total_people }}
+
+                    {% if reservation.is_active %}
+                        (Active)
+                        <form action="{% url 'delete_reservation' reservation.pk restaurant.pk %}" method="get">
+                            <button type = "submit">Delete</button>
+                        </form>
+                        <form action="{% url 'update_reservation' reservation.pk restaurant.pk %}" method = "get">
+                            <button type="submit">Update</button>
+                        </form>
+                    {% else %}
+                        {Not Active}
+                    {% endif %}
+                </p>
+            {% endfor %}
+            <form action="{% url 'add_reservation' restaurant.pk %}" method = "GET">
+                <button type="submit">Add Reservation</button>
+            </form>
+        {% else %}
+            <p>No Reservations</p>
+            <form action="{% url 'add_reservation' restaurant.pk %}" method = "GET">
+                <button type="submit">Add Reservation</button>
+            </form>
+        {% endif %}
+
+    {% else %}
+        <p><Strong>You do not supervise any restaurants</Strong></p>
+    {% endif %}
+    {% endfor %}
+
+    <hr>
+    {% if is_supervisor %}
+        <form action="{% url 'supervisor_dashboard_home' %}" method = "GET">
+            <button type="submit">Dashboard</button>
+        </form>
+    {% endif %}
+
 </body>
