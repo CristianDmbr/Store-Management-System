@@ -11,7 +11,6 @@
 
 Supervisors : 
 
-- [ ] View and modify orders. 
 - [ ] Holiday request system where staff request Holliday and supervisors can accept or decline 
 Staff :
 - [ ] View their shifts 

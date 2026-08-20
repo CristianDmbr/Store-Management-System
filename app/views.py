@@ -1639,8 +1639,10 @@ def add_order_items(request,order_pk,restaurant_pk):
         if form.is_valid():
             order_item = form.save(commit = False)
             order_item.order = order
+            order_item.save()
             messages.success(request, "Sucessfully added new item to order !")
-            return redirect("all_orders_list")
+            print(f'New order item : {order_item}')
+            return redirect("all_order_items",order.pk,restaurant.pk)
     else:
         form = OrderItemForm(restaurant = restaurant)
     
@@ -1656,27 +1658,60 @@ def add_order_items(request,order_pk,restaurant_pk):
     return render(request, "order_templates/order_items_templates/add_items.html",context)
 
 @login_required
-def list_all_order_items(request,order_pk):
+def list_all_order_items(request,order_pk, restaurant_pk):
 
     if not request.user.groups.filter(name = "Supervisor").exists():
         return HttpResponseForbidden("You do not have permission to add item to order")
     
     is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
     order = get_object_or_404(Order, pk = order_pk)
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
 
     all_items_by_category = {}
     for item in order.items.all():
-        category = item.menu_item.category
+        category = item.menu_item.get_category_display()
 
         if category not in all_items_by_category.keys():
             all_items_by_category[category] = []
         
         all_items_by_category[category].append(item)
+    
+    receipe_items_by_category = {}
+
+    for category, items in all_items_by_category.items():
+        receipe_items_by_category[category] = []
+
+        for item in items:
+            for _ in range(item.quantity):
+                receipe_items_by_category[category].append(item)
 
     context = {
         "is_supervisor" : is_supervisor,
         "order" : order,
-        "all_items_by_category" : all_items_by_category
+        "restaurant" : restaurant,
+        "all_items_by_category" : all_items_by_category,
+        "receipe_items_by_category" : receipe_items_by_category
     }
 
     return render(request, "order_templates/order_items_templates/all_items.html",context)
+
+@login_required
+def remove_order_item(request, order_item_pk, restaurant_pk):
+
+    if not request.user.groups.filter(name = "Supervisor").exists():
+        return HttpResponseForbidden("You do not have permission to remove a item.")
+    
+    order_item= get_object_or_404(OrderItem, pk = order_item_pk)
+    order = order_item.order
+    restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+    if request.method == "POST":
+        
+        if order_item.quantity > 1 :
+            order_item.quantity -= 1
+            order_item.save()
+        else:
+            order_item.delete()
+    
+    return redirect("all_order_items", order_pk = order.pk , restaurant_pk = restaurant.pk )
+ 

@@ -431,4 +431,3 @@ class OrderItem(models.Model):
     @property
     def total_cost(self):
         return self.quantity * self.price_sold_at
-        

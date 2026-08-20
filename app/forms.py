@@ -161,7 +161,7 @@ class OrderItemForm(forms.ModelForm):
         # Order added dynamically
         fields = ["menu_item","quantity","price_sold_at"]
     
-    def __init__(self, *args, restaurant = None, **kwargs):
+    def __init__(self, *args, restaurant, **kwargs):
         super().__init__(*args,**kwargs)
 
         self.fields["menu_item"].queryset = MenuItem.objects.filter( restaurant = restaurant )

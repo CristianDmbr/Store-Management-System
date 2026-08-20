@@ -6,17 +6,31 @@
 </head>
 <body>
     <h1>Full Order Details :</h1>
+    <hr>
+    <h2>Total : {{ order.total_price }}</h2>
 
-    {% for category, items in all_items_by_category.items() %}
-
-        {{ category : }}
+    {% for category, items in receipe_items_by_category.items %}
+        <hr>
+        <h1> {{ category }}</h1>
 
         {% for item in items %}
-
-            <p>item.menu_item</p>
-
+            <p>{{ item.menu_item.name }} - £ {{ item.price_sold_at }}</p>
+            <form action="{% url 'delete_a_order_item' item.pk restaurant.pk %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">delete</button>
+            </form>
         {% endfor %}
 
-    {% end for %}
+    {% endfor %}
+
+    <hr>
+    {% if is_supervisor %}
+    <form action="{% url 'all_orders_list' %}" method = "GET">
+        <button type="submit">All Ordered</button>
+    </form>
+    {% endif %}
+    <form action="{% url 'add_item_to_order' order.pk restaurant.pk %}" method = "GET">
+        <button type="submit">Add item</button>
+    </form>
 
 </body>
