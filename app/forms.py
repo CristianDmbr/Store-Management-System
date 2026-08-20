@@ -1,5 +1,5 @@
 from django import forms
-from .models import Restaurant, MenuItem, Staff, Shift, Reservation, Order, OrderItem
+from .models import Restaurant, MenuItem, Staff, Shift, Reservation, Order, OrderItem, User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -79,7 +79,7 @@ class ReservationForm(forms.ModelForm):
             )
         }
 
-# Used by Owners
+# Used by Owners 
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
@@ -88,7 +88,13 @@ class StaffForm(forms.ModelForm):
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})
         }    
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+        self.fields["manager"].queryset = User.objects.filter(groups__name = "Supervisor")
+
+# Used by Supervisors because the manager field is dynamically added with the elif is_supervisor.
 class StaffFormSupervisor(forms.ModelForm):
     class Meta:
         model = Staff
@@ -97,6 +103,18 @@ class StaffFormSupervisor(forms.ModelForm):
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})
         } 
+        
+    
+# Used by owners and supervisors to add staff users and then link it to a 1 to 1 Staff row.
+class StaffUserCreationForm(forms.ModelForm):
+
+    username = forms.CharField(
+        help_text = ""
+    )
+
+    class Meta:
+        model = User
+        fields = ["username","password"]
 
 class ShiftForm(forms.ModelForm):
     class Meta:

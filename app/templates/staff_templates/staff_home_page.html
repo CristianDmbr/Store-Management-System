@@ -5,6 +5,13 @@
 <body>
     <h1>Hello {{ user.username }}! This is your Staff Dashboard</h1>
 
+    <hr>
+
+    <form action="{% url 'individual_shifts' %}" method = "GET">
+        <button type="submit" > View Shifts </button>
+    </form>
+
+    <hr>
     <form action="{% url 'logout' %}" method = 'post'>
         <button type = "submit">Logout</button>
     </form>

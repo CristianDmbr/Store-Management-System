@@ -1,7 +1,7 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation, Order,OrderItem
-from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor, OrderForm, OrderItemForm
+from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor, OrderForm, OrderItemForm, StaffUserCreationForm
 from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
@@ -1089,21 +1089,34 @@ def add_staff(request):
 
         if request.method == "POST":
 
-            form = StaffForm(request.POST)
+            staff_model_form = StaffForm(request.POST)
+            staff_user_account_form = StaffUserCreationForm(request.POST)
 
-            if form.is_valid():
-                form.save()
-                name = form.cleaned_data["name"]
-                surname = form.cleaned_data["surname"]
-                restaurant = form.cleaned_data["restaurant"]
+            if staff_model_form.is_valid() and staff_user_account_form.is_valid():
+                user_account = staff_user_account_form.save()
+
+                staff_group = Group.objects.get(name = "Staff")
+                user_account.groups.add(staff_group)
+
+                staff_row = staff_model_form.save(commit = False)
+                staff_row.user = user_account
+                staff_row.save()
+                
+                name = staff_model_form.cleaned_data["name"]
+                surname = staff_model_form.cleaned_data["surname"]
+                restaurant = staff_model_form.cleaned_data["restaurant"]
+
                 messages.success(request, f'{name} {surname} was hired at {restaurant}.')
                 return redirect("display_all_staff")
         else:
+            
+            staff_model_form = StaffForm()
+            staff_user_account_form = StaffUserCreationForm()
 
-            form = StaffForm()
 
         context = {
-            "form" : form
+            "staff_model_form" : staff_model_form,
+            "staff_user_account_form" : staff_user_account_form
         }
 
         return render(request, "staff_templates/staff_add.html",context)
@@ -1112,23 +1125,38 @@ def add_staff(request):
 
         if request.method == "POST":
 
-            form = StaffFormSupervisor(request.POST)
+            staff_model_form = StaffFormSupervisor(request.POST)
+            staff_model_form.instance.manager = request.user
 
-            form.instance.manager = request.user
+            staff_user_account_form = StaffUserCreationForm(request.POST)
 
-            if form.is_valid():
-                form.save()
-                name = form.cleaned_data["name"]
-                surname = form.cleaned_data["surname"]
-                restaurant = form.cleaned_data["restaurant"]
+            if staff_model_form.is_valid() and staff_user_account_form.is_valid():
+                user_account = staff_user_account_form.save()
+                staff_group = Group.objects.get(name = "Staff")
+
+                user_account.groups.add(staff_group)
+
+                staff_row = staff_model_form.save(commit=False)
+                staff_row.manager = request.user
+                staff_row.user = user_account
+                staff_row.save()
+
+                name = staff_model_form.cleaned_data["name"]
+                surname = staff_model_form.cleaned_data["surname"]
+                restaurant = staff_model_form.cleaned_data["restaurant"]
+                
                 messages.success(request, f'{name} {surname} was hired at {restaurant}.')
                 return redirect("display_all_staff")
         else:
 
-            form = StaffFormSupervisor()
+            staff_model_form = StaffFormSupervisor()
+            staff_user_account_form = StaffUserCreationForm()
+        
+        staff_model_form.instance.manager = request.user
         
         context = {
-            "form" : form
+            "staff_model_form" : staff_model_form,
+            "staff_user_account_form" : staff_user_account_form
         }
 
         return render(request, "staff_templates/staff_add.html",context)
@@ -1355,6 +1383,23 @@ def shift_list_full(request):
     }
 
     return render(request, "shift_templates/shift_list_supervisor.html",context)
+
+@login_required
+def individual_staff_shift_list(request):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have permission to see individual Shifts")
+    
+    all_shifts = request.user.shifts.all()
+    staff = request.user
+
+    context = {
+        "all_shifts" : all_shifts,
+        "staff" : staff
+    }
+
+    return render(request, "shift_templates/individual_shift_lists.html", context)
+
 
 @login_required
 def add_shift(request, staff_pk):

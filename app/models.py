@@ -171,6 +171,14 @@ class Reservation(models.Model):
     
 class Staff(models.Model):
 
+    # Merge User staff with Staff business model
+
+    user = models.OneToOneField(
+        User,
+        on_delete = models.CASCADE,
+        related_name = "staff_profile"
+    )
+
     manager = models.ForeignKey(
         User, 
         on_delete = models.CASCADE,
@@ -193,7 +201,7 @@ class Staff(models.Model):
     ROLES = [
         ("chief", "Chief"),
         ("waiter", "Waiter"),
-        ("manager","Manager")
+        ("cleaner","Cleaner")
     ]
 
     name = models.CharField(max_length = 200, null = False, blank = False)

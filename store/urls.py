@@ -66,7 +66,7 @@ urlpatterns = [
     # Staff Model
     path("general_staff_list",views.display_all_staff, name = "display_all_staff"),
     path("delete_staff/<int:staff_pk>",views.delete_staff, name = "delete_staff"),
-    path("add_staff>",views.add_staff, name = "add_staff"),
+    path("add_staff",views.add_staff, name = "add_staff"),
     path("staff_info/<int:staff_pk>",views.staff_info, name = "staff_info"),
     path("update_staff/<int:staff_pk>",views.update_staff_info, name = "update_staff"),
 
@@ -83,6 +83,7 @@ urlpatterns = [
     path("add_shift/<int:staff_pk>", views.add_shift, name = "add_shift"),
     path("delete_shift/<int:shift_pk>/<int:staff_pk>", views.delete_shift, name = "delete_shift"),
     path("update_shift/<int:shift_pk>/<int:staff_pk>", views.update_shift, name = "update_shift"),
+    path("individual_shift_list", views.individual_staff_shift_list, name = "individual_shifts"),
 
     # Reservation Model
     path("list_all_reservations",views.display_all_reservations, name = "reservation_list"),

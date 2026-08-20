@@ -5,9 +5,15 @@
 <body>
     <h1>Add a new Staff Member</h1>
     <form method = "post">
+        <h2>User Account :</h2>
         {% csrf_token %}
 
-        {{ form.as_p }}
+        {{ staff_user_account_form.as_p }}
+
+        <h2>User Information :</h2>
+
+        {{ staff_model_form.as_p }}
+
         <button type="submit">Add</button>
     </form>
     <hr>
