@@ -45,8 +45,7 @@ class UserRoleCreationForm(UserCreationForm):
 
     CHOICES = [
         ("Owner","Owner"),
-        ("Supervisor","Supervisor"),
-        ("Staff","Staff")
+        ("Supervisor","Supervisor")
     ]
     role = forms.ChoiceField(choices = CHOICES)
 
@@ -103,18 +102,24 @@ class StaffFormSupervisor(forms.ModelForm):
         widgets = {
             "date_of_birth": forms.DateInput(attrs={"type": "date"})
         } 
-        
+
     
 # Used by owners and supervisors to add staff users and then link it to a 1 to 1 Staff row.
-class StaffUserCreationForm(forms.ModelForm):
+class StaffUserCreationForm(UserCreationForm):
 
     username = forms.CharField(
+        help_text = ""
+    )
+    password1 = forms.CharField(
+        help_text = ""
+    )
+    password2 = forms.CharField(
         help_text = ""
     )
 
     class Meta:
         model = User
-        fields = ["username","password"]
+        fields = ["username","password1","password2"]
 
 class ShiftForm(forms.ModelForm):
     class Meta:
