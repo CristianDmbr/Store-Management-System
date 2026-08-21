@@ -1353,6 +1353,25 @@ def update_menu_item(request,menu_item_pk,restaurant_pk):
 ############################################# Shift #############################################
 
 @login_required
+def shift_list_individual(request):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have permission to view individual shifts")
+    
+    is_staff = request.user.groups.filter(name = "Staff").exists()
+    staff = get_object_or_404(Staff, user = request.user)
+    all_shifts = staff.shifts.all().order_by("start_time")
+
+    context = {
+        "is_staff" : is_staff,
+        "staff" : staff,
+        "all_shifts" : all_shifts
+    }
+
+    return render(request,"shift_templates/individual_shift_list.html",context)
+
+
+@login_required
 def shift_list_brief(request):
 
     if not request.user.groups.filter(name = "Owner").exists():
@@ -1383,22 +1402,6 @@ def shift_list_full(request):
     }
 
     return render(request, "shift_templates/shift_list_supervisor.html",context)
-
-@login_required
-def individual_staff_shift_list(request):
-
-    if not request.user.groups.filter(name = "Staff").exists():
-        return HttpResponseForbidden("You do not have permission to see individual Shifts")
-    
-    all_shifts = request.user.shifts.all()
-    staff = request.user
-
-    context = {
-        "all_shifts" : all_shifts,
-        "staff" : staff
-    }
-
-    return render(request, "shift_templates/individual_shift_lists.html", context)
 
 
 @login_required

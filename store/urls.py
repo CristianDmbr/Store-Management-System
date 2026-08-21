@@ -83,7 +83,7 @@ urlpatterns = [
     path("add_shift/<int:staff_pk>", views.add_shift, name = "add_shift"),
     path("delete_shift/<int:shift_pk>/<int:staff_pk>", views.delete_shift, name = "delete_shift"),
     path("update_shift/<int:shift_pk>/<int:staff_pk>", views.update_shift, name = "update_shift"),
-    path("individual_shift_list", views.individual_staff_shift_list, name = "individual_shifts"),
+    path("individual_shift_list", views.shift_list_individual, name = "individual_shifts"),
 
     # Reservation Model
     path("list_all_reservations",views.display_all_reservations, name = "reservation_list"),

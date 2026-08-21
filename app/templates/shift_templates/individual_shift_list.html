@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<head>
+    <title>Individual Shift List</title>
+</head>
+<body>
+    <h1> {{ staff.name }}'s shift's </h1>
+    <hr>
+    {% for shift in all_shifts %}
+
+        <p>{{ shift }}</p>
+
+    {% endfor %}
+    
+    <hr>
+
+    {% if is_staff%}
+        <form action="{% url 'staff_dashboard_home' %}" method = "GET">
+            <button type="submit">DashBoard</button>
+        </form>
+    {% endif %}
+
+</body>
