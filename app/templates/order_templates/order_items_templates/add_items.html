@@ -14,7 +14,11 @@
     <hr>
     {% if is_supervisor %}
         <form action="{% url 'all_orders_list' %}" method = "GET">
-            <button method = "submit">Back</button>
+            <button type = "submit">Back</button>
+        </form>
+    {% elif is_staff %}
+        <form action="{% url 'staff_order_list' %}" method = "GET">
+            <button type="submit">Back</button>
         </form>
     {% endif %}
 

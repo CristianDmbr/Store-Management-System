@@ -409,9 +409,14 @@ class Order(models.Model):
         return total
 
     def __str__(self):
+
+        # Converts <2026-08-25 16:42:50.932601+00:00 for Luis.> to just < 25/08/2026 16:42 for Luis.>
+        local_date_time = timezone.localtime(self.date_time_of_order)
+        formatted_date_time = local_date_time.strftime("%d/%m/%Y %H:%M")
+
         if self.reservation:
-            return f"Reservation at {self.restaurant.restaurant_name} : {self.date_time_of_order} for {self.reservation.name_of_reservation}."
-        return f"Reservation at {self.restaurant.restaurant_name} : {self.date_time_of_order} for Guess User"
+            return f"Reservation at {self.restaurant.restaurant_name} : {formatted_date_time} for {self.reservation.name_of_reservation}."
+        return f"Reservation at {self.restaurant.restaurant_name} : {formatted_date_time} for Guest User"
 
 class OrderItem(models.Model):
 

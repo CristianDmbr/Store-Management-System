@@ -98,6 +98,8 @@ urlpatterns = [
     path("list_all_orders",views.order_list, name = "all_orders_list"),
     path("add_order/<int:restaurant_pk>", views.add_order, name = "add_order"),
     path("delete_order/<int:order_pk>",views.delete_order, name = "delete_order"),
+    path("staff_order_list",views.staff_order_list, name = "staff_order_list"),
+    path("staff_add_order/<int:restaurant_pk>",views.staff_add_order, name = "staff_add_order"),
 
     # Order Item Model
     path("add_order_item/<int:order_pk>/<int:restaurant_pk>/",views.add_order_items, name = "add_item_to_order"),

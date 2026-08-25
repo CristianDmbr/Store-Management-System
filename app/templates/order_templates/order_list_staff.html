@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+    <title>Order list from a Staff</title>
+</head>
+<body>
+    <h1>Orders List at {{ restaurant.restaurant_name }} :</h1>
+    <hr>
+
+    {% for status, orders_list in orders_by_status.items %}
+
+        {% if status == "not_been_served" %}
+            <h2>Waiting to be served : </h2>
+
+        {% elif status == "waiting" %}
+            <h2>Waiting to be cooked : </h2>
+        
+        {% elif status == "complete" %}
+            <h2>Complete : </h2>
+        {% endif %}
+
+        {% if orders_list %}
+
+            {% for order in orders_list %}
+                <p>{{ order }}</p>
+                <form action="{% url 'add_item_to_order' order.pk restaurant.pk %}" method = "GET">
+                    <button type = "submit">Add item</button>
+                </form>
+                <form action="{% url 'all_order_items' order.pk restaurant.pk %}" method = "GET">
+                    <button type = "submit">Info</button>
+                </form>
+            {% endfor %}
+
+        {% else %}
+            <p><strong>No Orders</strong></p>
+        {% endif %}
+    {% endfor %}
+    <hr>
+
+    <form action="{% url 'staff_add_order' restaurant.pk %}" method = "GET">
+        <button type = "submit">Create new Order</button>
+    </form>
+
+    <hr>
+    {% if is_staff %}
+    <form action="{% url 'staff_dashboard_home' %}" method = "GET">
+        <button type="submit">Dashboard</button>
+    </form>
+    {% endif %}
+
+</body>

@@ -178,6 +178,19 @@ class OrderForm(forms.ModelForm):
 
             self.fields["reservation"].queryset = Reservation.objects.filter( restaurant = restaurant)
 
+# Used by Staff to add orders
+# Staff and Restaurant are dynamically added dynamically
+class StaffOrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ["reservation","status","note","table_number"]
+    
+    def __init__(self,*args,restaurant,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.fields["reservation"].queryset = Reservation.objects.filter(restaurant = restaurant)
+
+
 class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
