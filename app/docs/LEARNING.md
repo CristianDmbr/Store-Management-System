@@ -1176,9 +1176,8 @@ More complex calculations are done in views.
 Commit=False means it creates the Restaurant instance but does not save it yet
 
 Cristian, Cristi22 SupUser 
-Bob, Cristian22
+
 
 Molea, Cristi22 Owner
 Kevin, Cristi22 Supervisor
 Steff, Cristi22 Staff
- 

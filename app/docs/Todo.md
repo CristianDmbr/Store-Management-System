@@ -14,9 +14,6 @@ Supervisors :
 - [ ] Holiday request system where staff request Holliday and supervisors can accept or decline 
 
 Staff :
-# Fix the database problem. Clear the DB from bad user password, learn how to use SQL on the DB app. Delete all superusers and make a new fresh one. Give Steff Shifts to see if it shows up on her list :)
-- [ ] View their shifts 
-- [ ] View the menu of the restaurant
 - [ ] Request a holiday
 - [ ] View and modify orders 
 

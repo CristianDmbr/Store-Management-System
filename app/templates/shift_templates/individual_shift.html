@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<head>
+    <title>Shift View</title>
+</head>
+<body>
+    <h1>Shift Info ( {{ shift.status }} ) </h1>
+
+    <hr>
+
+    <p>
+        Duration : {{ shift.duration_hours }} hrs
+    </p>
+
+    <p>
+        Start : {{ shift.start_time }} 
+    </p>
+
+    <p>
+        End : {{ shift.end_time }}
+    </p>
+
+    <hr>
+
+    <p>
+        Earnings : £{{ shift.earnings }}
+    </p>
+
+    <hr>
+    {% if is_staff %}
+        <form action="{% url 'individual_shifts' %}" method = "GET">
+            <button type="submit">Back</button>
+        </form>
+    {% endif %}
+
+
+</body>

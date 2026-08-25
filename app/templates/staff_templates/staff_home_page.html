@@ -11,8 +11,13 @@
         <button type="submit" > View Shifts </button>
     </form>
 
+    <form action="{% url 'menu_for_staff' %}" method = "GET">
+        <button type="submit">Menu</button>
+    </form>
+
     <hr>
     <form action="{% url 'logout' %}" method = 'post'>
+        {% csrf_token %}
         <button type = "submit">Logout</button>
     </form>
 </body>

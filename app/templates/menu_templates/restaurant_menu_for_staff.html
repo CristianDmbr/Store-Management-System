@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+    <title>Restaurant Menu for Staff to see</title>
+</head>
+<body>
+    <h1>Menu for {{ restaurant.restaurant_name }}</h1>
+
+    {% for category, menu_items in menu_items_by_category.items %}
+
+        <hr>
+        <h2>{{ category }}s ({{ menu_items|length  }})</h2>
+
+        {% if menu_items %}
+            
+            {% for item in menu_items %}
+                <p> {{ item.name }} - {{ item.price }} 
+                    {% if item.availability%}
+                        (Available)
+                    {% else %}
+                        (Unavailable)
+                    {% endif %}
+                    <small>{{ item.calories }}kcal</small></p>
+                    <form action="{% url 'menu_item_description' item.pk %}" method = "GET">
+                        <button type = "submit"><small>Description</small></button>
+                    </form>
+            {% endfor %}
+
+        {% else %}
+            <small>(No Items)</small>
+        {% endif %}
+
+    {% endfor %}
+
+    <hr>
+    {% if is_staff %}
+        <form action="{% url 'staff_dashboard_home' %}">
+            <button type="submit">Dashboard</button>
+        </form>
+    {% endif %}
+
+</body>

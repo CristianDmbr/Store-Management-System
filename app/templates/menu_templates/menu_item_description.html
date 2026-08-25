@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<head>
+    <title>Menu Item description For Staff</title>
+</head>
+<body>
+    <h1>{{ menu_item.name }}</h1>
+    <hr>
+
+    {% if menu_item.description %}
+        <p style="white-space: pre-line;">{{ menu_item.description }}</p>
+    {% else  %}
+        <p><strong>No Description</strong></p>
+    {% endif %}
+
+    <hr>    
+    {% if is_staff %}  
+        <form action="{% url 'menu_for_staff' %}" method = "GET">
+            <button type="submit">Back</button>
+        </form>
+    {% endif %}
+
+</body>

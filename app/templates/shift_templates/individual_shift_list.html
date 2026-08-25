@@ -3,16 +3,28 @@
     <title>Individual Shift List</title>
 </head>
 <body>
-    <h1> {{ staff.name }}'s shift's </h1>
-    <hr>
-    {% for shift in all_shifts %}
+    <h1> Your Shifts </h1>
+    
+    {% for status, all_shifts in shifts_by_status.items %}
 
-        <p>{{ shift }}</p>
+        <hr>
+        <h2>{{ status }}</h2>
+        {% if all_shifts %}
+            {% for shift in all_shifts %}
+                {{ shift.start_time }} - {{ shift.end_time }}
+                <form action="{% url 'view_individual_shift' shift.pk %}" method = "GET" >
+                    <button type="submit"><small>info</small></button>
+                </form>
+                <br>
+            {% endfor %}
+        {% else %}
+            <p> Currently no Shifts </p>
+        {% endif %}
 
     {% endfor %}
-    
-    <hr>
 
+
+    <hr>
     {% if is_staff%}
         <form action="{% url 'staff_dashboard_home' %}" method = "GET">
             <button type="submit">DashBoard</button>

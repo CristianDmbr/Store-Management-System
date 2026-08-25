@@ -1161,9 +1161,6 @@ def add_staff(request):
 
         return render(request, "staff_templates/staff_add.html",context)
         
-
-
-
 @login_required
 def staff_info(request, staff_pk):
     
@@ -1231,6 +1228,60 @@ def update_staff_info(request, staff_pk):
 
 ############################################# Menu Item #############################################
 
+# Menu item description for Staff to see
+@login_required
+def menu_item_description(request,menu_item_pk):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have the permission to view menu item description")
+    
+    is_staff = request.user.groups.filter(name = "Staff").exists()
+
+    menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+
+    context = {
+        "is_staff" : is_staff,
+        "menu_item" : menu_item
+    }
+
+    return render(request,"menu_templates/menu_item_description.html",context)
+
+
+# Used by Staff to view Restaurant Menu Items
+@login_required
+def all_restaurant_menu_items_for_staff(request):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have access to view the Menu")
+    
+    is_staff = request.user.groups.filter(name = "Staff").exists()
+
+    staff_user = get_object_or_404(Staff, user = request.user)
+    restaurant = staff_user.restaurant
+    all_menu_items = restaurant.menu_items.all()
+
+    menu_item_by_category = {
+        "Starter" : [],
+        "Main" : [],
+        "Dessert" : [],
+        "Drink" : [],
+        "Snack" : [],
+    }
+
+    for item in all_menu_items:
+        for key in menu_item_by_category.keys():
+            small_key = key.lower()
+            if item.category == small_key:
+                menu_item_by_category[key].append(item)
+    
+    context = {
+        "is_staff" : is_staff,
+        "restaurant" : restaurant,
+        "menu_items_by_category" : menu_item_by_category
+    }
+
+    return render(request, "menu_templates/restaurant_menu_for_staff.html",context)
+
 @login_required
 def display_all_restaurant_and_menuitems(request):
 
@@ -1281,6 +1332,7 @@ def add_new_menu_item(request,restaurant_pk):
     }
 
     return render(request,"menu_templates/add_menu_item.html",context)
+
 
 @login_required
 def delete_menu_item(request,menu_item_pk,restaurant_pk):
@@ -1362,27 +1414,34 @@ def shift_list_individual(request):
     staff = get_object_or_404(Staff, user = request.user)
     all_shifts = staff.shifts.all().order_by("start_time")
 
+    shifts_by_status = {
+        "Completed" : [],
+        "Active" : [],
+        "Planned" : []
+    }
+
+    for shift in all_shifts:
+        for key in shifts_by_status.keys():
+            small_key = key.lower()
+            if small_key == shift.status:
+                shifts_by_status[key].append(shift)
+
     context = {
         "is_staff" : is_staff,
         "staff" : staff,
-        "all_shifts" : all_shifts
+        "shifts_by_status" : shifts_by_status
     }
 
     return render(request,"shift_templates/individual_shift_list.html",context)
 
-
 @login_required
 def shift_list_brief(request):
-
     if not request.user.groups.filter(name = "Owner").exists():
         return HttpResponseForbidden("You have no permissions to view all shifts")
-    
     all_shifts = Shift.objects.filter(employee__restaurant__owner = request.user).order_by("employee__restaurant","start_time")
-
     context = {
         "all_shifts" : all_shifts
     }
-
     return render(request, "shift_templates/shift_list.html",context) 
 
 @login_required
@@ -1480,6 +1539,24 @@ def update_shift(request, shift_pk, staff_pk):
     }
 
     return render(request, "shift_templates/update_shift.html", context)
+
+# Used by staff to see the information of their shift
+@login_required
+def view_individual_shift(request, shift_pk,):
+
+    if not request.user.groups.filter(name = "Staff").exists():
+        return HttpResponseForbidden("You do not have permission to view this shift")
+    
+    is_staff = request.user.groups.filter(name = "Staff").exists()
+
+    shift = get_object_or_404(Shift, pk = shift_pk)
+
+    context = {
+        "is_staff" : is_staff,
+        "shift" : shift
+    }
+
+    return render(request,"shift_templates/individual_shift.html",context)
 
 ############################################# Reservations #############################################
 

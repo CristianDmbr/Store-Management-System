@@ -76,6 +76,8 @@ urlpatterns = [
     path("delete_menu_item/<int:menu_item_pk>/<int:restaurant_pk>",views.delete_menu_item, name = "delete_menu_item"),
     path("menu_item_info/<int:menu_item_pk>/<int:restaurant_pk>",views.menu_item_info, name = "menu_item_info"),
     path("update_menu_item/<int:menu_item_pk>/<int:restaurant_pk>",views.update_menu_item, name = "update_menu_item"),
+    path("view_menu_items_for_staff",views.all_restaurant_menu_items_for_staff, name = "menu_for_staff"),
+    path("individual_menu_item_description/<int:menu_item_pk>",views.menu_item_description, name = "menu_item_description"),
     
     # Shift Model
     path("list_all_shifts_brief", views.shift_list_brief, name = "shift_list_brief"),
@@ -84,6 +86,7 @@ urlpatterns = [
     path("delete_shift/<int:shift_pk>/<int:staff_pk>", views.delete_shift, name = "delete_shift"),
     path("update_shift/<int:shift_pk>/<int:staff_pk>", views.update_shift, name = "update_shift"),
     path("individual_shift_list", views.shift_list_individual, name = "individual_shifts"),
+    path("view_individual_shift/<int:shift_pk>",views.view_individual_shift, name = "view_individual_shift"),
 
     # Reservation Model
     path("list_all_reservations",views.display_all_reservations, name = "reservation_list"),
