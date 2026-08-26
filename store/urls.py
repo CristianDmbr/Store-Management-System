@@ -107,8 +107,13 @@ urlpatterns = [
     path("delete_order_item/<int:order_item_pk>/<int:restaurant_pk>/", views.remove_order_item, name = "delete_a_order_item"),
 
     ###### API
+    # Restaurant
     path("api/my_restaurants/", views.MyRestaurantsAPI.as_view(), name = "my_restaurants_api"), # Collection endpoint
     path("api/detail_restaurant/<int:restaurant_pk>",views.RestaurantDetailAPI.as_view(), name = "detail_restaurant"), # Detail endpoint
     path("api/restaurant_stats/<int:restaurant_pk>",views.RestaurantStatsAPI.as_view(), name = "restaurant_stats"),
+
+    # Staff
+    path("api/all_staff",views.MyStaffAPI.as_view(), name = "all_staff"),
+    path("api/detail_staff/<int:staff_pk>",views.StaffDetailAPI.as_view(), name = "staff_detail"),
 ]
  

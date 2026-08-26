@@ -31,6 +31,7 @@
 # Serializers only call the models.py database level constrants (because enforced by database) and not the validators in clean () so we have to call them here.
 
 from rest_framework import serializers
+from django.contrib.auth.models import User, Group
 from .models import Restaurant, Reservation, Staff, Shift, MenuItem
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
                            validate_unique_restaurant_name_reservation, # Reservation
@@ -38,6 +39,26 @@ from .validators import  (  validate_unique_restaurant_name, validate_appropriat
                            validate_shift_time, # Shift
                            validate_unique_menu_item_name, validate_calories # Menu Item
                            )
+
+class StaffUserCreationSerializer(serializers.ModelSerializer):
+
+  # Does not get returned after being created
+  password = serializers.CharField(write_only = True)
+  
+  class Meta:
+    model = User
+    fields = ["username","password"]
+
+  def create(self,validated_data):
+      user = User.objects.create_user(
+        username = validated_data["username"],
+        password = validated_data["password"]
+      )
+
+      staff_group = Group.objects.get(name = "Staff")
+      user.groups.add(staff_group)
+
+      return user
 
 class RestaurantSerializer(serializers.ModelSerializer): 
   class Meta:
@@ -63,24 +84,22 @@ class ReservationSerialiser(serializers.ModelSerializer):
 
     validate_unique_restaurant_name_reservation(restaurant, name_of_reservation, self.instance)
     return attrs
-    
+
+# Used by owners 
 class StaffSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Staff
-    fields = ["pk","name","surname","manager","restaurant","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
+    fields = ["user","name","surname","manager","restaurant","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
+    # User is FK inside of the Staff and because in the APIs we create them in the same POST request as staff we need to leave it as read only otherwise it will fail validation
+    read_only_fields = ["user"]
   
-  def validate(self, attrs):
-
-    name = attrs.get("name")
-    surname = attrs.get("surname")
-    date_of_birth = attrs.get("date_of_birth")
-    date_time_employed = attrs.get("date_time_employed")
-
-    validate_unique_name_and_surname(name,surname,self.instance)
-    validate_date_of_birth(date_of_birth)
-    validate_time_date_employed(date_time_employed)
-
-    return attrs
+# Used by managers to dynamically hide and fill the manager role
+class StaffSupervisorSerializers(serializers.ModelSerializer):
+  class Meta:
+    model = Staff
+    fields = ["user","name","surname","restaurant","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
+    # User is FK inside of the Staff and because in the APIs we create them in the same POST request as staff we need to leave it as read only otherwise it will fail validation
+    read_only_fields = ["user"]
   
 class ShiftSerialiser(serializers.ModelSerializer):
   class Meta:

@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation, Order,OrderItem
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor, OrderForm, OrderItemForm, StaffUserCreationForm, StaffOrderForm
-from .serialisers import RestaurantSerializer, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
+from .serialisers import RestaurantSerializer, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser, StaffUserCreationSerializer, StaffSupervisorSerializers
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
@@ -2233,3 +2233,223 @@ class RestaurantStatsAPI(APIView):
         )
 
 ########################################################################################## Staff
+
+class MyStaffAPI(APIView):
+
+    def get(self,request):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"detail" : "You do not have the permission to view the staff list"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+        if is_owner:
+
+            all_staff = Staff.objects.filter(restaurant__owner = request.user)
+            
+            serializer = StaffSerialiser(all_staff, many = True)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+
+        elif is_supervisor:
+
+            all_staff = request.user.employees.all()
+
+            serializer = StaffSerialiser(all_staff, many = True)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+
+    # Even if two serializers are used we can POST using the same JSON {} but do the order of fields with the order we mention the serializers
+    def post(self, request):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"detail" : "You do not have the permission to add a new employee"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+        user_serializer = StaffUserCreationSerializer(
+            data = request.data
+        )
+
+        if not user_serializer.is_valid():
+            return Response(
+                user_serializer.errors, status = status.HTTP_400_BAD_REQUEST
+            )
+        
+        user = user_serializer.save()
+
+        if is_owner:
+
+            staff_serializer = StaffSerialiser(data = request.data)
+
+            # If the staff registation fails validation, delete the user row we created earlier
+            if not staff_serializer.is_valid():
+                user.delete()
+
+                return Response(
+                    staff_serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+            
+            staff = staff_serializer.save(user = user)
+
+        elif is_supervisor:
+
+            supervisor_staff_serializer = StaffSupervisorSerializers(data = request.data)
+
+            if not supervisor_staff_serializer.is_valid():
+                user.delete()
+
+                return Response(
+                    supervisor_staff_serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+            
+            staff = supervisor_staff_serializer.save(user = user, manager = request.user )
+        
+        return Response(
+            StaffSerialiser(staff).data,
+            status = status.HTTP_201_CREATED
+        )
+    
+class StaffDetailAPI(APIView):
+
+    # GET, DELETE, PATCH, PUT
+
+    def get(self, request, staff_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+                    return Response(
+                        {"detail" : "You do not have the permission to view employee"},
+                        status = status.HTTP_403_FORBIDDEN
+                    )
+                
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+        staff = get_object_or_404(Staff, pk = staff_pk )
+
+        serializer = StaffSerialiser(staff)
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+    
+    def delete(self, request, staff_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+                    return Response(
+                        {"detail" : "You do not have the permission to view employee"},
+                        status = status.HTTP_403_FORBIDDEN
+                    )
+
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+        staff = get_object_or_404(Staff, pk = staff_pk)
+
+        staff.delete()
+
+        return Response(
+            status = status.HTTP_200_OK
+        )
+
+    def put(self, request, staff_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+                    return Response(
+                        {"detail" : "You do not have the permission to view employee"},
+                        status = status.HTTP_403_FORBIDDEN
+                    )
+            
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+        staff = get_object_or_404(Staff, pk = staff_pk)
+
+        if is_owner:
+
+            serializer = StaffSerialiser(staff, data = request.data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+            
+        elif is_supervisor:
+            serializer = StaffSupervisorSerializers(staff, data = request.data)
+
+            if serializer.is_valid():
+                staff = serializer.save(manager = request.user)
+                return Response(
+                    StaffSupervisorSerializers(staff).data,
+                    status = status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+        
+    def patch(self, request, staff_pk):
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+                    return Response(
+                        {"detail" : "You do not have the permission to view employee"},
+                        status = status.HTTP_403_FORBIDDEN
+                    )
+            
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+
+        staff = get_object_or_404(Staff, pk = staff_pk)
+
+        if is_owner:
+            serializer = StaffSerialiser(staff, data = request.data , partial = True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+        elif is_supervisor:
+            serializer = StaffSupervisorSerializers(staff, request.data, partial = True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
