@@ -105,5 +105,10 @@ urlpatterns = [
     path("add_order_item/<int:order_pk>/<int:restaurant_pk>/",views.add_order_items, name = "add_item_to_order"),
     path("all_items_in_order/<int:order_pk>/<int:restaurant_pk>/",views.list_all_order_items, name = "all_order_items"),
     path("delete_order_item/<int:order_item_pk>/<int:restaurant_pk>/", views.remove_order_item, name = "delete_a_order_item"),
+
+    ###### API
+    path("api/my_restaurants/", views.MyRestaurantsAPI.as_view(), name = "my_restaurants_api"), # Collection endpoint
+    path("api/detail_restaurant/<int:restaurant_pk>",views.RestaurantDetailAPI.as_view(), name = "detail_restaurant"), # Detail endpoint
+    path("api/restaurant_stats/<int:restaurant_pk>",views.RestaurantStatsAPI.as_view(), name = "restaurant_stats"),
 ]
  

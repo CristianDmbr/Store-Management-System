@@ -39,10 +39,10 @@ from .validators import  (  validate_unique_restaurant_name, validate_appropriat
                            validate_unique_menu_item_name, validate_calories # Menu Item
                            )
 
-class RestaurantSerialiser(serializers.ModelSerializer): 
+class RestaurantSerializer(serializers.ModelSerializer): 
   class Meta:
     model = Restaurant
-    fields = ["pk","restaurant_name","owner","date_opened","location","restaurant_cuisine","capacity"]
+    fields = ["pk","restaurant_name","supervisor","date_opened","location","restaurant_cuisine","capacity","number_of_tables"]
 
   def validate(self, attrs):
     restaurant_name = attrs.get("restaurant_name")

@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation, Order,OrderItem
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor, OrderForm, OrderItemForm, StaffUserCreationForm, StaffOrderForm
-from .serialisers import RestaurantSerialiser, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
+from .serialisers import RestaurantSerializer, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
@@ -130,6 +130,263 @@ from django.utils import timezone
 # For the Individual Reservation Case:
 # The form had the restaurant field and you want a readable object in context so fetching object is useful
 
+######################################################   Helper Functions   ######################################################
+# Used by the RestaurantStatisticsAPI
+
+def calculate_restaurant_statistics(restaurant):
+
+    today = timezone.now().date()
+    last_week = today - timedelta(days = 7)
+    last_month = today - timedelta(days = 31)
+    last_year = today - timedelta(days = 365)
+
+    # Finances
+    total_earned_general = sum(order.total_price for order in restaurant.orders.all())
+    total_earned_today = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__date = today))
+    total_earned_last_week = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__gte = last_week))
+    total_earned_last_month = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__gte = last_month))
+    total_earned_last_year = sum(order.total_price for order in restaurant.orders.filter(date_time_of_order__gte = last_year))
+
+    # Orders
+    total_orders_general = len(restaurant.orders.all())
+    orders_today = len(restaurant.orders.filter(date_time_of_order__date = today))
+    orders_last_week = len(restaurant.orders.filter(date_time_of_order__gte = last_week))
+    orders_last_month = len(restaurant.orders.filter(date_time_of_order__gte = last_month))
+    orders_last_year = len(restaurant.orders.filter(date_time_of_order__gte = last_year))
+
+    if total_earned_general > 0 and total_orders_general > 0:
+        average_transaction_value = total_orders_general // total_orders_general
+    else:
+        average_transaction_value = 0
+
+    # Menu
+    total_menu_items = len(restaurant.menu_items.all())
+
+    # Staff
+    general_staff_count = len(restaurant.who_works_here.all())
+    chief_staff_count = len(restaurant.who_works_here.filter(position = "chief"))
+    waiter_staff_count = len(restaurant.who_works_here.filter(position = "waiter"))
+    cleaner_staff_count = len(restaurant.who_works_here.filter(position = "cleaner"))
+
+    if general_staff_count > 0:
+        total_age = 0
+        for staff in restaurant.who_works_here.all():
+            total_age += staff.age
+        average_age = total_age // general_staff_count
+    else:
+        average_age = 0
+
+    # Labour Hours
+    total_labour_hours = sum(staff.total_hours_worked for staff in restaurant.who_works_here.all())
+    last_week_labour_hours = sum(staff.total_hours_worked_last_week for staff in restaurant.who_works_here.all())
+    last_month_labour_hours = sum(staff.total_hours_worked_last_month for staff in restaurant.who_works_here.all())
+    last_year_labour_hours = sum(staff.total_hours_worked_last_year for staff in restaurant.who_works_here.all())
+
+    # Labour Cost
+    total_labour_cost = sum(staff.total_earned for staff in restaurant.who_works_here.all())
+    last_week_labour_cost = sum(staff.total_earned_this_week for staff in restaurant.who_works_here.all())
+    last_month_labour_cost = sum(staff.total_earned_last_month for staff in restaurant.who_works_here.all())
+    last_year_labour_cost = sum(staff.total_earned_last_year for staff in restaurant.who_works_here.all())
+
+    # Food Stats
+    all_starters = restaurant.menu_items.filter(category = "starter")
+    number_of_starters = len(all_starters)
+    number_of_starters_ordered = 0
+    for starter in all_starters:
+        for order in starter.order_items.all():
+            number_of_starters_ordered += order.quantity
+    
+    all_mains = restaurant.menu_items.filter(category = "main")
+    number_of_mains = len(all_mains)
+    number_of_mains_ordered = 0
+    for main in all_mains:
+        for order in main.order_items.all():
+            number_of_mains_ordered += order.quantity
+        
+    all_deserts = restaurant.menu_items.filter(category = "desert")
+    number_of_deserts = len(all_deserts)
+    number_of_deserts_ordered = 0
+    for desert in all_deserts:
+        for order in desert.order_items.all():
+            number_of_deserts_ordered += order.quantity
+    
+    all_drinks = restaurant.menu_items.filter(category = "drink")
+    number_of_drinks = len(all_drinks)
+    number_of_drinks_ordered = 0
+    for drink in all_drinks:
+        for order in drink.order_items.all():
+            number_of_drinks_ordered += order.quantity
+        
+    all_snacks = restaurant.menu_items.filter(category = "snack")
+    number_of_snacks = len(all_snacks)
+    number_of_snacks_ordered = 0
+    for snack in all_snacks:
+        for order in snack.order_items.all():
+            number_of_snacks_ordered += order.quantity
+    
+    category_sales = {
+        "Starter": number_of_starters_ordered,
+        "Main": number_of_mains_ordered,
+        "Dessert": number_of_deserts_ordered,
+        "Drink": number_of_drinks_ordered,
+        "Snack": number_of_snacks_ordered,
+    }
+
+    most_popular_category = max(category_sales, key = category_sales.get)
+
+    total_number_of_items_sold = (
+        number_of_starters_ordered + number_of_mains_ordered + number_of_deserts_ordered + number_of_drinks_ordered + number_of_snacks_ordered
+    )
+
+    if total_number_of_items_sold > 0:
+        starters_percent = (number_of_starters_ordered / total_number_of_items_sold) * 100
+        mains_percent = (number_of_mains_ordered / total_number_of_items_sold) * 100
+        desserts_percent = (number_of_deserts_ordered // total_number_of_items_sold) * 100
+        drinks_percent = (number_of_drinks_ordered / total_number_of_items_sold) * 100
+        snacks_percent = (number_of_snacks_ordered / total_number_of_items_sold) * 100
+    else:   
+        starters_percent = 0
+        mains_percent = 0
+        desserts_percent = 0
+        drinks_percent = 0
+        snacks_percent = 0
+    
+    starter_revenue = 0
+    for starter in all_starters:
+        for starter_ordered in starter.order_items.all():
+            starter_revenue += starter_ordered.total_cost
+
+
+    main_revenue = 0
+    for main in all_mains:
+        for main_ordered in main.order_items.all():
+            main_revenue += main_ordered.total_cost
+
+
+    dessert_revenue = 0
+    for dessert in all_deserts:
+        for dessert_ordered in dessert.order_items.all():
+            dessert_revenue += dessert_ordered.total_cost
+
+
+    drink_revenue = 0
+    for drink in all_drinks:
+        for drink_ordered in drink.order_items.all():
+            drink_revenue += drink_ordered.total_cost
+
+
+    snack_revenue = 0
+    for snack in all_snacks:
+        for snack_ordered in snack.order_items.all():
+            snack_revenue += snack_ordered.total_cost
+        
+    category_revenue = {
+        "Starters" : starter_revenue,
+        "Mains" : main_revenue,
+        "Desserts" : dessert_revenue,
+        "Drinks" : drink_revenue,
+        "Snacks" : snack_revenue
+    }
+
+    most_profitable_category = max(category_revenue, key = category_revenue.get)
+    least_profitable_category = min(category_revenue, key = category_revenue.get)
+
+    # Reservations
+    all_reservations = restaurant.reservations.all()
+    reservations_for_today = restaurant.reservations.filter(reservation_date_time__date = today)
+    reservations_this_week = restaurant.reservations.filter(reservation_date_time__gte = last_week)
+    reservations_this_month = restaurant.reservations.filter(reservation_date_time__gte = last_month)
+    reservations_this_year = restaurant.reservations.filter(reservation_date_time__gte = last_year)
+
+    active_reservations = restaurant.reservations.filter(is_active = True)
+    inactive_reservations = restaurant.reservations.filter(is_active = False)
+
+
+
+    return {
+        "restaurant" : {
+            "pk" : restaurant.pk,
+            "name" : restaurant.restaurant_name,
+            "location" : restaurant.location,
+            "cuisine" : restaurant.get_restaurant_cuisine_display(),
+            "supervisor" : restaurant.supervisor.username
+        },
+        "financials" : {
+            "total_earned_general" : total_earned_general,
+            "total_earned_today" : total_earned_today,
+            "total_earned_last_week" : total_earned_last_week,
+            "total_earned_last_month" : total_earned_last_month,
+            "total_earned_last_year" : total_earned_last_year,
+            "average_transaction_value" : average_transaction_value
+        },
+        "orders" : {
+            "total_orders_general" : total_orders_general,
+            "orders_today" : orders_today,
+            "orders_last_week" : orders_last_week,
+            "orders_last_month" : orders_last_month,
+            "orders_last_year" : orders_last_year,
+        },
+        "menu" : {
+            "menu_size" : total_menu_items
+        },
+        "staff" : {
+            "general_staff_count" : general_staff_count,
+            "chief_staff_count" : chief_staff_count,
+            "waiter_staff_count" : waiter_staff_count,
+            "cleaner_staff_count" : cleaner_staff_count,
+            "average_age" : average_age
+        },
+        "labour_hours" : {
+            "total_labour_hours" : total_labour_hours,
+            "last_week_labour_hours" : last_week_labour_hours,
+            "last_month_labour_hours" : last_month_labour_hours,
+            "last_year_labour_hours" : last_year_labour_hours,
+        },
+        "labour_cost" : {
+            "total_labour_cost" : total_labour_cost,
+            "last_week_labour_cost" : last_week_labour_cost,
+            "last_month_labour_cost" : last_month_labour_cost,
+            "last_year_labour_cost" : last_year_labour_cost
+        },
+        "food_stats" : {
+            "number_of_starters_ordered" : number_of_starters_ordered,
+            "number_of_starters" : number_of_starters,
+            "number_of_mains_ordered" : number_of_mains_ordered,
+            "number_of_mains" : number_of_mains,
+            "number_of_deserts_ordered" : number_of_deserts_ordered,
+            "number_of_deserts" : number_of_deserts,
+            "number_of_drinks_ordered" : number_of_drinks_ordered,
+            "number_of_drinks" : number_of_drinks,
+            "number_of_snacks_ordered" : number_of_snacks_ordered,
+            "number_of_snacks" : number_of_snacks,
+            "most_popular_category" : most_popular_category,
+
+            "starters_percent" : starters_percent,
+            "mains_percent" : mains_percent,
+            "desserts_percent" : desserts_percent,
+            "drinks_percent" : drinks_percent,
+            "snacks_percent" : snacks_percent,
+        },
+        "food_revenue": {
+            "starter_revenue": starter_revenue,
+            "main_revenue": main_revenue,
+            "dessert_revenue": dessert_revenue,
+            "drink_revenue": drink_revenue,
+            "snack_revenue": snack_revenue,
+            "most_profitable_category": most_profitable_category,
+            "least_profitable_category": least_profitable_category,
+        },
+        "reservations": {
+            "total_reservations": all_reservations.count(),
+            "reservations_today": reservations_for_today.count(),
+            "reservations_this_week": reservations_this_week.count(),
+            "reservations_this_month": reservations_this_month.count(),
+            "reservations_this_year": reservations_this_year.count(),
+            "active_reservations": active_reservations.count(),
+            "inactive_reservations": inactive_reservations.count(),
+        }
+    }
+
 ######################################################____Home____######################################################
 def home(request):
     return render(request, "home.html",{})
@@ -200,40 +457,6 @@ class RestaurantDelete(DeleteView):
     template_name = "restaurant_delete.html"
     success_url = reverse_lazy("restaurant_list")
 
-    ##### API
-    # DRF generic views
-    # Create an API view that can LIST and CREATE restaurant (so gets us GET to return all restaurant and POST to create new restaurant)
-    # GET request : 1. Queries all restaurants -> serialises (converts to JSON) -> returns the JSON
-    # POST request : 1. Incoming JSON, Serialiser validates it, Creates a Restaurant Object, Saves to DB and returns the JSON response
-    # Having a CBV mixed view is more risky than a GET POST DRF ListCreate
-class RestaurantListCreateAPI(generics.ListCreateAPIView):
-    # Work with all Restaurants objects from the DB
-    queryset = Restaurant.objects.all()
-    # Use this serialiser to convert data
-    serializer_class = RestaurantSerialiser
-
-    # HTTP method handlers in Django
-    # My confusion if this is allows to have a delete function why have different DRF with different purposes?
-    # You can but you shouldn't because of design, clarity and control. Also DRF are designed around resources and endpoints.(Collection, Detail endpoints)
-    # Why does it appear on the Django page? DRF looks at the view and asks what HTTP methods are implemented here so we can show as buttons.
-    # Main buttons to show : [GET,POST,PUT,PATCH,Delete]
-
-    def delete(self, request, *args, **kwargs):
-        Restaurant.objects.all().delete()
-        return Response(status = status.HTTP_204_NO_CONTENT)
-    
-    def get_queryset(self):
-        return super().get_queryset().order_by("-date_opened")
-
-class RestaurantRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
-    # This is just a description of the query not actual data, and its only fetched when needed using .get() .filter() serialization 
-    # This is a lazy query that only hits the database when needed, "I am ready to fetch all restaurants but not yet" but query only with pk
-
-    queryset = Restaurant.objects.all() 
-    serializer_class = RestaurantSerialiser
-    # This pk is used not because of the kwargs from the url, but the pk from the module Field name pk
-    lookup_field = "pk"
-
     # Just returns a JSON
 class HelloWorldView(APIView):
     # How does this get converted into a JSON if its not using serialisation?
@@ -242,72 +465,6 @@ class HelloWorldView(APIView):
     def get(self,request):
         return Response({"message":"Hello World !!!!"})
     
-# Not automatic like generics so it gives full control over logic
-# Inherit from the APIView 
-class RestaurantSearchView(APIView):
-
-    # GET /api/restaurants/search/?name=pizza
-    def get(self, request):
-
-        name = request.query_params.get("name", "")
-
-        if name:
-            restaurants = Restaurant.objects.filter(restaurant_name__icontains=name)
-        else:
-            restaurants = Restaurant.objects.all()
-
-        serializer = RestaurantSerialiser(
-            restaurants,
-            many=True
-        )
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
-
-    # POST /api/restaurants/search/
-    def post(self, request):
-
-        serializer = RestaurantSerialiser(
-            data=request.data
-        )
-
-        if serializer.is_valid():
-            serializer.save()
-
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    # DELETE /api/restaurants/search/
-    # DELETE /api/restaurants/search/?pk=5
-    def delete(self, request):
-
-        name = request.query_params.get("name")
-
-        # Delete one restaurant
-        if name:
-            restaurants = Restaurant.objects.filter(restaurant_name = name)
-
-            restaurants.delete()
-
-            return Response(
-                status=status.HTTP_204_NO_CONTENT
-            )
-
-        # Delete all restaurants
-        Restaurant.objects.all().delete()
-
-        return Response(
-            status=status.HTTP_204_NO_CONTENT
-        )
 ######################################################___Reservations___######################################################
 
 class ReservationCreateView(CreateView):
@@ -1913,3 +2070,166 @@ def remove_order_item(request, order_item_pk, restaurant_pk):
             order_item.delete()
     
     return redirect("all_order_items", order_pk = order.pk , restaurant_pk = restaurant.pk )
+
+
+
+
+########################################################################################## APIs Views ########################################################################################## 
+
+########################################################################################## Restaurant 
+
+# Collection endpoint
+class MyRestaurantsAPI(APIView):
+
+    def get(self, request):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have the permission to access this resource"}, 
+                status = status.HTTP_403_FORBIDDEN)
+
+        restaurants = Restaurant.objects.filter(owner = request.user)
+        serializer = RestaurantSerializer(
+            restaurants,
+            many = True
+        )
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"details" : "You do not have the permission to add a new Restaurant"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = RestaurantSerializer(data = request.data)
+        
+        if serializer.is_valid():
+            serializer.save(owner = request.user)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+
+# Detail Endpoint
+class RestaurantDetailAPI(APIView):
+
+    def get(self, request, restaurant_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have permission to view a Restaurant"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+
+        serializer = RestaurantSerializer(restaurant)
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+    
+    def put(self, request, restaurant_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have the permission to update a restaurant"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+
+        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+
+        serializer = RestaurantSerializer(
+            restaurant,
+            data = request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save(owner = request.user)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+    def patch(self, request, restaurant_pk):
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have the permission to path a row"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+
+        serializer = RestaurantSerializer(
+            restaurant,
+            data = request.data,
+            partial = True
+        )
+
+        if serializer.is_valid():
+            serializer.save(owner = request.user)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+    
+    def delete(self, request, restaurant_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have the permission to delete this restaurant."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+        restaurant.delete()
+
+        return Response(
+            {"detail" : "Restaurant deleted successfully"},
+        )
+
+class RestaurantStatsAPI(APIView):
+
+    def get(self,request,restaurant_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have the permission to view Restaurant Stats"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+
+        restaurant_stats = calculate_restaurant_statistics(restaurant)
+
+        return Response(
+            restaurant_stats,
+            status = status.HTTP_200_OK
+        )
+
+########################################################################################## Staff

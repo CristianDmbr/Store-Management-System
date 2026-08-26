@@ -221,6 +221,7 @@ class Staff(models.Model):
         validate_date_of_birth(self.date_of_birth)
         validate_time_date_employed(self.date_time_employed)
     
+    # Earnings
     @property
     def total_earned(self):
         return sum(shift.earnings or 0 for shift in self.shifts.all())
@@ -249,6 +250,7 @@ class Staff(models.Model):
             shift.earnings or 0 for shift in self.shifts.filter(start_time__gte = last_year)
         )
     
+    # Hours Worked
     @property
     def total_hours_worked(self):
         return sum(shift.duration_hours or 0 for shift in self.shifts.all())
