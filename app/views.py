@@ -2623,4 +2623,129 @@ class CollectionShiftAPI(APIView):
         is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
         is_staff = request.user.groups.filter(name = "Staff").exists()
 
-        # CONTINUE
+        if is_owner:
+            all_shifts = Shift.objects.filter(employee__restaurant__owner = request.user)
+            serializer = ShiftSerialiser(all_shifts, many = True)
+
+            return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+        elif is_supervisor:
+            all_shifts = Shift.objects.filter(employee__restaurant__supervisor = request.user)
+            serializer = ShiftSerialiser(all_shifts, many = True)
+
+            return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+        elif is_staff:
+            all_shifts = Shift.objects.filter(employee__user = request.user)
+            serializer = ShiftSerialiser(all_shifts, many = True)
+
+            return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+    
+    def post(self, request):
+
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"detail" : "You do not have the permission to add a new shift"}
+            )
+        
+        serializer = ShiftSerialiser(
+            data = request.data,
+            supervisor = request.user)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+class DetailShiftAPI(APIView):
+
+    def get(self, request, shift_pk):
+
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to access a shift"},
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+        shift = get_object_or_404(Shift, pk = shift_pk)
+        serializer = ShiftSerialiser(shift)
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+
+
+    def delete(self, request, shift_pk):
+
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to delete a shift"}
+            )
+        
+        shift = get_object_or_404(Shift, pk = shift_pk)
+        shift.delete()
+
+        return Response(
+            status = status.HTTP_204_NO_CONTENT
+        )
+    
+    def put(self, request, shift_pk):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to update a shift"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+    
+        shift = get_object_or_404(Shift, pk = shift_pk)
+        serializer = ShiftSerialiser(shift, data = request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+    def patch(self, request, shift_pk):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission ot path a shift"},
+                status = status.HTTP_400_BAD_REQUEST
+            )
+    
+        shift = get_object_or_404(Shift, pk = shift_pk)
+        serializer = ShiftSerialiser(shift, data = request.data, partial = True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+    
+########################################################################################## Reservations

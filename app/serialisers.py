@@ -104,7 +104,7 @@ class StaffSupervisorSerializers(serializers.ModelSerializer):
 class ShiftSerialiser(serializers.ModelSerializer):
   class Meta:
     model = Shift
-    fields = ["employee","start_time","end_time"]
+    fields = ["pk","employee","start_time","end_time","status"]
 
   def validate(self, attrs):
     employee = attrs.get("employee")
@@ -114,6 +114,12 @@ class ShiftSerialiser(serializers.ModelSerializer):
     validate_shift_time(employee, start_time, end_time, self.instance)
   
     return attrs
+  
+  def __init__(self,*args, supervisor = None, **kwargs):
+    super().__init__(*args,**kwargs)
+
+    if supervisor:
+      self.fields["employee"].queryset = Staff.objects.filter(restaurant__supervisor = supervisor)
   
 class MenuItemSerialiser(serializers.ModelSerializer):
   class Meta:

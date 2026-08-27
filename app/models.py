@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from datetime import date, timedelta, datetime
 from django.core.exceptions import ValidationError
+from decimal import Decimal
 
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
                            validate_unique_restaurant_name_reservation, validate_reservation_date_time_not_being_in_the_past_or_late,  # Reservation
@@ -314,12 +315,16 @@ class Shift(models.Model):
     # If validation passes, save gets used at the very end to save python object to DB.
     # Save runs after we populate the model instance with cleaned data and save the form/serialiser.
     def save(self, *args, **kwargs):
+
         if self.start_time and self.end_time and self.employee:
             duration = self.end_time - self.start_time
-            self.duration_hours = duration.total_seconds() / 3600
-
-            pay = float(self.employee.pay_per_hour)
-            self.earnings = self.duration_hours * pay
+            self.duration_hours = Decimal(
+                str(duration.total_seconds() / 3600)
+            ).quantize(Decimal("0.01"))
+            pay = self.employee.pay_per_hour
+            self.earnings = (
+                self.duration_hours * pay
+            ).quantize(Decimal("0.01"))
 
         super().save(*args, **kwargs)
 

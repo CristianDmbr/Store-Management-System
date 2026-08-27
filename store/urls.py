@@ -119,6 +119,9 @@ urlpatterns = [
     # Menu Item
     path("api/menu_items_list", views.CollectionMenuItemAPI.as_view(), name = "menu_item_list"),
     path("api/menu_item_detail/<int:menu_item_pk>", views.DetailMenuItemAPI.as_view(), name = "menu_item_detail"),
-    
+
+    # Shift
+    path("api/shift_list",views.CollectionShiftAPI.as_view(),name = "shift_list"),
+    path("api/shift_detail/<int:shift_pk>", views.DetailShiftAPI.as_view(), name = "shift_detail"),
 ]
  
