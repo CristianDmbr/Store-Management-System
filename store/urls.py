@@ -106,7 +106,7 @@ urlpatterns = [
     path("all_items_in_order/<int:order_pk>/<int:restaurant_pk>/",views.list_all_order_items, name = "all_order_items"),
     path("delete_order_item/<int:order_item_pk>/<int:restaurant_pk>/", views.remove_order_item, name = "delete_a_order_item"),
 
-    ###### API
+    ############################## API
     # Restaurant
     path("api/my_restaurants/", views.MyRestaurantsAPI.as_view(), name = "my_restaurants_api"), # Collection endpoint
     path("api/detail_restaurant/<int:restaurant_pk>",views.RestaurantDetailAPI.as_view(), name = "detail_restaurant"), # Detail endpoint
@@ -115,5 +115,10 @@ urlpatterns = [
     # Staff
     path("api/all_staff",views.MyStaffAPI.as_view(), name = "all_staff"),
     path("api/detail_staff/<int:staff_pk>",views.StaffDetailAPI.as_view(), name = "staff_detail"),
+
+    # Menu Item
+    path("api/menu_items_list", views.CollectionMenuItemAPI.as_view(), name = "menu_item_list"),
+    path("api/menu_item_detail/<int:menu_item_pk>", views.DetailMenuItemAPI.as_view(), name = "menu_item_detail"),
+    
 ]
  

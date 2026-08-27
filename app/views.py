@@ -2328,8 +2328,6 @@ class MyStaffAPI(APIView):
     
 class StaffDetailAPI(APIView):
 
-    # GET, DELETE, PATCH, PUT
-
     def get(self, request, staff_pk):
 
         if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
@@ -2453,3 +2451,160 @@ class StaffDetailAPI(APIView):
                 serializer.errors,
                 status = status.HTTP_400_BAD_REQUEST
             )
+
+########################################################################################## Menu Items
+  
+class CollectionMenuItemAPI(APIView):
+
+    def get(self,request):
+
+        if not request.user.groups.filter(name = "Staff").exists() and not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"detail" : "You do not have the permission to view menu items"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+        is_staff = request.user.groups.filter(name = "Staff").exists()
+
+        if is_owner:
+
+            all_menu_items = MenuItem.objects.filter(restaurant__owner = request.user)
+
+            serializer = MenuItemSerialiser(all_menu_items, many = True)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+
+        elif is_supervisor:
+
+            all_menu_items = MenuItem.objects.filter(restaurant__supervisor = request.user)
+
+            serializer = MenuItemSerialiser(all_menu_items, many = True)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        
+        elif is_staff:
+
+            user_staff = get_object_or_404(Staff, user = request.user)
+            all_menu_items = MenuItem.objects.filter(restaurant = user_staff)
+
+            serializer = MenuItemSerialiser(all_menu_items)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        
+    def post(self, request):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"Detail" : "You do not have the permission to add a new menu item"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = MenuItemSerialiser(data = request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+
+class DetailMenuItemAPI(APIView):
+
+    def get(self, request, menu_item_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data" : "You do not have the permission to view this Menu Item"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+        serializer = MenuItemSerialiser(menu_item)
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+
+    def delete(self, request, menu_item_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"Detail" : "You do not have the permission to delete menu item."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+
+        if is_owner:
+
+            menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+            menu_item.delete()
+
+            return Response(
+                status = status.HTTP_204_NO_CONTENT
+                )
+    
+    def put(self, request, menu_item_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"data" : "You do not have the permission to update a Menu Item"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+        serializer = MenuItemSerialiser(menu_item, data = request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+    def patch(self, request, menu_item_pk):
+
+        if not request.user.groups.filter(name = "Owner").exists():
+            return Response(
+                {"data" : "You do not have the permission to patch a menu item"},
+                status = status.HTTP_403_FORBIDDEN
+            )    
+        
+        menu_item = get_object_or_404(MenuItem, pk = menu_item_pk)
+        serializer = MenuItemSerialiser(menu_item, data = request.data, partial = True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+
+########################################################################################## Menu Items

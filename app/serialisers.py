@@ -118,7 +118,7 @@ class ShiftSerialiser(serializers.ModelSerializer):
 class MenuItemSerialiser(serializers.ModelSerializer):
   class Meta:
     model = MenuItem
-    fields = ["pk","name","restaurant","price","description","category","availability","calories","ingredience"]
+    fields = ["pk","name","restaurant","price","date_added","description","category","availability","calories","ingredience"]
   
   def validate(self, attrs):
 

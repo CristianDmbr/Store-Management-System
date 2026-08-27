@@ -83,4 +83,10 @@ Three Main Jobs:
 3. Validate
     def validate(self, attrs)
 
-    
+# My confusion about the different Stacks
+1. FBV + CBV -> Forms -> Django Templates (HTML)
+Django FBV + CBV -> render() -> HTML Template(html) -> Browser
+2. Django REST Framework (DRF) : when you want the backend to communicate with separate technologies (e.g. React) use APIs, DRF allows to build API views which communicate with other technologies using the JSON format (Uses serializers)
+Django + DRF -> Serializers -> JSON -> React/JavaScript
+3. JavaScript and React : JavaScript is a Programming Language, React is a JavaScript library used to build user interface.
+JavaScript can manipulate the data (How it presents the data) and chose how its displayed on REACT.
