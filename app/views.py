@@ -2608,3 +2608,19 @@ class DetailMenuItemAPI(APIView):
             )
 
 ########################################################################################## Shifts
+
+class CollectionShiftAPI(APIView):
+
+    def get(self, request):
+
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data": "You do not have the permission to access shift list"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+        is_staff = request.user.groups.filter(name = "Staff").exists()
+
+        # CONTINUE
