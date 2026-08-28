@@ -127,5 +127,9 @@ urlpatterns = [
     # Reservation
     path("api/reservation_list", views.CollectionReservationAPI.as_view(), name = "reservation_list"),
     path("api/detail_reservation/<int:reservation_pk>", views.DetailReservationAPI.as_view(), name = "reservation_detail"),
+
+    # Order
+    path("api/order_list",views.CollectionOrderAPI.as_view(), name = "order_list"),
+    path("api/detail_order/<int:order_pk>", views.DetailOrderAPI.as_view(), name = "order_detail"),
 ]
  

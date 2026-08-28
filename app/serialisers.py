@@ -32,7 +32,7 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Restaurant, Reservation, Staff, Shift, MenuItem
+from .models import Restaurant, Reservation, Staff, Shift, MenuItem, Order, OrderItem
 from .validators import  (  validate_unique_restaurant_name, validate_appropriate_restaurant_name, # Restaurant
                            validate_unique_restaurant_name_reservation, # Reservation
                            validate_unique_name_and_surname, validate_date_of_birth, validate_time_date_employed, # Staff
@@ -142,3 +142,17 @@ class MenuItemSerialiser(serializers.ModelSerializer):
     validate_calories(calories)
 
     return attrs
+  
+class OrderSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Order
+    fields = ["pk","reservation","restaurant","staff","date_time_of_order","table_number","status","note"]
+  
+  def __init__(self, *args, staff = None, supervisor = None, **kwargs):
+    super().__init__(*args,**kwargs)
+
+    if staff:
+      self.fields["restaurant"].queryset = Restaurant.objects.filter(who_works_here__user = staff)
+      self.fields["staff"].queryset = Staff.objects.filter(user = staff)
+    elif supervisor:
+      self.fields["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
