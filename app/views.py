@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Restaurant, Staff, Shift, MenuItem, Reservation, Order,OrderItem
 from .forms import RestaurantForm, MenuItemForm, StaffForm, ShiftForm, MenuItemForm, ReservationForm,ShiftForEmployeeForm, UserRoleCreationForm, StaffFormSupervisor, OrderForm, OrderItemForm, StaffUserCreationForm, StaffOrderForm
-from .serialisers import RestaurantSerializer, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser, StaffUserCreationSerializer, StaffSupervisorSerializers, OrderSerializer
+from .serialisers import RestaurantSerializer, ReservationSerialiser, StaffSerialiser, ShiftSerialiser, MenuItemSerialiser, StaffUserCreationSerializer, StaffSupervisorSerializers, OrderSerializer, OrderItemSerializer
 from django.views.generic import ListView,CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
@@ -2493,9 +2493,9 @@ class CollectionMenuItemAPI(APIView):
         elif is_staff:
 
             user_staff = get_object_or_404(Staff, user = request.user)
-            all_menu_items = MenuItem.objects.filter(restaurant = user_staff)
+            all_menu_items = MenuItem.objects.filter(restaurant = user_staff.restaurant)
 
-            serializer = MenuItemSerialiser(all_menu_items)
+            serializer = MenuItemSerialiser(all_menu_items, many = True)
 
             return Response(
                 serializer.data,
@@ -3028,3 +3028,208 @@ class DetailOrderAPI(APIView):
             )
 
 ### All Items in a order
+
+########################################################################################## Order Items
+
+class CollectionOrderItemAPI(APIView):
+
+    def get(self, request):
+
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data" : "You do not have the permission to view an Order."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+        is_staff = request.user.groups.filter(name = "Staff").exists()
+
+        if is_supervisor:
+            all_order_items = OrderItem.objects.filter(order__restaurant__supervisor = request.user)
+
+            serializer = OrderItemSerializer(all_order_items, many = True, supervisor = request.user)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        elif is_staff:
+            staff = get_object_or_404(Staff, user = request.user)
+            restaurant = staff.restaurant
+            all_order_items = OrderItem.objects.filter(order__restaurant = restaurant)
+            serializer = OrderItemSerializer(all_order_items, many = True, staff = request.user)
+        
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        
+    def post(self, request):
+
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data" : "You do not have the permission to view an Order."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+        is_staff = request.user.groups.filter(name = "Staff").exists()
+
+        if is_supervisor:
+
+            serializer = OrderItemSerializer(data = request.data, supervisor = request.user)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data,
+                    status = status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+        elif is_staff:
+
+            serializer = OrderItemSerializer(data = request.data, staff = request.user)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    serializer.data,
+                    status = status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    serializer.errors,
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+
+class DetailOrderItemAPI(APIView):
+
+    def get(self, request, order_item_pk):
+
+        if not request.user.groups.filter(name="Supervisor").exists() and \
+           not request.user.groups.filter(name="Staff").exists():
+            return Response(
+                {"data": "You do not have permission to view this order item."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        is_supervisor = request.user.groups.filter(name="Supervisor").exists()
+        is_staff = request.user.groups.filter(name="Staff").exists()
+
+        if is_supervisor:
+            order_item = get_object_or_404(
+                OrderItem,
+                pk=order_item_pk,
+                order__restaurant__supervisor=request.user
+            )
+            serializer = OrderItemSerializer(
+                order_item,
+                supervisor=request.user
+            )
+
+        elif is_staff:
+            order_item = get_object_or_404(
+                OrderItem,
+                pk=order_item_pk,
+                order__staff__user=request.user
+            )
+            serializer = OrderItemSerializer(
+                order_item,
+                staff=request.user
+            )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def delete(self, request, order_item_pk):
+
+        if not request.user.groups.filter(name="Supervisor").exists():
+            return Response(
+                {"data": "You do not have permission to delete this order item."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        order_item = get_object_or_404(
+            OrderItem,
+            pk=order_item_pk,
+            order__restaurant__supervisor=request.user
+        )
+
+        order_item.delete()
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+    def put(self, request, order_item_pk):
+
+        if not request.user.groups.filter(name="Supervisor").exists():
+            return Response(
+                {"data": "You do not have permission to update this order item."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        order_item = get_object_or_404(
+            OrderItem,
+            pk=order_item_pk,
+            order__restaurant__supervisor=request.user
+        )
+
+        serializer = OrderItemSerializer(
+            order_item,
+            data=request.data,
+            supervisor=request.user
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def patch(self, request, order_item_pk):
+
+        if not request.user.groups.filter(name="Supervisor").exists():
+            return Response(
+                {"data": "You do not have permission to patch this order item."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        order_item = get_object_or_404(
+            OrderItem,
+            pk=order_item_pk,
+            order__restaurant__supervisor=request.user
+        )
+
+        serializer = OrderItemSerializer(
+            order_item,
+            data=request.data,
+            partial=True,
+            supervisor=request.user
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -153,6 +153,26 @@ class OrderSerializer(serializers.ModelSerializer):
 
     if staff:
       self.fields["restaurant"].queryset = Restaurant.objects.filter(who_works_here__user = staff)
-      self.fields["staff"].queryset = Staff.objects.filter(user = staff)
+      self.fields["staff"].read_only = True
     elif supervisor:
       self.fields["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
+      self.fields["staff"].queryset = Staff.objects.filter(restaurant__supervisor = supervisor)
+    
+class OrderItemSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = OrderItem
+    fields = ["pk","menu_item","quantity","order","price_sold_at"]
+    read_only_fields = ["pk"]
+
+  def __init__(self, *args, supervisor = None, staff = None, **kwargs):
+      super().__init__(*args,**kwargs)
+
+      if supervisor:
+        self.fields["menu_item"].queryset = MenuItem.objects.filter(restaurant__supervisor = supervisor)
+        self.fields["order"].queryset = Order.objects.filter(restaurant__supervisor = supervisor)
+      elif staff:
+        staff_user = Staff.objects.get(user = staff.user)
+        restaurant = staff_user.restaurant
+        self.fields["menu_item"].queryset = MenuItem.objects.filter(restaurant = restaurant)
+        self.fields["order"].queryset = Order.objects.filter(restaurant = restaurant)
+  

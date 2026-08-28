@@ -131,5 +131,9 @@ urlpatterns = [
     # Order
     path("api/order_list",views.CollectionOrderAPI.as_view(), name = "order_list"),
     path("api/detail_order/<int:order_pk>", views.DetailOrderAPI.as_view(), name = "order_detail"),
+
+    # Order Item
+    path("api/order_item", views.CollectionOrderItemAPI.as_view(),name = "order_item_collection"),
+    path("api/detail_order_item/<int:order_item_pk>",views.DetailOrderItemAPI.as_view(),name="order_item_detail"),
 ]
  
