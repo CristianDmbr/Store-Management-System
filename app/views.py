@@ -2749,3 +2749,121 @@ class DetailShiftAPI(APIView):
             )
     
 ########################################################################################## Reservations
+
+class CollectionReservationAPI(APIView):
+
+    def get(self, request):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to view all the reservations"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        all_reservations = Reservation.objects.filter(restaurant__supervisor = request.user)
+        serializer = ReservationSerialiser(all_reservations, many = True, supervisor = request.user)
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+    
+    def post(self, request):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to add a new reservation"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = ReservationSerialiser(data = request.data, supervisor = request.user)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+class DetailReservationAPI(APIView):
+
+    # Get, Delete, Put, Patch
+
+    def get(self, request, reservation_pk):
+
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to view a reservation."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        reservation = get_object_or_404(Reservation, pk = reservation_pk)
+        serializer = ReservationSerialiser(reservation, supervisor = request.user)
+
+        return Response(
+            serializer.data,
+            status = status.HTTP_200_OK
+        )
+    
+    def delete(self, request, reservation_pk):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to delete a reservation"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        reservation = get_object_or_404(Reservation, pk = reservation_pk)
+        reservation.delete()
+        
+        return Response(
+            status = status.HTTP_204_NO_CONTENT
+        )
+    
+    def put(self, request, reservation_pk):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to update a reservation"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        reservation = get_object_or_404(Reservation, pk = reservation_pk)
+        serializer = ReservationSerialiser(reservation, data = request.data, supervisor = request.user)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+    def patch(self, request, reservation_pk):
+        if not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to patch a reservation"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        reservation = get_object_or_404(Reservation, pk = reservation_pk)
+        serializer = ReservationSerialiser(reservation, data = request.data, partial = True, supervisor = request.user)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        
+

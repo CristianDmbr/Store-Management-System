@@ -123,5 +123,9 @@ urlpatterns = [
     # Shift
     path("api/shift_list",views.CollectionShiftAPI.as_view(),name = "shift_list"),
     path("api/shift_detail/<int:shift_pk>", views.DetailShiftAPI.as_view(), name = "shift_detail"),
+
+    # Reservation
+    path("api/reservation_list", views.CollectionReservationAPI.as_view(), name = "reservation_list"),
+    path("api/detail_reservation/<int:reservation_pk>", views.DetailReservationAPI.as_view(), name = "reservation_detail"),
 ]
  
