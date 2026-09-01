@@ -3121,15 +3121,8 @@ class DetailOrderItemAPI(APIView):
         is_staff = request.user.groups.filter(name="Staff").exists()
 
         if is_supervisor:
-            order_item = get_object_or_404(
-                OrderItem,
-                pk=order_item_pk,
-                order__restaurant__supervisor=request.user
-            )
-            serializer = OrderItemSerializer(
-                order_item,
-                supervisor=request.user
-            )
+            order_item = get_object_or_404(OrderItem, pk=order_item_pk )
+            serializer = OrderItemSerializer( order_item, supervisor=request.user )
 
         elif is_staff:
             order_item = get_object_or_404(
@@ -3155,11 +3148,7 @@ class DetailOrderItemAPI(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        order_item = get_object_or_404(
-            OrderItem,
-            pk=order_item_pk,
-            order__restaurant__supervisor=request.user
-        )
+        order_item = get_object_or_404( OrderItem, pk=order_item_pk)
 
         order_item.delete()
 
@@ -3175,17 +3164,9 @@ class DetailOrderItemAPI(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        order_item = get_object_or_404(
-            OrderItem,
-            pk=order_item_pk,
-            order__restaurant__supervisor=request.user
-        )
+        order_item = get_object_or_404( OrderItem, pk=order_item_pk)
 
-        serializer = OrderItemSerializer(
-            order_item,
-            data=request.data,
-            supervisor=request.user
-        )
+        serializer = OrderItemSerializer( order_item,data=request.data,)
 
         if serializer.is_valid():
             serializer.save()
@@ -3194,11 +3175,11 @@ class DetailOrderItemAPI(APIView):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     def patch(self, request, order_item_pk):
 
@@ -3208,18 +3189,10 @@ class DetailOrderItemAPI(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        order_item = get_object_or_404(
-            OrderItem,
-            pk=order_item_pk,
-            order__restaurant__supervisor=request.user
+        order_item = get_object_or_404( OrderItem, pk=order_item_pk
         )
 
-        serializer = OrderItemSerializer(
-            order_item,
-            data=request.data,
-            partial=True,
-            supervisor=request.user
-        )
+        serializer = OrderItemSerializer( order_item, data=request.data, partial=True,)
 
         if serializer.is_valid():
             serializer.save()
@@ -3228,8 +3201,8 @@ class DetailOrderItemAPI(APIView):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )    
