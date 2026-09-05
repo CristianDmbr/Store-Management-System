@@ -4,9 +4,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
 
+import RestaurantList from "./RestaurantList"
+
+// Where UI gets constructed
+
 function App() {
   return (
-      <h1>Hello from my restaurant system!</h1>
+    <RestaurantList />
   );
 }
 
