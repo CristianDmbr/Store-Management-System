@@ -228,7 +228,7 @@ Arrays
         - arr.sort() == arr.sort()
         - arr.reverse == arr.reverse()
 Objects
-        - A JavaScript object stores a key/value pair.
+        - A JavaScript/Python object stores a key/value pair.
         - Say the Django API returns this Jason
                 [
                 {
@@ -612,10 +612,136 @@ useState
 Events
         - Similar to the JavaScript listener
         - In HTML:
-        - <button onClick = {FunctionName} >
-Conditional rendering # Continue
+        - <button onClick = {FunctionName} > Click Me </button>
+Conditional rendering
+        - Showing different UI based on the condition.
 Lists
+        - Say we have:
+        - consts orders = [
+           { id : 1, table : 5 },
+           { id : 2, table : 2} 
+          - ];
+        - In React we can do
+        - {orders.map(order => (
+          - <p key = {order.id}>
+                Order #{order.id} - Table {order.table}
+            </p>    
+        - ))}
+        - We only need the key for REACT to display
+        - So map goes throught each object in the array one at a time.
 Forms
+        - Need To Learn
 useEffect
-API requests
+        - " Run some code when something happens/changes in the component lifecycle "
+        - < useEffect(() => {
+          - getOrders();
+        - }, []
+        - )>
+        - Means Run getOrders when this component "[]" loads.
+        - This connect Api's so React
 React Router
+        - Lets you have different pages/views in the React Application
+        - e.g.
+          - / -> DashBoard
+          - /order -> Orders
+        - Create routes :
+          - <Route path="/orders" elements={<OrderList />}/>
+          - So at the /orders it will show the OrderLis components
+  
+npm -> Manages JavaScript packages
+pip -> Manages Python packages
+Vite is the tool that creates and serves the frontend during the development
+
+.jsx is what allows us to write HTML components inside of JavaScript
+.js just JavaScript
+
+# Starting JavaScript and React
+
+Inside App.jsx:
+<function App(){
+        ...
+}
+export App>
+App is not the Restaurant Management Application, its a React component/function.
+
+A React Component : piece of Website/UI e.g. NavBar, SideBar, RestaurantCard, MenuItem ...
+e.g.
+<function RestaurantCard() {
+    return (
+        <div>
+            <h2>Mario's Restaurant</h2>
+            <p>London</p>
+        </div>
+    );
+}>
+Similar to how we can have JavaScript functions which say add parameters we have a function which returns JSX that would appear on the webpage.
+
+Where does the App() component get used?
+Inside the main.jsx we have <import App from './App.jsx'> which means "Get the component called App from the App.jsx".
+We can use it with <App />
+Why does the <App /> look like HTML? because its JSX so its a React component not a HTML component
+
+Purpose of <export default App;> is to allow other JavaScript files to import this component. "Make this available to other files"
+
+# What is Vite?
+Development tool for the frontend which helps develop your React application.
+So when you run <npm run dev> to start the localhost for the frontend it means "Vite, start my React development environment" and Vite starts http://localhost:5173
+
+# Why does http://localhost:5173 work without having to run Django?
+<npm run dev> : Vite -> React frontend -> http://localhost:5173
+<python manage.py runserver> : Django -> Backend/API -> 127.0.0.1:8000
+They are completely independent.
+
+# Do they need to run simultaneously?
+When you are developing the full React + Django application, Yes. (Use two terminals)
+So it will become : Browser -> React/Vite (localhost:5173) -> fetch() -> Django/ DRF (127.0.0.1:8000) -> DataBase
+
+# How can React work without Django?
+Since the only component we have is :
+<function App() {
+    return <h1>Hello from my restaurant system!</h1>;
+}>
+There is no request to Django
+
+# Why have different .jmx files e.g. for RestaurantList? 
+App.jsx is where components from other files get sorted / organised and then rendererd. (Main root)
+Other files are useful since there will be a lot of components
+
+# What is a <div>?
+A container for grouping HTML elements.
+Think of it as a box and you can add CSS to style that box
+
+<div className = "restaurant-card">
+In CSS:
+.restaurant-card {
+        border : 1px solid black;
+        padding : 20px;
+}
+
+# Get Restaurants from Django
+I already </api/my_restaurants/> and the Django API is responsible for querying the database.
+REACT DO NOT DIRECTLY QUERY YOUR DJANGO DATABASE.
+
+React -> HTTP request -> Django API -> Django queries database -> Serializer -> JSON -> REACT
+(Architecture rule)
+
+Django will return:
+[
+    {
+        "pk": 1,
+        "restaurant_name": "Mario's",
+        "location": "London",
+        "restaurant_cuisine": "Italian"
+    },
+    {
+        "pk": 2,
+        "restaurant_name": "The Grill",
+        "location": "Romford",
+        "restaurant_cuisine": "Steakhouse"
+    }
+]
+
+REACT only requests and displays the data.
+
+# Understand all of the new code inside of RestaurantList.jsx (concepts of useState, UseEffect) and understand each line by line.
+# Make React authenticated
