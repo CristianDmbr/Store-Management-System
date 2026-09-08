@@ -10,8 +10,11 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required 
 
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import Group
 from django.contrib.auth.forms import UserCreationForm
+
+from django.middleware.csrf import get_token
 
 from django.http import HttpResponseForbidden
 
@@ -3212,7 +3215,58 @@ class DetailOrderItemAPI(APIView):
 class GetUserLoggedIn(APIView):
 
     def get(self, request):
+        
+
+        if request.user.groups.filter(name = "Owner").exists():
+            role = "Owner"
+        elif request.user.groups.filter(name = "Supervisor").exists():
+            role = "Supervisor"
+        elif reqeust.user.groups.filter(name = "Staff").exists():
+            role = "Staff"
+        else:
+            role = None
+
+
         return Response(
-            {"username" : request.user.username},
+            {"username" : request.user.username,
+             "role" : role,
+             },
             status = status.HTTP_200_OK
         )
+    
+class LoginAPI(APIView):
+
+    def post(self, request):
+
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        user = authenticate(
+            request,
+            username = username,
+            password = password
+        )
+
+        if user is None:
+            return Response(
+                {"detail" : "Invalid username or password"},
+                status = status.HTTP_401_UNAUTHORIZED
+            )
+        
+        login(request, user)
+        
+        return Response(
+            {
+                "username" : user.username
+            },
+            status = status.HTTP_200_OK
+        )
+    
+# Gets me the CSRF token
+
+class GetCSRFToken(APIView):
+
+    def get(self,request):
+        return Response(
+            {"csrfToken" : get_token(request)
+        })

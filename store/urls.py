@@ -139,5 +139,9 @@ urlpatterns = [
     # Other
     # Gets username of logged in user
     path("api/user_name",views.GetUserLoggedIn.as_view(),name = "user_username"),
+    # Login API for users
+    path("api/login", views.LoginAPI.as_view(),name = "login_page"),
+    # Get CSRF token
+    path("api/csrf", views.GetCSRFToken.as_view(),name = "csrf_token"),
 ]
  

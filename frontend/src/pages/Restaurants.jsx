@@ -1,5 +1,5 @@
-import RestaurantList from "./RestaurantList";
-import UserGreetings from "./Greetings";
+import RestaurantList from "../components/RestaurantList";
+import UserGreetings from "../components/Greetings";
 
 function Restaurants(){
     return (
