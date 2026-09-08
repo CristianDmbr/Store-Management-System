@@ -61,9 +61,20 @@ class StaffUserCreationSerializer(serializers.ModelSerializer):
       return user
 
 class RestaurantSerializer(serializers.ModelSerializer): 
+
+  location_display = serializers.CharField(
+    source = "get_location_display",
+    read_only = True
+  )
+
+  restaurant_cuisine_display = serializers.CharField(
+    source = "get_restaurant_cuisine_display",
+    read_only = True
+  )
+
   class Meta:
     model = Restaurant
-    fields = ["pk","restaurant_name","supervisor","date_opened","location","restaurant_cuisine","capacity","number_of_tables"]
+    fields = ["pk","restaurant_name","supervisor","date_opened","location_display","restaurant_cuisine_display","capacity","number_of_tables"]
 
   def validate(self, attrs):
     restaurant_name = attrs.get("restaurant_name")

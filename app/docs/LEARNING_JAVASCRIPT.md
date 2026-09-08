@@ -743,5 +743,115 @@ Django will return:
 
 REACT only requests and displays the data.
 
-# Understand all of the new code inside of RestaurantList.jsx (concepts of useState, UseEffect) and understand each line by line.
-# Make React authenticated
+# Summary
+1. We have a RestaurantList.jsx file which containts reusable React components.
+2. We then have a Restaurants.jsx to display all of these components and structure them.
+3. We use the App.jsx to generate and route.
+
+# Have multiple React Component in one jsx page when they go together when exporting.
+
+# Understand my first React Function :
+########################################################################
+# Importing the two functions from the React library.
+< import { useState, useEffect } from "react";
+
+# RestaurantList describes what should appear on the screen.
+function RestaurantList() {
+
+    # useState is a React function and in this case we give it []
+    # Means "React I want to create some state, and its starting value should be an empty array."
+    # State : data that belongs to a component and can change over time. (In this case we fill it with Restaurant objects)
+    # Why [restaurants, setRestaurants] ? desctructuring where restaurants is the current value, setRestaurants is the function used to change that value.
+    # So create a state. Set the current value to be restaurants, and give me a function called setRestaurants that changes it.
+    const [restaurants, setRestaurants] = useState([])
+
+    # useEffect means "React after rendering this component, perform this piece of code."
+    useEffect(() => {
+        # fetch is used to make HTTP requests. Its GET by default. 
+        # fetch() doesn't give you the data immediatelly, its a Promise that its working on getting the result and it will give me the result one its ready.
+        fetch("http://127.0.0.1:8000/api/my_restaurants/")
+            # Could also be .then(x => x.json())
+            .then(response => response.json()) # This is a arrow function meaning the response from this promise gets converted to a body usabel by JavaScript.
+            # After previous operation has finished and the produced JSON data, give that data to this function. (Output from previous arrow function is called data).
+            # Fills the useState array with objects.
+            .then(data => {
+                setRestaurants(data); # Where the API data gets put into the React state. (Initially its a empty array []) 
+            });
+    }, []); # This [] means the dependency array. Ignore for now
+    1. RestaurantList appears
+    2. React Renders it. useEffect runs the code
+    3. React renders again
+    4. Displays the restaurants
+
+    return (
+        <div>
+            <h1>My Restaurants :</h1>
+            # Since restaurants is the useCase which is an array.
+            # .map() is a JavaScript array method means "Go through every item in an array and create something from each item."
+            # In the restaurants array go through each restaurant (variable name) and have its key and its name, location and cuisine.
+            {restaurants.map(restaurant => (
+                # Helps represent each restaurant with something in this case its the pk
+                <div key = {restaurant.pk}>
+                    <h2>{restaurant.restaurant_name}</h2>
+                    <p>{restaurant.location}</p>
+                    <p>{restaurant.restaurant_cuisine}</p>
+                </div>
+                # Why two divs? each has its purpose
+            ))}
+
+        </div>
+    );
+};
+
+export default RestaurantList>
+# default means its only imported as < import RestaurantListfrom from "./RestaurantList"; >
+if we do export {RestaurantList};
+# It will allow for import { RestaurantList } from "./RestaurantList";
+########################################################################
+
+# useState : Lets a React component store data that can change with a function you named that specific datatype.
+const [age, setAge] = useState(18); age is current age, setAge is the function to modify, 18 is the starting value.
+< setAge(19); >
+
+# useEffect : lets you run code as a side effect of a component being rendered.
+useEffect(() => {code}, [])
+
+# .then : since fetch is a promise, then means run this function once promise is finished
+find(url)
+        .then(response => response.json())
+        .them(data => restaurants(data);)
+
+# .map() : goes through every item in an array and creates something for each item.
+restaurants.map(restaurant => (HTML))
+
+# Make React authenticated with Django session cookies
+Since when we make a request to get the Restaurant list from the Collection of Restaurant's API using fetch and then running it at < http://localhost:5173 >
+Browser considers them different origins.
+We need to make cross-origin requests and allow credentials. "Include my django session cookie with this request".
+< pip install django-cors-headers > Followed AI tutorial
+After updating the settings.py:
+<    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/my_restaurants/", {
+            credentials : "include"        ## Add this. Include cookies when making this request
+        })>
+
+# How authentication from Django now works on React?
+Cookies/session authentication is what allows React to be recognised by Django as a logged in user.
+The Browser stores the Django session cookies so its the Browser that holds the cookies.
+After the modification to the settings.
+1. When React makes the API request:
+< fetch("http://localhost:8000/api/my_restaurants/", {
+    credentials: "include"
+}) >
+credentials : "include"
+Tells the browser that "When making this request, include the relevant cookies from this browser"
+
+# Rendering in Django
+I did not make a HTML template but there is a HTML file just not made by me.
+Once we try to render the App.jsx React creates a DOM and it renders in the Browser.
+
+# Creating a Greetings component
+I had to make a seperate Django API endpoint to get me the user.
+
+
+

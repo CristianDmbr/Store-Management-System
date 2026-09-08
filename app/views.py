@@ -3206,3 +3206,13 @@ class DetailOrderItemAPI(APIView):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )    
+    
+########################################################################################## Other
+
+class GetUserLoggedIn(APIView):
+
+    def get(self, request):
+        return Response(
+            {"username" : request.user.username},
+            status = status.HTTP_200_OK
+        )

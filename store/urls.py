@@ -135,5 +135,9 @@ urlpatterns = [
     # Order Item
     path("api/order_item", views.CollectionOrderItemAPI.as_view(),name = "order_item_collection"),
     path("api/detail_order_item/<int:order_item_pk>",views.DetailOrderItemAPI.as_view(),name="order_item_detail"),
+
+    # Other
+    # Gets username of logged in user
+    path("api/user_name",views.GetUserLoggedIn.as_view(),name = "user_username"),
 ]
  
