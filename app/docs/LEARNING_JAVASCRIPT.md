@@ -854,4 +854,104 @@ Once we try to render the App.jsx React creates a DOM and it renders in the Brow
 I had to make a seperate Django API endpoint to get me the user.
 
 
+# Understand why and how LoginPage.jsx works and how tokens work, also what is authentication
+The React Login page does two completely seperate jobs:
+1. Displays the form with Username and Password.
+2. When Login is clicked, send information to Django.
 
+# Input field
+<input 
+        type = "text"
+        value = {username}
+        onChange = {(event) => setUsername(event.target.value)}/>
+This is a combination of ordinary HTML and JavaScript put together.
+<input> : HTML input box, browser gives you a box where the user can type.
+<type = "text"> : Just means this is a text input (type = "password" allows for password input)
+<value = {username}> : (React specific things)
+Since we have <const [username, setUsername] = useState("");> where username is the current value, setUsername changes the value.
+So <value = {username}> means the value displayed in this input should be whatever is inside the username useState("") (empty)
+Uses {} since its jsx.
+<onChange = {(event) => setUsername(event.target.value)} > (Biggest React concept) Means that whenever the user changes what is inside the input box,
+run this function. This allows the username to be changes to whatever the user enters.  this (event) is the information about what happened.
+<event.target.value> is the current value inside the input box. 
+Full meaning is "Take whatever the user has put inside and set that to the username State."
+So full : 
+1. Create a input box.
+2. Display the username variable (Initially its empty)
+3. Whever the user types something, the username gets updated after that.
+
+<label> Just tells the user what the input is for
+
+# What is <form> ? 
+<form onSubmit={handleSubmit}> : It groups together inputs/elements that belong to one action (Username, Password, Login).
+<onSubmit = {handleSubmit}> : When the form is submitted, call this function.
+What causes a form to submit? 
+<button type = "submit"> Login </button>
+Why once we submit it does not redirect? Since button only means "Submit the form" nothing about redirection. Its the onSubmit = {Function}
+the Function which decides what happens when Login is pressed. (So the redirect logic must go there.)
+
+# Inside the handleSubmit(event)
+< event.preventDefault(); > 
+Normally a form's submit button means the browser itself would submit the form and reload/navigate the page, but we don't want the browser to take over.
+
+# fetch()
+JavaScript's way of making HTTP requests to the Django's API endpoints
+So <fetch("http://localhost:8000/api/login")> means make a request to this Django endpoint.
+By default fetch is a GET request.
+Here we want to send over the Username and Password so we need the POST request.
+So : 
+<fetch("http://localhost:8000/api/login",{
+        method : "POST",
+})>
+Meaning "Make a POST request to the Django API endpoint.
+And this will go to the def post() inside of the LoginAPI.
+
+# What is a header in a HTTP request?
+<headers : {
+        "Content-Type" : "application/json",
+        "X-CSRFToken": csrfToken,
+}>
+A HTTP request contains different pieces of information.
+e.g. Method type (POST,GET,UPDATE), Body : Username, Password
+A Header is just additional information to that request.
+<"Content-Type": "application/json"> means the data I will be sending is JSON.
+Since it wil be :
+{
+        "username" : "",
+        "password" : ""
+}
+Its so Django knows how to interpret the request body.
+<credentials : "include"> means include the cookies
+
+# What is a Body?
+body : JSON.stringify ({
+        username : username,
+        password : password,
+})
+Body is the actual data we are sending to Django.
+Header : What kind of thing am I sending, Body : This is what I am sending.
+<.stringify> converts data into a JSON format so it can be used in the API function from request.data.
+
+# <login(request,user)> starts the sessionId and cookies for the session.
+
+# CSRF
+"Since we request the CSRF tokens during every rendering of the REACT page using the useEffect to update the csrfToken, are these tokens different for every session? "
+A CSRF token is not the same thing as a session ID.
+
+There are two seperate security mechanics:
+1. Session : Who are you? (Identifies authenticated user)
+2. CSRF : Did this request actually come from my legitimate frontend? (Helps protect unsafe requests)
+(I have a whole API function to get me the CSRF token for a session)
+This function sets the useState of csrfToken. 
+Flow :
+1. React useEffect -> Django gets csrf token -> React stores it with useState
+2. This token useState gets sent back as a header for POST requests.  
+
+# Why do we do all of this?
+Django is protecting your POST endpoint.
+
+<credentials : "include"> : Cookies to cross authenticate.
+
+# fetch 
+fetch() doesn't just instantly give you a Django response, it starts a network request.
+JavaScript uses a Promise, once that promise if fulfilled it will continue with the .then() 

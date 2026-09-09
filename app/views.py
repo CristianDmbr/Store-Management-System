@@ -3241,6 +3241,10 @@ class LoginAPI(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
 
+        # Authenticate asks if there credentials are valid for a user.
+        # 1. Does a user with this username exist? 2. Does the password match with the stored password?
+        # Yes: Return the user Object
+        # No : Return None
         user = authenticate(
             request,
             username = username,
@@ -3253,6 +3257,11 @@ class LoginAPI(APIView):
                 status = status.HTTP_401_UNAUTHORIZED
             )
         
+        # If the authentication passes and the user exists.
+        # This means the user is not logged into this browser session.
+        # Sessionid Cookies are made and Browser stores tehse cookies.
+        # These cookies are used with HTTP requests 
+        # < fetch("url"),{ credentials : "include"})
         login(request, user)
         
         return Response(
@@ -3262,8 +3271,9 @@ class LoginAPI(APIView):
             status = status.HTTP_200_OK
         )
     
-# Gets me the CSRF token
-
+# Gets me the CSRF token to make sure the security mechanic works.
+# Ensures the request is made from a legitimate frontend.
+# Its Django that manage and sets CSRF cookie.
 class GetCSRFToken(APIView):
 
     def get(self,request):
