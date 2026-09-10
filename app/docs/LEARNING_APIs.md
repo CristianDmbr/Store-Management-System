@@ -118,4 +118,4 @@ To receive that query parameter:
 <const { restaurant_pk } = useParams();>
 Ensure the naming matches with the app route naming of variables.
 
-# Add independent dictionaries from nested and finish the displa
+# Add the Update Page

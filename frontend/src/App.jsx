@@ -8,7 +8,7 @@ import StaffDashboard from "./pages/StaffDashboard";
 import RegisterPage from "./pages/RegisterPage";
 
 import RestaurantsList from "./pages/Restaurants";
-import RestaurantInfo from "./pages/Restaurant_info";
+import RestaurantInfo from "./pages/RestaurantInfo";
 import DeleteRestaurant from "./pages/RestaurantDelete";
 
 
@@ -55,7 +55,7 @@ function App() {
 
         <Route
           path = "/delete_restaurant/:restaurant_pk"
-          elements = {<DeleteRestaurant/>}
+          element = {<DeleteRestaurant/>}
         />
 
       </Routes>
