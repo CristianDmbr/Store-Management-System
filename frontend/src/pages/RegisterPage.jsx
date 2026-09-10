@@ -17,7 +17,9 @@ function RegisterPage() {
             setCsrfToken(data.csrfToken));
     },[]);
 
-    function handleSumision(event){
+    function handleSumition(event){
+            event.preventDefault();
+
             fetch("http://localhost:8000/api/create_user",
             {
                 credentials : "include",
@@ -33,6 +35,7 @@ function RegisterPage() {
             }).then(request => request.json())
               .then(data => {
                 console.log(data.username)
+                console.log("Created")
               })
     }
 
@@ -41,14 +44,14 @@ function RegisterPage() {
             <h1>Register Page</h1>
 
                 <div>
-                    <form onSubmit={handleSumision}>
+                    <form onSubmit={handleSumition}>
 
                         <div>
                             <label> Unsername </label>
                                 <input 
                                     type="text"
-                                    data = {username}
-                                    onChange = {(event) => setUsername(data.target.value)}
+                                    value = {username}
+                                    onChange = {(event) => setUsername(event.target.value)}
                                     />
                         </div>
                             
@@ -56,8 +59,11 @@ function RegisterPage() {
                             <label> Password </label>
                                 <input
                                     type="password"
-                                    data = {password}
-                                    onChange = {(event) => setPassword(data.target.value)}  />
+                                    value= {password}
+                                    onChange = {(event) => setPassword(event.target.value)}  />
+                        </div>
+                        <div>
+                            <button type="submit">Register</button>
                         </div>
                     </form>
                 </div>
@@ -67,7 +73,6 @@ function RegisterPage() {
                     Login
                 </button>
             </div>
-
         </div>
 
     )

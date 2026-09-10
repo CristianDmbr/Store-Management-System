@@ -49,6 +49,7 @@ class StaffUserCreationSerializer(serializers.ModelSerializer):
     model = User
     fields = ["username","password"]
 
+  # Create is ran after we validate the data and we want to create the User object
   def create(self,validated_data):
       user = User.objects.create_user(
         username = validated_data["username"],

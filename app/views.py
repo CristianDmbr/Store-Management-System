@@ -3221,7 +3221,7 @@ class GetUserLoggedIn(APIView):
             role = "Owner"
         elif request.user.groups.filter(name = "Supervisor").exists():
             role = "Supervisor"
-        elif reqeust.user.groups.filter(name = "Staff").exists():
+        elif request.user.groups.filter(name = "Staff").exists():
             role = "Staff"
         else:
             role = None
@@ -3237,11 +3237,11 @@ class GetUserLoggedIn(APIView):
 class CreateUserAPI(APIView):
 
     def post(self, request):
-        serializer = UserCreationForm(data = request.data)
+        serializer = StaffUserCreationSerializer(data = request.data)
         
         if serializer.is_valid():
             user = serializer.save()
-            return Render(
+            return Response(
                 {"username" : user.username},
                 status = status.HTTP_201_CREATED
             )
@@ -3281,11 +3281,11 @@ class LoginAPI(APIView):
         # < fetch("url"),{ credentials : "include"})
         login(request, user)
 
-        if request.user.groups.filter(name = "Owner").exists():
+        if user.groups.filter(name = "Owner").exists():
             role = "Owner"
-        elif request.user.groups.filter(name = "Supervisor").exist():
+        elif user.groups.filter(name = "Supervisor").exists():
             role = "Supervisor"
-        elif request.user.groups.filter(name = "Staff").exists():
+        elif user.groups.filter(name = "Staff").exists():
             role = "Staff"
         else:
             role = "None"

@@ -91,4 +91,12 @@ Django + DRF -> Serializers -> JSON -> React/JavaScript
 3. JavaScript and React : JavaScript is a Programming Language, React is a JavaScript library used to build user interface.
 JavaScript can manipulate the data (How it presents the data) and chose how its displayed on REACT.
 
-# Check Registration Process. 
+# JSON.stringify()
+Say we have a JavaScript object
+{
+    username : username,
+    password : password
+}
+
+JSON.stringidy converts the JavaScript object into a JSON string so it can be sent in the HTTP request body.
+To see the JavaScript/React terminal we need to see it on the browser
