@@ -955,3 +955,8 @@ Django is protecting your POST endpoint.
 # fetch 
 fetch() doesn't just instantly give you a Django response, it starts a network request.
 JavaScript uses a Promise, once that promise if fulfilled it will continue with the .then() 
+
+# useNavigate
+<import { useNavigate } from "react-router-dom";>
+<const navigate = useNavigate();>
+if I do <navigate("/owner")> means take me to "/owner"

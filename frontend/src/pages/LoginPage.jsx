@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
+
+    const navigate = useNavigate();
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     // It will be used to pass the token security requests.
@@ -45,7 +49,15 @@ function LoginPage() {
             // 
             .then(response => response.json())
             .then(data => {
-                console.log(data)
+                if (data.role == "Owner") {
+                    navigate("/owner_dashboard");
+                }
+                else if (data.role == "Supervisor") {
+                    navigate("/supervisor_dashboard");
+                }
+                else if (data.role == "Staff") { 
+                    navigate("/staff_dashboard");
+                }
             });
     }
 
@@ -59,9 +71,10 @@ function LoginPage() {
                     <label>Username</label>
                     <input 
                         type = "text"
-                        value = {username} // The Use case variable created earlier
+                        // The Use case variable created earlier
+                        value = {username} 
                         // Means every time there is a change to this input box, run this code and the value is from event.target.value
-                        onChange = {(event) => setUsername(event.target.value) }/> //  
+                        onChange = {(event) => setUsername(event.target.value) }/> 
 
                 </div>
 
@@ -79,6 +92,11 @@ function LoginPage() {
                 </button>
 
             </form>
+            <div>
+                <button type="submit" onClick={() => navigate("/register")}>
+                    Register
+                </button>
+            </div>
 
         </div>
     );

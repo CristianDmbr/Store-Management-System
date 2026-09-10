@@ -143,5 +143,7 @@ urlpatterns = [
     path("api/login", views.LoginAPI.as_view(),name = "login_page"),
     # Get CSRF token
     path("api/csrf", views.GetCSRFToken.as_view(),name = "csrf_token"),
-]
+    # Create a new user using React
+    path("api/create_user",views.CreateUserAPI.as_view(), name = "create_user_api"),
+    ]
  

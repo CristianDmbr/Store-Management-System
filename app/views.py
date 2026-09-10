@@ -3234,6 +3234,23 @@ class GetUserLoggedIn(APIView):
             status = status.HTTP_200_OK
         )
     
+class CreateUserAPI(APIView):
+
+    def post(self, request):
+        serializer = UserCreationForm(data = request.data)
+        
+        if serializer.is_valid():
+            user = serializer.save()
+            return Render(
+                {"username" : user.username},
+                status = status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                serializer.errors,
+                status = status.HTTP_400_BAD_REQUEST
+            )
+    
 class LoginAPI(APIView):
 
     def post(self, request):
@@ -3263,10 +3280,20 @@ class LoginAPI(APIView):
         # These cookies are used with HTTP requests 
         # < fetch("url"),{ credentials : "include"})
         login(request, user)
+
+        if request.user.groups.filter(name = "Owner").exists():
+            role = "Owner"
+        elif request.user.groups.filter(name = "Supervisor").exist():
+            role = "Supervisor"
+        elif request.user.groups.filter(name = "Staff").exists():
+            role = "Staff"
+        else:
+            role = "None"
         
         return Response(
             {
-                "username" : user.username
+                "role" : role,
+                "username" : user.username,
             },
             status = status.HTTP_200_OK
         )
@@ -3280,3 +3307,4 @@ class GetCSRFToken(APIView):
         return Response(
             {"csrfToken" : get_token(request)
         })
+    

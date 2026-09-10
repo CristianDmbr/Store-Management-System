@@ -90,3 +90,5 @@ Django FBV + CBV -> render() -> HTML Template(html) -> Browser
 Django + DRF -> Serializers -> JSON -> React/JavaScript
 3. JavaScript and React : JavaScript is a Programming Language, React is a JavaScript library used to build user interface.
 JavaScript can manipulate the data (How it presents the data) and chose how its displayed on REACT.
+
+# Check Registration Process. 
