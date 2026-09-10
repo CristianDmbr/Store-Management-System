@@ -141,9 +141,13 @@ urlpatterns = [
     path("api/user_name",views.GetUserLoggedIn.as_view(),name = "user_username"),
     # Login API for users
     path("api/login", views.LoginAPI.as_view(),name = "login_page"),
+    # Logout API
+    path("api/logout", views.LogoutAPI.as_view(), name = "logout"),
     # Get CSRF token
     path("api/csrf", views.GetCSRFToken.as_view(),name = "csrf_token"),
     # Create a new user using React
     path("api/create_user",views.CreateUserAPI.as_view(), name = "create_user_api"),
+    # Dynamic Greetings Message for React
+    path("api/time_greetings",views.GetTime.as_view(),name = "time_greetings"),
     ]
  

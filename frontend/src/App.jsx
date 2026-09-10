@@ -1,22 +1,22 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import Restaurants from "./pages/Restaurants"
+
 import LoginPage from "./pages/LoginPage";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import SupervisorDashboard from "./pages/SupervisorDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 import RegisterPage from "./pages/RegisterPage";
 
+import RestaurantsList from "./pages/Restaurants";
+import RestaurantInfo from "./pages/Restaurant_info";
+import DeleteRestaurant from "./pages/RestaurantDelete";
+
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        <Route
-          path = "/restaurants"
-          element = {<Restaurants /> }
-        />
 
         <Route
           path = "/login"
@@ -41,6 +41,21 @@ function App() {
         <Route
           path = "/register"
           element = {<RegisterPage/>}
+        />
+
+        <Route
+          path = "/restaurant_list"
+          element = {<RestaurantsList /> }
+        />
+
+        <Route
+          path = "/restaurant_info/:restaurant_pk"  
+          element = {<RestaurantInfo/>}
+        />
+
+        <Route
+          path = "/delete_restaurant/:restaurant_pk"
+          elements = {<DeleteRestaurant/>}
         />
 
       </Routes>

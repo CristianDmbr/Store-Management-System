@@ -99,4 +99,23 @@ Say we have a JavaScript object
 }
 
 JSON.stringidy converts the JavaScript object into a JSON string so it can be sent in the HTTP request body.
-To see the JavaScript/React terminal we need to see it on the browser
+To see the JavaScript/React terminal we need to see it on the browser 
+
+# Pass url parameters in JavaScript
+e.g. passing the restaurant pk to another page.
+Make the route : {
+    <Route
+          path = "/restaurant_info/:restaurant_pk"  
+          element = {<RestaurantInfo/>}
+        />
+}
+:restaurant_pk is the parameter.
+Pass it to another page: 
+<<button onClick={(event) => navigate(`/restaurant_info/${restaurant.pk}`)}>View details</button>>
+make sure to use `` and ${}.
+
+To receive that query parameter:
+<const { restaurant_pk } = useParams();>
+Ensure the naming matches with the app route naming of variables.
+
+# Add independent dictionaries from nested and finish the displa

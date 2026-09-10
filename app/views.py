@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required 
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
 from django.contrib.auth.forms import UserCreationForm
 
@@ -3298,6 +3298,15 @@ class LoginAPI(APIView):
             status = status.HTTP_200_OK
         )
     
+class LogoutAPI(APIView):
+    def post(self,request):
+        logout(request)
+
+        return Response(
+            {"detail" : "Successfully logged out"},
+            status = status.HTTP_200_OK
+        )
+    
 # Gets me the CSRF token to make sure the security mechanic works.
 # Ensures the request is made from a legitimate frontend.
 # Its Django that manage and sets CSRF cookie.
@@ -3308,3 +3317,20 @@ class GetCSRFToken(APIView):
             {"csrfToken" : get_token(request)
         })
     
+class GetTime(APIView):
+    def get(self, request):
+        curr_hour = timezone.localtime().hour
+        
+        if curr_hour < 12:
+            greeting = "Good morning"
+        elif curr_hour < 17:
+            greeting = "Good afternoon"
+        elif curr_hour < 21:
+            greeting = "Good evening"
+        else:
+            greeting = "Good Night"
+    
+        return Response(
+            {"greeting" : greeting},
+            status = status.HTTP_200_OK
+        )
