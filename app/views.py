@@ -10,8 +10,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, permission_required 
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.forms import UserCreationForm
 
 from django.middleware.csrf import get_token
@@ -3216,6 +3215,7 @@ class GetUserLoggedIn(APIView):
 
     def get(self, request):
         
+        user = get_object_or_404(User, pk = request.user.pk)
 
         if request.user.groups.filter(name = "Owner").exists():
             role = "Owner"
@@ -3228,7 +3228,8 @@ class GetUserLoggedIn(APIView):
 
 
         return Response(
-            {"username" : request.user.username,
+            {"username" : user.username,
+             "pk" : user.pk,
              "role" : role,
              },
             status = status.HTTP_200_OK
@@ -3252,6 +3253,8 @@ class CreateUserAPI(APIView):
             )
     
 class LoginAPI(APIView):
+
+    from django.contrib.auth import authenticate, login, logout
 
     def post(self, request):
 
@@ -3299,6 +3302,7 @@ class LoginAPI(APIView):
         )
     
 class LogoutAPI(APIView):
+    from django.contrib.auth import logout
     def post(self,request):
         logout(request)
 
@@ -3334,3 +3338,19 @@ class GetTime(APIView):
             {"greeting" : greeting},
             status = status.HTTP_200_OK
         )
+
+class GetAllSupervisors(APIView):
+    def get(self,request):
+        supervisors = User.objects.filter(groups__name = "Supervisor")
+
+        data = []
+
+        for supervisor in supervisors:
+            data.append(
+                {
+                    "id" : supervisor.id,
+                    "username" : supervisor.username
+                }
+            )
+        
+        return Response(data,status = status.HTTP_200_OK)

@@ -149,5 +149,6 @@ urlpatterns = [
     path("api/create_user",views.CreateUserAPI.as_view(), name = "create_user_api"),
     # Dynamic Greetings Message for React
     path("api/time_greetings",views.GetTime.as_view(),name = "time_greetings"),
+    # Gather all Supervisors
+    path("api/get_supervisors",views.GetAllSupervisors.as_view(),name = "all_supervisors"),
     ]
- 

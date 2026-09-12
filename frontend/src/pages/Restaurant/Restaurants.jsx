@@ -45,6 +45,10 @@ function RestaurantsList() {
             </div>
 
             <div>
+                <button onClick={(event) => navigate("/add_restaurant")}>Add Restaurant</button>
+            </div>
+
+            <div>
                 <button onClick={(event) => navigate("/owner_dashboard")} >Dashboard</button>
             </div>
 

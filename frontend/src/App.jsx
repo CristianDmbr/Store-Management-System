@@ -5,11 +5,12 @@ import LoginPage from "./pages/LoginPage";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import SupervisorDashboard from "./pages/SupervisorDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
-import RegisterPage from "./pages/RegisterPage";
+import RegisterPage from "./pages/Restaurant/RegisterPage";
 
-import RestaurantsList from "./pages/Restaurants";
-import RestaurantInfo from "./pages/RestaurantInfo";
-import DeleteRestaurant from "./pages/RestaurantDelete";
+import RestaurantsList from "./pages/Restaurant/Restaurants";
+import RestaurantInfo from "./pages/Restaurant/RestaurantInfo";
+import DeleteRestaurant from "./pages/Restaurant/RestaurantDelete";
+import AddRestaurant from "./pages/Restaurant/RestaurantAdd";
 
 
 
@@ -56,6 +57,11 @@ function App() {
         <Route
           path = "/delete_restaurant/:restaurant_pk"
           element = {<DeleteRestaurant/>}
+        />
+
+        <Route
+          path = "/add_restaurant"
+          element = {<AddRestaurant/>}
         />
 
       </Routes>

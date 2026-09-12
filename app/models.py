@@ -94,13 +94,6 @@ class Restaurant(models.Model):
     capacity = models.IntegerField()
     number_of_tables = models.PositiveIntegerField(null = False, blank = False)
 
-    class Meta:
-        # Additional permissions on the default create, delete, update and view
-        permissions = [
-            ("archive_restaurant","Can archive restaurant")
-        ]
-
-
     # How does self.reservations works? Because we made a Foreing key inside of the Reservation class to the Restaurant,
     # we automatically have a manager tool / query interface as self.reservation_set (by default). We renamed the reversed relationship
     # in the reservation to reservation from reservation_set. 
