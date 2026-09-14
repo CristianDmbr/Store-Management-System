@@ -36,11 +36,16 @@ function OwnerDashboard() {
 
     return (
         <div>
-            <UserGreetings />
+            
             <h1>Owner's Dashboard</h1>
+            <UserGreetings />
 
             <div>
                 <button onClick={(event) => navigate("/restaurant_list")}>Manage Restaurants</button>
+            </div>
+
+            <div>
+                <button onClick={(event) => navigate("/staff_list")}>Manage Staff</button>
             </div>
 
             <div>

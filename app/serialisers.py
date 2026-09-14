@@ -116,9 +116,17 @@ class ReservationSerialiser(serializers.ModelSerializer):
 
 # Used by owners 
 class StaffSerialiser(serializers.ModelSerializer):
+
+  # Adds a field to where we can also see the Restaurant Name and not just the PK
+  # (Used for Staff List and showing Restaurant names)
+  restaurant_name = serializers.CharField(
+    source = "restaurant.restaurant_name",
+    read_only = True
+  )
+
   class Meta:
     model = Staff
-    fields = ["user","name","surname","manager","restaurant","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
+    fields = ["user","name","surname","manager","restaurant","restaurant_name","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
     # User is FK inside of the Staff and because in the APIs we create them in the same POST request as staff we need to leave it as read only otherwise it will fail validation
     read_only_fields = ["user"]
   

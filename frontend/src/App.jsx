@@ -13,6 +13,8 @@ import DeleteRestaurant from "./pages/Restaurant/RestaurantDelete";
 import AddRestaurant from "./pages/Restaurant/RestaurantAdd";
 import UpdateRestaurant from "./pages/Restaurant/RestaurantUpdate";
 
+import StaffList from "./pages/Staff/StaffList";
+
 
 
 function App() {
@@ -45,6 +47,8 @@ function App() {
           element = {<RegisterPage/>}
         />
 
+
+
         <Route
           path = "/restaurant_list"
           element = {<RestaurantsList /> }
@@ -64,11 +68,19 @@ function App() {
           path = "/add_restaurant"
           element = {<AddRestaurant/>}
         />
-    
+
         <Route
-          path = "/update_restaurant"
+          path = "/update_restaurant/:restaurant_pk"
           element = {<UpdateRestaurant/>}
         />
+
+
+
+        <Route
+          path="/staff_list"
+          element = {<StaffList/>}
+        />
+
 
       </Routes>
     </BrowserRouter>

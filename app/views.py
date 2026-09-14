@@ -3254,9 +3254,9 @@ class CreateUserAPI(APIView):
     
 class LoginAPI(APIView):
 
-    from django.contrib.auth import authenticate, login, logout
-
     def post(self, request):
+
+        from django.contrib.auth import authenticate, login, logout
 
         username = request.data.get("username")
         password = request.data.get("password")
@@ -3348,7 +3348,7 @@ class GetAllSupervisors(APIView):
         for supervisor in supervisors:
             data.append(
                 {
-                    "id" : supervisor.id,
+                    "id" : supervisor,
                     "username" : supervisor.username
                 }
             )

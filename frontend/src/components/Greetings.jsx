@@ -24,7 +24,7 @@ function UserGreetings() {
         
     return (
         <div>
-            <h1> {greeting} {name} !</h1>
+            <h2> {greeting} {name} !</h2>
         </div>
     ); 
 }
