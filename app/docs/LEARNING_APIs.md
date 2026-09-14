@@ -118,4 +118,4 @@ To receive that query parameter:
 <const { restaurant_pk } = useParams();>
 Ensure the naming matches with the app route naming of variables.
 
-# Add the Update Page
+# Add the Update Page and update the existing code for it with the url parameter

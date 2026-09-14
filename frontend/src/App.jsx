@@ -11,6 +11,7 @@ import RestaurantsList from "./pages/Restaurant/Restaurants";
 import RestaurantInfo from "./pages/Restaurant/RestaurantInfo";
 import DeleteRestaurant from "./pages/Restaurant/RestaurantDelete";
 import AddRestaurant from "./pages/Restaurant/RestaurantAdd";
+import UpdateRestaurant from "./pages/Restaurant/RestaurantUpdate";
 
 
 
@@ -62,6 +63,11 @@ function App() {
         <Route
           path = "/add_restaurant"
           element = {<AddRestaurant/>}
+        />
+    
+        <Route
+          path = "/update_restaurant"
+          element = {<UpdateRestaurant/>}
         />
 
       </Routes>
