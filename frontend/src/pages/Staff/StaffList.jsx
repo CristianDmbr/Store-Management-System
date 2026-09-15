@@ -8,37 +8,38 @@ function StaffList(){
     const [all_staff, setAllStaff] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:8000/api/all_staff",{
+        fetch("http://localhost:8000/api/all_staff", {
             credentials : "include"
         })
             .then(request => request.json())
             .then(data => {
                 setAllStaff(data)
             })
-    })
-    
+    },[])
 
     return (
         <div>
             <h1>Staff List</h1>
 
-            <div>
-                {all_staff.map((staff) => (
-                    <div key = {staff.pk}>
+            {all_staff.map((staff) => {
+                return(
+                    <div key={staff.pk}>
                         <h2>{staff.name} {staff.surname}</h2>
-                        <p>{staff.restaurant_name}</p>
-                        <p>{staff.date_of_birth}</p>
-                        <p>{staff.work_right}</p>
+                        <p>{staff.restaurant_name} ( {staff.position_display} )</p>   
+                        <button onClick={(event) => navigate(`/staff_info/${staff.pk}`)}>Info</button>
+                        <button onClick={(event) => navigate(`/staff_delete/${staff.pk}`)}>Delete</button>
                     </div>
-                ))}
-            </div>
+                )
+            })}
 
             <div>
-                <button onClick={() => navigate("/owner_dashboard")}>Back</button>
+                <button onClick={(event) => navigate("/owner_dashboard")}>Back</button>
             </div>
 
         </div>
     )
+     
+
 }
 
 export default StaffList;

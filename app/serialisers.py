@@ -124,9 +124,19 @@ class StaffSerialiser(serializers.ModelSerializer):
     read_only = True
   )
 
+  display_work_right = serializers.CharField(
+    source = "get_work_right_display",
+    read_only = True
+  )
+
+  position_display = serializers.CharField(
+    source = "get_position_display",
+    read_only = True
+  )
+
   class Meta:
     model = Staff
-    fields = ["user","name","surname","manager","restaurant","restaurant_name","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
+    fields = ["pk","user","name","surname","manager","restaurant","restaurant_name","date_of_birth","date_time_employed","work_right","display_work_right","position","position_display","pay_per_hour"]
     # User is FK inside of the Staff and because in the APIs we create them in the same POST request as staff we need to leave it as read only otherwise it will fail validation
     read_only_fields = ["user"]
   
