@@ -73,6 +73,7 @@ function StaffAdd(){
                 "manager" : manager,
                 "restaurant" : restaurant,
                 "date_of_birth" : date_of_birth,
+                "date_time_employed" : date_time_employed,
                 "work_right" : work_right,
                 "position" : position,
                 "pay_per_hour" : pay_per_hour
@@ -104,7 +105,7 @@ function StaffAdd(){
                         <div>
                             <label>Password</label>
                             <input 
-                                type="text" 
+                                type="password" 
                                 value = {password}
                                 onChange = {(event) => setPassword(event.target.value)}
                                 />

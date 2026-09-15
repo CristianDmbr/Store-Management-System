@@ -2369,8 +2369,10 @@ class StaffDetailAPI(APIView):
         is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
 
         staff = get_object_or_404(Staff, pk = staff_pk)
+        user = staff.user
 
         staff.delete()
+        user.delete()
 
         return Response(
             status = status.HTTP_200_OK
