@@ -1,14 +1,64 @@
 import {  useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate, useParams } from "react-router-dom"; 
 
 function StaffDelete() {
 
     const navigate = useNavigate();
+    const { staff_pk } = useParams()
+
+    const [csrfToken, setCSRFToken] = useState(null);
+    const [staff, setStaff] = useState(null);
+
+    useEffect(() => {
+        fetch(`http://localhost:8000/api/detail_staff/${staff_pk}`,{
+            credentials : "include"
+        })
+            .then(request => request.json())
+            .then(data => {
+                console.log("Staff Gained")
+                setStaff(data)
+            })
+
+        fetch("http://localhost:8000/api/csrf",{
+            credentials : "include"
+        })
+            .then(request => request.json())
+            .then(data => {
+                console.log("Csrf token")
+                setCSRFToken(data.csrfToken)
+            })
+        
+    },[staff_pk])
+
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        fetch(`http://localhost:8000/api/detail_staff/${staff_pk}`,{
+            credentials : "include",
+            method : "DELETE",
+            headers : {
+                "X-CSRFToken" : csrfToken
+            }
+        })  
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to Delete Staff")
+                }
+            })
+            .then(() => navigate("/staff_list"))
+    }
+
+    if (!staff) {
+        return <h1>Loading</h1>
+    }
 
     return (
         <div>
-            <h1>Delete Staff</h1>
+            <h1>Remove {staff.name}? </h1>
 
+            <form onSubmit={handleSubmit}>
+                <button type="submit"><strong>YES</strong></button>
+            </form>
 
             <div>
                 <button onClick={() => navigate("/staff_list")}>No</button>

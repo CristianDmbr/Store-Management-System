@@ -122,4 +122,4 @@ Ensure the naming matches with the app route naming of variables.
 In my UpdateRestaurant REACT page. ONCE I made the PUT request if I was to navigate straight away then the update would not have been finished yet and the restaurant list still would show the old data. So instead of relocating straight away make a function which will wait for the update completion.
 < .then(() => navigate("/restaurant_list")); > 
 
-# Info Page, Add Staff, Delete staff, Update Staff
+# Update Staff

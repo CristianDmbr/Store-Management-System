@@ -33,6 +33,10 @@ function StaffList(){
             })}
 
             <div>
+                <button onClick={() => {navigate("/staff_add")}}>Add Staff</button>
+            </div>
+
+            <div>
                 <button onClick={(event) => navigate("/owner_dashboard")}>Back</button>
             </div>
 

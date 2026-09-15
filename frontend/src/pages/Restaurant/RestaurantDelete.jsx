@@ -18,7 +18,7 @@ function DeleteRestaurant(){
             headers : {
                 "X-CSRFToken" : csrfToken
             }
-        }).then(() => console.log("Deleted"))
+        })
           .then(() => navigate("/restaurant_list"))
     }
 

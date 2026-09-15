@@ -2085,19 +2085,26 @@ class MyRestaurantsAPI(APIView):
 
     def get(self, request):
 
-        if not request.user.groups.filter(name = "Owner").exists():
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supevisor").exists():
             return Response(
                 {"detail" : "You do not have the permission to access this resource"}, 
                 status = status.HTTP_403_FORBIDDEN)
 
-        restaurants = Restaurant.objects.filter(owner = request.user)
-        serializer = RestaurantSerializer(
-            restaurants,
-            many = True
-        )
+        is_owner = request.user.groups.filter(name = "Owner").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisr").exists()
+
+        if is_owner:
+            restaurants = Restaurant.objects.filter(owner = request.user)
+            serializer = RestaurantSerializer(restaurants, many = True)
+        elif is_supervisor:
+            restaurants = Restaurant.objects.filter(supervisor = request.user)
+            serializer = RestaurantSerializer(restaurants, many = True)
 
         return Response(
-            serializer.data,
+            {
+                "restaurants" : serializer.data,
+                "role" : "Owner" if is_owner else "Supervisor"
+            },
             status = status.HTTP_200_OK
         )
 
@@ -2311,7 +2318,7 @@ class MyStaffAPI(APIView):
 
         elif is_supervisor:
 
-            supervisor_staff_serializer = StaffSupervisorSerializers(data = request.data)
+            supervisor_staff_serializer = StaffSupervisorSerializers(data = request.data, supervisor = request.user)
 
             if not supervisor_staff_serializer.is_valid():
                 user.delete()
@@ -3348,9 +3355,12 @@ class GetAllSupervisors(APIView):
         for supervisor in supervisors:
             data.append(
                 {
-                    "id" : supervisor,
+                    "id" : supervisor.pk,
                     "username" : supervisor.username
                 }
             )
         
-        return Response(data,status = status.HTTP_200_OK)
+        return Response(
+            data,
+            status = status.HTTP_200_OK
+        )

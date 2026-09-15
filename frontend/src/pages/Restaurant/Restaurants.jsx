@@ -4,6 +4,7 @@ import { useNavigate} from "react-router-dom"
 function RestaurantsList() {
 
     const navigate = useNavigate();
+    const [role, setRole] = useState();
 
     const [username, setUsername] = useState("");
     const [restaurants,setRestaurants] = useState([])
@@ -20,7 +21,8 @@ function RestaurantsList() {
             credentials : "include"
         }).then(request => request.json())
           .then(data => {
-            setRestaurants(data)
+            setRestaurants(data.restaurants)
+            setRole(data.role)
           });
     },[]);
 
