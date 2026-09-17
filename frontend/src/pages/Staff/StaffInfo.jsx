@@ -14,8 +14,7 @@ function StaffInfo(){
         })
             .then(request => request.json())
             .then(data => {
-                console.log(data)
-                setStaff(data)
+                setStaff(data.staff)
             });
     }, [staff_pk])
 

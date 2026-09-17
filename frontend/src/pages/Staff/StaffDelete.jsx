@@ -15,7 +15,6 @@ function StaffDelete() {
         })
             .then(request => request.json())
             .then(data => {
-                console.log("Staff Gained")
                 setStaff(data)
             })
 
@@ -24,7 +23,6 @@ function StaffDelete() {
         })
             .then(request => request.json())
             .then(data => {
-                console.log("Csrf token")
                 setCSRFToken(data.csrfToken)
             })
         
