@@ -28,6 +28,7 @@ function StaffList(){
                         <p>{staff.restaurant_name} ( {staff.position_display} )</p>   
                         <button onClick={(event) => navigate(`/staff_info/${staff.pk}`)}>Info</button>
                         <button onClick={(event) => navigate(`/staff_delete/${staff.pk}`)}>Delete</button>
+                        <button onClick={(event) => navigate(`/staff_update/${staff.pk}`)}>Update</button>
                     </div>
                 )
             })}

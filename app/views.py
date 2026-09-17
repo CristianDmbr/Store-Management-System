@@ -2348,14 +2348,24 @@ class StaffDetailAPI(APIView):
         is_owner = request.user.groups.filter(name = "Owner").exists()
         is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
 
-        staff = get_object_or_404(Staff, pk = staff_pk )
+        staff = get_object_or_404(Staff,pk = staff_pk)
 
-        serializer = StaffSerialiser(staff)
+        if is_owner:
+            serializer = StaffSerialiser(staff)
 
-        return Response(
-            serializer.data,
-            status = status.HTTP_200_OK
-        )
+            return Response(
+                {"role" : "Owner",
+                 "staff" : serializer.data},
+                 status = status.HTTP_200_OK
+            )
+        elif is_supervisor:
+            serializer = StaffSupervisorSerializers(staff, supervisor = request.user)
+
+            return Response(
+                {"role" : "Supervisor",
+                 "staff" : serializer.data},
+                status = status.HTTP_200_OK
+            )
     
     def delete(self, request, staff_pk):
 

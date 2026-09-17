@@ -140,6 +140,7 @@ class StaffSerialiser(serializers.ModelSerializer):
     # User is FK inside of the Staff and because in the APIs we create them in the same POST request as staff we need to leave it as read only otherwise it will fail validation
     read_only_fields = ["user"]
   
+  
 # Used by managers to dynamically hide and fill the manager role
 class StaffSupervisorSerializers(serializers.ModelSerializer):
   class Meta:
@@ -147,12 +148,6 @@ class StaffSupervisorSerializers(serializers.ModelSerializer):
     fields = ["user","name","surname","restaurant","date_of_birth","date_time_employed","work_right","position","pay_per_hour"]
     # User is FK inside of the Staff and because in the APIs we create them in the same POST request as staff we need to leave it as read only otherwise it will fail validation
     read_only_fields = ["user"]
-
-    def __init__(self, *args, supervisor = None ,**kwargs):
-      super().__init__(*args,**kwargs)
-
-      if supervisor:
-        self.fields["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
   
 class ShiftSerialiser(serializers.ModelSerializer):
   class Meta:
