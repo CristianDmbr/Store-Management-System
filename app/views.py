@@ -2474,6 +2474,30 @@ class StaffDetailAPI(APIView):
             )
 
 ########################################################################################## Menu Items
+
+# Could be used by both Owners and Supervisors to see the menu items for their Restaurant they own/work for
+class CollectionMenuItempPerRestaurantAPI(APIView):
+
+    def get(self,request, restaurant_pk):
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+            return Response(
+                {"data" : "You do not have the permission to acess restaurant menu items"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
+        all_menu_items = restaurant.menu_items.all()
+
+        restaurant_serializer = RestaurantSerializer(restaurant)
+        all_menu_items_serializer = MenuItemSerialiser(all_menu_items, many = True)
+
+        return Response(
+            {"restaurant" : restaurant_serializer.data,
+             "all_menu_items" : all_menu_items_serializer.data},
+             status = status.HTTP_200_OK
+        )
+
+
   
 class CollectionMenuItemAPI(APIView):
 
@@ -2544,6 +2568,8 @@ class CollectionMenuItemAPI(APIView):
                 serializer.errors,
                 status = status.HTTP_400_BAD_REQUEST
             )
+    
+
 
 class DetailMenuItemAPI(APIView):
 
@@ -3230,6 +3256,7 @@ class DetailOrderItemAPI(APIView):
     
 ########################################################################################## Other
 
+# Indicates what role the user is.
 class GetUserLoggedIn(APIView):
 
     def get(self, request):
@@ -3319,9 +3346,9 @@ class LoginAPI(APIView):
             },
             status = status.HTTP_200_OK
         )
-    
+
+from django.contrib.auth import logout
 class LogoutAPI(APIView):
-    from django.contrib.auth import logout
     def post(self,request):
         logout(request)
 
@@ -3370,8 +3397,7 @@ class GetAllSupervisors(APIView):
                     "id" : supervisor.pk,
                     "username" : supervisor.username
                 }
-            )
-        
+            ) 
         return Response(
             data,
             status = status.HTTP_200_OK

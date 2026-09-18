@@ -117,6 +117,7 @@ urlpatterns = [
     path("api/detail_staff/<int:staff_pk>",views.StaffDetailAPI.as_view(), name = "staff_detail"),
 
     # Menu Item
+    path("api/menu_items_per_restaurants/<int:restaurant_pk>",views.CollectionMenuItempPerRestaurantAPI.as_view(),name = "menu_items_per_restaurant"),
     path("api/menu_items_list", views.CollectionMenuItemAPI.as_view(), name = "menu_item_list"),
     path("api/menu_item_detail/<int:menu_item_pk>", views.DetailMenuItemAPI.as_view(), name = "menu_item_detail"),
 

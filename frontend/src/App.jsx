@@ -19,6 +19,8 @@ import StaffDelete from "./pages/Staff/StaffDelete";
 import StaffAdd from "./pages/Staff/StaffAdd";
 import StaffUpdate from "./pages/Staff/StaffUpdate";
 
+import MenuItemsPerRestaurant from "./pages/MenuItem/MenuItemsPerRestaurant";
+
 
 
 function App() {
@@ -103,6 +105,12 @@ function App() {
         <Route
           path = "/staff_update/:staff_pk"
           element = {<StaffUpdate/>}
+        />
+
+
+        <Route
+          path = "/menu_items_per_restaurant/:restaurant_pk"
+          element = {<MenuItemsPerRestaurant/>}
         />
 
 

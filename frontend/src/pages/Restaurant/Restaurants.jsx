@@ -39,6 +39,7 @@ function RestaurantsList() {
                         <p>Capacity : {restaurant.capacity}</p>
                         <p>Tables : {restaurant.number_of_tables}</p>
 
+                        <button onClick={(event) => navigate(`/menu_items_per_restaurant/${restaurant.pk}`)}>Menu List</button>
                         <button onClick={(event) => navigate(`/restaurant_info/${restaurant.pk}`)}>View details</button>
                         <button onClick={(event) => navigate(`/update_restaurant/${restaurant.pk}`)}>Update</button>
                         <button onClick={(event) => navigate(`/delete_restaurant/${restaurant.pk}`)}>Delete</button>

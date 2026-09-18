@@ -122,5 +122,71 @@ Ensure the naming matches with the app route naming of variables.
 In my UpdateRestaurant REACT page. ONCE I made the PUT request if I was to navigate straight away then the update would not have been finished yet and the restaurant list still would show the old data. So instead of relocating straight away make a function which will wait for the update completion.
 < .then(() => navigate("/restaurant_list")); > 
 
-# Fix Staff Info Page
-#
+# Learn reduce 
+<const numbers = [1,2,3,4];>
+<numbers.reduce(...)>
+To take an array and build something else from it.
+We start with an empty object : 
+{}
+Starters arrive : {starter : [starter item]}
+Main Arrives : {
+    starter: [starter item],
+    main: [main item]
+}
+Another starter arrives: {
+    starter: [starter item, another starter],
+    main: [main item]
+}
+
+Example :
+<    const groupedMenuItems = menu_items.reduce((groups, menu_item) =>{
+        
+        if ( !groups[menu_item.category]) {
+            groups[menu_item.category] = [];
+        }
+
+        groups[menu_item.category].push(menu_item);
+    
+    }, {});>
+
+# What is reduce? 
+Take an array and repeatedly build one final value from it.
+e.g. we have an array of menu items.
+We want to take each item and sort them by category :
+
+{
+    starter: [
+        { name: "Soup", category: "starter" },
+        { name: "Salad", category: "starter" }
+    ],
+    main: [
+        { name: "Steak", category: "main" }
+    ],
+    dessert: [
+        { name: "Cake", category: "dessert" }
+    ]
+}
+
+In menu_items.reduce((groups,menu_item))
+What is groups? 
+groups = accumulator (Object we built so far)
+menu_item = current item
+
+Why not do (!groupedMenuItems[menu_item.category])?
+Because groupedMenuItems does not exist yet since we have to run the code in reduce(...) Once final object is done assing it to GroupedMenuItems
+The {} at the end refers to the groups should start as an empty OBJECT
+Simple explanation:
+{} is the object we are currently building. Declared at the begining. It then becomes groups["starters"] : []
+{
+    "Starters" : [],
+}
+then 
+{
+    "Starters" : [],
+    "Mains" : []
+}
+
+At the end the completed groups gets assigned to groupedMenuItems.
+
+# How to access a reduce object?
+groupedMenuItems.starter or groupedMenuItems.main
