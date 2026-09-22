@@ -190,3 +190,13 @@ At the end the completed groups gets assigned to groupedMenuItems.
 
 # How to access a reduce object?
 groupedMenuItems.starter or groupedMenuItems.main
+
+# I wanted to sort prices from most expensive to cheapest
+<.sort((a,b) => b.price - a.price)> (Used after map)
+Normally sort() is used to rearrange the items in the array
+<const nums = [1,2,3,4]
+nums.sort()>
+<.sort()> can be given a function that tells you how you want to sort the items.
+By giving it two variables a,b its because the JavaScript Algorithm takes two entries and sorts the whole algorithm like this.
+b - a means biggest to smallest
+a - b means smallest to biggest

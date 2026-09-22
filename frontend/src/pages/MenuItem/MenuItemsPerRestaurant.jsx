@@ -1,63 +1,63 @@
-import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function MenuItemsPerRestaurant(){
 
     const navigate = useNavigate();
-    const {restaurant_pk} = useParams();
+    const { restaurant_pk } = useParams();
 
-    const [menu_items, setMenuItems] = useState([]);
+    const [all_menu_items, setAllMenuItems] = useState([]);
     const [restaurant, setRestaurant] = useState();
 
     useEffect(() => {
-
-        fetch(`http://localhost:8000/api/menu_items_per_restaurants/${restaurant_pk}`, {
+        fetch(`http://localhost:8000/api/menu_items_per_restaurants/${restaurant_pk}`,{
             credentials : "include"
         })
             .then(request => request.json())
             .then(data => {
-                setMenuItems(data.all_menu_items)
-                setRestaurant(data.restaurant)
-                console.log(data.all_menu_items)
-                console.log(data.restaurant)
+                setAllMenuItems(data.all_menu_items);
+                setRestaurant(data.restaurant);
             })
 
-    }, [restaurant_pk])
+    },[restaurant_pk])
 
-    const groupedMenuItems = menu_items.reduce((groups, menu_item) =>{
-        
-        if ( !groups[menu_item.category]) {
-            groups[menu_item.category] = [];
-        }
+    const groupedMenuItems = all_menu_items.reduce((groups, menu_item) => {
+        if (!groups[menu_item.category]){
+            groups[menu_item.category] = []
+        };
 
         groups[menu_item.category].push(menu_item);
-    
-        return groups
 
-    }, {});
+        return groups;
+    },{})
+
+    if (!restaurant){
+        return(
+            <h1>Loading</h1>
+        )
+    }
 
     return (
         <div>
-            <h1>Menu Items per Restaurant</h1>
+
+            <h1>{restaurant.restaurant_name}'s Menu</h1>
 
             {Object.keys(groupedMenuItems).map(category => (
-
-                <div key={category}>
-                    <h2>{category}</h2>
-                    {groupedMenuItems[category].map(menu_item => (
-                        <p key={menu_item.pk}>
-                            {menu_item.name}
-                        </p>
+                <div key = {category}>
+                    <h2>{category.toUpperCase()}</h2>
+                    {groupedMenuItems[category]
+                        .sort((menuItem1,menuItem2) => menuItem1.price - menuItem2.price)
+                        .map(menu_item => (
+                        <p key={menu_item.pk}>{menu_item.name} : {menu_item.price}</p>
                     ))}
                 </div>
-
-                ))}
+            ))}
+        
             <div>
-                <button onClick={(event) => navigate("/restaurant_list")}>Back</button>
+                <button onClick={(event) => {navigate("/restaurant_list")}}>Back</button>
             </div>
-
         </div>
     )
-}
 
+}
 export default MenuItemsPerRestaurant;
