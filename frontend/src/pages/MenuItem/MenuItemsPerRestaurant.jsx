@@ -51,6 +51,7 @@ function MenuItemsPerRestaurant(){
                         <div key = {menu_item.pk}>
                             <p>{menu_item.name} : £{menu_item.price}</p>
                             <button onClick={(event) => {navigate(`/menu_item_info/${menu_item.pk}/${restaurant_pk}`)}}><small>info</small></button>
+                            <button onClick={(event) => {navigate(`/menu_item_update/${menu_item.pk}/${restaurant_pk}`)}}>Update</button>
                             <button onClick={(event) => {navigate(`/menu_item_delete/${menu_item.pk}/${restaurant_pk}`)}}><small>Delete</small></button>
                         </div>
                     ))}

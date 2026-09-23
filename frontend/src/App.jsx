@@ -23,6 +23,7 @@ import MenuItemsPerRestaurant from "./pages/MenuItem/MenuItemsPerRestaurant";
 import MenuItemInfo from "./pages/MenuItem/MenuItemInfo";
 import DeleteMenuItem from "./pages/MenuItem/MenuItemDelete";
 import MenuItemAdd from "./pages/MenuItem/MenuItemAdd";
+import UpdateMenuItem from "./pages/MenuItem/MenuItemUpdate";
 
 
 
@@ -128,6 +129,11 @@ function App() {
         <Route
           path = "/menu_item_add/:restaurant_pk"
           element = {<MenuItemAdd/>}
+        />
+
+        <Route
+          path = "/menu_item_update/:menu_item_pk/:restaurant_pk"
+          element = {<UpdateMenuItem/>}
         />
 
 

@@ -96,13 +96,8 @@ function MenuItemInfo() {
                 </p>
             </div>
 
-            <button
-                onClick={() =>
-                    navigate(`/menu_items_per_restaurant/${restaurant_pk}`)
-                }
-            >
-                Back to Menu
-            </button>
+            <button onClick={(event) => navigate(`/menu_items_per_restaurant/${restaurant_pk}`) }> Back to Menu </button>
+            <button onClick={(event) => navigate(`/menu_item_update/${menu_item_pk}/${restaurant_pk}`)}><strong>Update</strong></button>
 
         </div>
     );
