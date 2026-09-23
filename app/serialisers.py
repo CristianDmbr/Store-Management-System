@@ -170,9 +170,20 @@ class ShiftSerialiser(serializers.ModelSerializer):
       self.fields["employee"].queryset = Staff.objects.filter(restaurant__supervisor = supervisor)
   
 class MenuItemSerialiser(serializers.ModelSerializer):
+
+  display_category = serializers.CharField(
+    source = "get_category_display",
+    read_only = True
+  )
+
+  display_restaurant_name = serializers.CharField(
+    source = "restaurant.restaurant_name",
+    read_only = True
+  )
+
   class Meta:
     model = MenuItem
-    fields = ["pk","name","restaurant","price","date_added","description","category","availability","calories","ingredience"]
+    fields = ["pk","name","restaurant","display_restaurant_name","price","date_added","description","category","display_category","availability","calories","ingredience"]
   
   def validate(self, attrs):
 

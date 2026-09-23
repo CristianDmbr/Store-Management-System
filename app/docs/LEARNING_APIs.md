@@ -200,3 +200,19 @@ nums.sort()>
 By giving it two variables a,b its because the JavaScript Algorithm takes two entries and sorts the whole algorithm like this.
 b - a means biggest to smallest
 a - b means smallest to biggest
+
+# For each map row item React expects one JSX element.
+
+# setState doesn't immediatelly set a value but instead its a request to change the value (Takes time and is not immediate)
+# Database Locks happend when say both Django and the Browser want's to modify the database at the same time. Only one component can change the database at a time.
+
+# Database Understanding
+I thought I was using a simple SQL database and thats it.
+SQL isn't a database, its a language used to communicate with the databases.
+There are many different databases systems that understand SQL : (SQLite, PostgreSQL, MySQL ...)
+
+# Why SQLite?
+SQLite is a database engine. Its lightweight and doesn't require a seperate database server (The database is stored as a file on the computer) why why we have db.sqlite3
+
+# Where does SQL Come into this?
+<MenuItems.objects.create(...)> This isn't SQL but its Django's ORM translates your Python into SQL

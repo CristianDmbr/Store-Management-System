@@ -46,12 +46,18 @@ function MenuItemsPerRestaurant(){
                 <div key = {category}>
                     <h2>{category.toUpperCase()}</h2>
                     {groupedMenuItems[category]
-                        .sort((menuItem1,menuItem2) => menuItem1.price - menuItem2.price)
+                        .sort((menuItem1,menuItem2) => menuItem2.price - menuItem1.price)
                         .map(menu_item => (
-                        <p key={menu_item.pk}>{menu_item.name} : {menu_item.price}</p>
+                        <div key = {menu_item.pk}>
+                            <p>{menu_item.name} : £{menu_item.price}</p>
+                            <button onClick={(event) => {navigate(`/menu_item_info/${menu_item.pk}/${restaurant_pk}`)}}><small>info</small></button>
+                            <button onClick={(event) => {navigate(`/menu_item_delete/${menu_item.pk}/${restaurant_pk}`)}}><small>Delete</small></button>
+                        </div>
                     ))}
                 </div>
             ))}
+
+            <button onClick={(event) => {navigate(`/menu_item_add/${restaurant_pk}`)}}>Add</button>
         
             <div>
                 <button onClick={(event) => {navigate("/restaurant_list")}}>Back</button>

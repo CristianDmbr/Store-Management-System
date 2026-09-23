@@ -2076,6 +2076,41 @@ def remove_order_item(request, order_item_pk, restaurant_pk):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ########################################################################################## APIs Views ########################################################################################## 
 
 ########################################################################################## Restaurant 
@@ -2497,8 +2532,6 @@ class CollectionMenuItempPerRestaurantAPI(APIView):
              status = status.HTTP_200_OK
         )
 
-
-  
 class CollectionMenuItemAPI(APIView):
 
     def get(self,request):
@@ -2590,7 +2623,7 @@ class DetailMenuItemAPI(APIView):
         )
 
     def delete(self, request, menu_item_pk):
-
+    
         if not request.user.groups.filter(name = "Owner").exists():
             return Response(
                 {"Detail" : "You do not have the permission to delete menu item."},

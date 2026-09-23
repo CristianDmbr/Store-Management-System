@@ -20,6 +20,9 @@ import StaffAdd from "./pages/Staff/StaffAdd";
 import StaffUpdate from "./pages/Staff/StaffUpdate";
 
 import MenuItemsPerRestaurant from "./pages/MenuItem/MenuItemsPerRestaurant";
+import MenuItemInfo from "./pages/MenuItem/MenuItemInfo";
+import DeleteMenuItem from "./pages/MenuItem/MenuItemDelete";
+import MenuItemAdd from "./pages/MenuItem/MenuItemAdd";
 
 
 
@@ -111,6 +114,20 @@ function App() {
         <Route
           path = "/menu_items_per_restaurant/:restaurant_pk"
           element = {<MenuItemsPerRestaurant/>}
+        />
+        <Route
+          path = "/menu_item_info/:menu_item_pk/:restaurant_pk"
+          element = {<MenuItemInfo/>}
+        />
+
+        <Route
+          path = "/menu_item_delete/:menu_item_pk/:restaurant_pk"
+          element = {<DeleteMenuItem/>}
+        />
+
+        <Route
+          path = "/menu_item_add/:restaurant_pk"
+          element = {<MenuItemAdd/>}
         />
 
 
