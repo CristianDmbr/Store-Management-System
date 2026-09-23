@@ -2708,7 +2708,10 @@ class CollectionShiftAPI(APIView):
             serializer = ShiftSerialiser(all_shifts, many = True)
 
             return Response(
-                    serializer.data,
+                    {
+                        "all_shifts" : serializer.data,
+                        "role" : "Owner"
+                    },
                     status = status.HTTP_200_OK
                 )
         elif is_supervisor:
@@ -2716,7 +2719,10 @@ class CollectionShiftAPI(APIView):
             serializer = ShiftSerialiser(all_shifts, many = True)
 
             return Response(
-                    serializer.data,
+                    {
+                        "all_shifts" : serializer.data,
+                        "role" : "Supervisor"
+                    },
                     status = status.HTTP_200_OK
                 )
         elif is_staff:
@@ -2724,7 +2730,10 @@ class CollectionShiftAPI(APIView):
             serializer = ShiftSerialiser(all_shifts, many = True)
 
             return Response(
-                    serializer.data,
+                    {
+                        "all_shifts" : serializer.data,
+                        "role" : "Staff"
+                    },
                     status = status.HTTP_200_OK
                 )
     

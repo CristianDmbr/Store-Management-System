@@ -49,6 +49,10 @@ function OwnerDashboard() {
             </div>
 
             <div>
+                <button onClick={(event) => navigate("/shifts_list")}>Manage Shifts</button>
+            </div>
+
+            <div>
                 <button onClick={logout}> Logout </button>
             </div>
         </div>

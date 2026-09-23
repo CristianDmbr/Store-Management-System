@@ -150,9 +150,34 @@ class StaffSupervisorSerializers(serializers.ModelSerializer):
     read_only_fields = ["user"]
   
 class ShiftSerialiser(serializers.ModelSerializer):
+
+  start_time_display = serializers.SerializerMethodField()
+
+  end_time_display = serializers.SerializerMethodField()
+
+  status_display = serializers.CharField(
+    source = "get_status_display",
+    read_only = True
+  )
+
+  employee_name_display = serializers.CharField(
+    source = "employee.name",
+    read_only = True
+  )
+  employee_surname_display = serializers.CharField(
+    source = "employee.surname",
+    read_only = True
+  )
+
   class Meta:
     model = Shift
-    fields = ["pk","employee","start_time","end_time","status"]
+    fields = ["pk","employee","employee_name_display","employee_surname_display","start_time","end_time","status","status_display", "start_time_display","end_time_display"]
+  
+  def get_start_time_display(self, obj):
+    return obj.start_time.astimezone().strftime("%d/%m/%Y %H:%M")
+
+  def get_end_time_display(self, obj):
+    return obj.end_time.astimezone().strftime("%d/%m/%Y %H:%M")
 
   def validate(self, attrs):
     employee = attrs.get("employee")
