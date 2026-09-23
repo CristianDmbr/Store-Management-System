@@ -960,3 +960,131 @@ JavaScript uses a Promise, once that promise if fulfilled it will continue with 
 <import { useNavigate } from "react-router-dom";>
 <const navigate = useNavigate();>
 if I do <navigate("/owner")> means take me to "/owner"
+
+# JSON.stringify()
+Say we have a JavaScript object
+{
+    username : username,
+    password : password
+}
+
+JSON.stringidy converts the JavaScript object into a JSON string so it can be sent in the HTTP request body.
+To see the JavaScript/React terminal we need to see it on the browser 
+
+# Pass url parameters in JavaScript
+e.g. passing the restaurant pk to another page.
+Make the route : {
+    <Route
+          path = "/restaurant_info/:restaurant_pk"  
+          element = {<RestaurantInfo/>}
+        />
+}
+:restaurant_pk is the parameter.
+Pass it to another page: 
+<<button onClick={(event) => navigate(`/restaurant_info/${restaurant.pk}`)}>View details</button>>
+make sure to use `` and ${}.
+
+To receive that query parameter:
+<const { restaurant_pk } = useParams();>
+Ensure the naming matches with the app route naming of variables.
+
+# Problem during development.
+In my UpdateRestaurant REACT page. ONCE I made the PUT request if I was to navigate straight away then the update would not have been finished yet and the restaurant list still would show the old data. So instead of relocating straight away make a function which will wait for the update completion.
+< .then(() => navigate("/restaurant_list")); > 
+
+# Learn reduce 
+<const numbers = [1,2,3,4];>
+<numbers.reduce(...)>
+To take an array and build something else from it.
+We start with an empty object : 
+{}
+Starters arrive : {starter : [starter item]}
+Main Arrives : {
+    starter: [starter item],
+    main: [main item]
+}
+Another starter arrives: {
+    starter: [starter item, another starter],
+    main: [main item]
+}
+
+Example :
+<    const groupedMenuItems = menu_items.reduce((groups, menu_item) =>{
+        
+        if ( !groups[menu_item.category]) {
+            groups[menu_item.category] = [];
+        }
+
+        groups[menu_item.category].push(menu_item);
+    
+    }, {});>
+
+# What is reduce? 
+Take an array and repeatedly build one final value from it.
+e.g. we have an array of menu items.
+We want to take each item and sort them by category :
+
+{
+    starter: [
+        { name: "Soup", category: "starter" },
+        { name: "Salad", category: "starter" }
+    ],
+    main: [
+        { name: "Steak", category: "main" }
+    ],
+    dessert: [
+        { name: "Cake", category: "dessert" }
+    ]
+}
+
+In menu_items.reduce((groups,menu_item))
+What is groups? 
+groups = accumulator (Object we built so far)
+menu_item = current item
+
+Why not do (!groupedMenuItems[menu_item.category])?
+Because groupedMenuItems does not exist yet since we have to run the code in reduce(...) Once final object is done assing it to GroupedMenuItems
+The {} at the end refers to the groups should start as an empty OBJECT
+Simple explanation:
+{} is the object we are currently building. Declared at the begining. It then becomes groups["starters"] : []
+{
+    "Starters" : [],
+}
+then 
+{
+    "Starters" : [],
+    "Mains" : []
+}
+
+At the end the completed groups gets assigned to groupedMenuItems.
+
+# How to access a reduce object?
+groupedMenuItems.starter or groupedMenuItems.main
+
+# I wanted to sort prices from most expensive to cheapest
+<.sort((a,b) => b.price - a.price)> (Used after map)
+Normally sort() is used to rearrange the items in the array
+<const nums = [1,2,3,4]
+nums.sort()>
+<.sort()> can be given a function that tells you how you want to sort the items.
+By giving it two variables a,b its because the JavaScript Algorithm takes two entries and sorts the whole algorithm like this.
+b - a means biggest to smallest
+a - b means smallest to biggest
+
+# For each map row item React expects one JSX element.
+
+# setState doesn't immediatelly set a value but instead its a request to change the value (Takes time and is not immediate)
+# Database Locks happend when say both Django and the Browser want's to modify the database at the same time. Only one component can change the database at a time.
+
+# Database Understanding
+I thought I was using a simple SQL database and thats it.
+SQL isn't a database, its a language used to communicate with the databases.
+There are many different databases systems that understand SQL : (SQLite, PostgreSQL, MySQL ...)
+
+# Why SQLite?
+SQLite is a database engine. Its lightweight and doesn't require a seperate database server (The database is stored as a file on the computer) why why we have db.sqlite3
+
+# Where does SQL Come into this?
+<MenuItems.objects.create(...)> This isn't SQL but its Django's ORM translates your Python into SQL
+
+# Fix the Supervisor add and update Staff

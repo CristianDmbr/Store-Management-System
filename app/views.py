@@ -2394,7 +2394,7 @@ class StaffDetailAPI(APIView):
                  status = status.HTTP_200_OK
             )
         elif is_supervisor:
-            serializer = StaffSupervisorSerializers(staff, supervisor = request.user)
+            serializer = StaffSupervisorSerializers(staff)
 
             return Response(
                 {"role" : "Supervisor",

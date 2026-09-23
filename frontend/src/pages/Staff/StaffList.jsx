@@ -6,6 +6,7 @@ function StaffList(){
     const navigate = useNavigate();
 
     const [all_staff, setAllStaff] = useState([]);
+    const [role, setRole] = useState();
 
     useEffect(() => {
         fetch("http://localhost:8000/api/all_staff", {
@@ -15,7 +16,25 @@ function StaffList(){
             .then(data => {
                 setAllStaff(data)
             })
+        fetch("http://localhost:8000/api/user_name",{
+            credentials : "include"
+        })
+            .then(request => request.json())
+            .then(data => {
+                setRole(data.role)
+            })
     },[])
+
+    function handleRedirect(event) {
+        event.preventDefault();
+
+        if (role == "Owner"){ 
+            navigate("/owner_dashboard")
+        }
+        else if (role == "Supervisor"){
+            navigate("/supervisor_dashboard")
+        }
+    }
 
     return (
         <div>
@@ -38,7 +57,7 @@ function StaffList(){
             </div>
 
             <div>
-                <button onClick={(event) => navigate("/owner_dashboard")}>Back</button>
+                <button onClick={handleRedirect}>Back</button>
             </div>
 
         </div>
