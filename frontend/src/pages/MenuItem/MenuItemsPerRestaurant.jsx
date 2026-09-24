@@ -8,6 +8,7 @@ function MenuItemsPerRestaurant(){
 
     const [all_menu_items, setAllMenuItems] = useState([]);
     const [restaurant, setRestaurant] = useState();
+    const [role, setRole] = useState();
 
     useEffect(() => {
         fetch(`http://localhost:8000/api/menu_items_per_restaurants/${restaurant_pk}`,{
@@ -17,6 +18,14 @@ function MenuItemsPerRestaurant(){
             .then(data => {
                 setAllMenuItems(data.all_menu_items);
                 setRestaurant(data.restaurant);
+            })
+        
+        fetch("http://localhost:8000/api/user_name",{
+            credentials : "include"
+        })
+            .then(request => request.json())
+            .then(data => {
+                setRole(data.role)
             })
 
     },[restaurant_pk])
@@ -51,14 +60,22 @@ function MenuItemsPerRestaurant(){
                         <div key = {menu_item.pk}>
                             <p>{menu_item.name} : £{menu_item.price}</p>
                             <button onClick={(event) => {navigate(`/menu_item_info/${menu_item.pk}/${restaurant_pk}`)}}><small>info</small></button>
-                            <button onClick={(event) => {navigate(`/menu_item_update/${menu_item.pk}/${restaurant_pk}`)}}>Update</button>
-                            <button onClick={(event) => {navigate(`/menu_item_delete/${menu_item.pk}/${restaurant_pk}`)}}><small>Delete</small></button>
+                            
+                            {role == "Owner" && (
+                                <>
+                                <button onClick={(event) => {navigate(`/menu_item_update/${menu_item.pk}/${restaurant_pk}`)}}>Update</button>
+                                <button onClick={(event) => {navigate(`/menu_item_delete/${menu_item.pk}/${restaurant_pk}`)}}><small>Delete</small></button>
+                                </>
+                            )}
+                            
                         </div>
                     ))}
                 </div>
             ))}
 
-            <button onClick={(event) => {navigate(`/menu_item_add/${restaurant_pk}`)}}>Add</button>
+            {role == "Owner" && (
+                <button onClick={(event) => {navigate(`/menu_item_add/${restaurant_pk}`)}}>Add</button>
+            )}
         
             <div>
                 <button onClick={(event) => {navigate("/restaurant_list")}}>Back</button>

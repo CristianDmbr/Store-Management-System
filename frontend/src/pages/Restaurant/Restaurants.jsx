@@ -26,6 +26,17 @@ function RestaurantsList() {
           });
     },[]);
 
+    function HandleRouting(event) {
+        event.preventDefault();
+
+        if (role == "Owner"){
+            navigate("/owner_dashboard")
+        }
+        else if (role == "Supervisor"){
+            navigate("/supervisor_dashboard")
+        }
+    }
+
     return (
         <div>
             <h1> {username}'s Restaurant List</h1>
@@ -40,25 +51,30 @@ function RestaurantsList() {
                         <p>Tables : {restaurant.number_of_tables}</p>
 
                         <button onClick={(event) => navigate(`/menu_items_per_restaurant/${restaurant.pk}`)}>Menu List</button>
-                        <button onClick={(event) => navigate(`/restaurant_info/${restaurant.pk}`)}>View details</button>
-                        <button onClick={(event) => navigate(`/update_restaurant/${restaurant.pk}`)}>Update</button>
-                        <button onClick={(event) => navigate(`/delete_restaurant/${restaurant.pk}`)}>Delete</button>
+                        {role === "Owner" && (
+                            <>
+                                <button onClick={() => navigate(`/restaurant_info/${restaurant.pk}`)}> View details </button>
+                                <button onClick={() => navigate(`/update_restaurant/${restaurant.pk}`)}> Update </button> 
+                                <button onClick={() => navigate(`/delete_restaurant/${restaurant.pk}`)}> Delete</button>
+                            </>
+                        )}
 
                     </div>
                 ))} 
             </div>
 
-            <div>
-                <button onClick={(event) => navigate("/add_restaurant")}>Add Restaurant</button>
-            </div>
+            {role === "Owner" && (
+                <div>
+                    <button onClick={(event) => navigate("/add_restaurant")}>Add Restaurant</button>
+                </div>
+            )}
 
             <div>
-                <button onClick={(event) => navigate("/owner_dashboard")} >Dashboard</button>
+                <button onClick={HandleRouting} >Dashboard</button>
             </div>
 
         </div>
     )
 
 }
-
 export default RestaurantsList;

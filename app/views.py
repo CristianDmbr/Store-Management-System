@@ -2120,28 +2120,34 @@ class MyRestaurantsAPI(APIView):
 
     def get(self, request):
 
-        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supevisor").exists():
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
             return Response(
                 {"detail" : "You do not have the permission to access this resource"}, 
                 status = status.HTTP_403_FORBIDDEN)
 
         is_owner = request.user.groups.filter(name = "Owner").exists()
-        is_supervisor = request.user.groups.filter(name = "Supervisr").exists()
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
 
         if is_owner:
             restaurants = Restaurant.objects.filter(owner = request.user)
             serializer = RestaurantSerializer(restaurants, many = True)
+            return Response(
+                {
+                    "restaurants" : serializer.data,
+                    "role" : "Owner"
+                },
+                status = status.HTTP_200_OK
+            )
         elif is_supervisor:
             restaurants = Restaurant.objects.filter(supervisor = request.user)
             serializer = RestaurantSerializer(restaurants, many = True)
-
-        return Response(
-            {
-                "restaurants" : serializer.data,
-                "role" : "Owner" if is_owner else "Supervisor"
-            },
-            status = status.HTTP_200_OK
-        )
+            return Response(
+                {
+                    "restaurants" : serializer.data,
+                    "role" : "Supervisor"
+                },
+                status = status.HTTP_200_OK
+            )
 
     def post(self, request):
         
@@ -2353,7 +2359,7 @@ class MyStaffAPI(APIView):
 
         elif is_supervisor:
 
-            supervisor_staff_serializer = StaffSupervisorSerializers(data = request.data, supervisor = request.user)
+            supervisor_staff_serializer = StaffSupervisorSerializers(data = request.data)
 
             if not supervisor_staff_serializer.is_valid():
                 user.delete()
@@ -2744,9 +2750,7 @@ class CollectionShiftAPI(APIView):
                 {"detail" : "You do not have the permission to add a new shift"}
             )
         
-        serializer = ShiftSerialiser(
-            data = request.data,
-            supervisor = request.user)
+        serializer = ShiftSerialiser(data = request.data)
 
         if serializer.is_valid():
             serializer.save()

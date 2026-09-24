@@ -204,12 +204,6 @@ class ShiftSerialiser(serializers.ModelSerializer):
   
     return attrs
   
-  def __init__(self,*args, supervisor = None, **kwargs):
-    super().__init__(*args,**kwargs)
-
-    if supervisor:
-      self.fields["employee"].queryset = Staff.objects.filter(restaurant__supervisor = supervisor)
-  
 class MenuItemSerialiser(serializers.ModelSerializer):
 
   display_category = serializers.CharField(

@@ -26,6 +26,8 @@ import MenuItemAdd from "./pages/MenuItem/MenuItemAdd";
 import UpdateMenuItem from "./pages/MenuItem/MenuItemUpdate";
 
 import ShiftList from "./pages/Shift/ShiftList";
+import AddShift from "./pages/Shift/ShiftAdd";
+import InfoShift from "./pages/Shift/ShiftInfo";
 
 
 
@@ -143,6 +145,16 @@ function App() {
         <Route
           path = "/shifts_list"
           element = {<ShiftList/>}
+        />
+
+        <Route
+          path = "/shift_add"
+          element = {<AddShift/>}
+        />
+
+        <Route
+          path = "/shift_info/:shift_pk"
+          element = {<InfoShift/>}
         />
 
 

@@ -1087,4 +1087,8 @@ SQLite is a database engine. Its lightweight and doesn't require a seperate data
 # Where does SQL Come into this?
 <MenuItems.objects.create(...)> This isn't SQL but its Django's ORM translates your Python into SQL
 
-# Fix the Supervisor add and update Staff
+# Add Shift management (delete, info (Continue), update)
+# Add Reservation management
+# Add Order management
+
+# Independent Shift List

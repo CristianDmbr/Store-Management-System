@@ -9,7 +9,7 @@ function SupervisorDashboard() {
     const navigate = useNavigate();
     const [csrfToken, setCSRFToken] = useState();
 
-    useEffect((event) => {
+    useEffect(() => {
         fetch("http://localhost:8000/api/csrf",{
             credentials : "include"
         })
@@ -38,7 +38,17 @@ function SupervisorDashboard() {
             <h1>Supervisor's Dashboard page</h1>
             <UserGreetings/>
 
-            <button onClick={(event) => {navigate("/staff_list")}}>Manage Staff</button>
+            <div>
+                <button onClick={(event) => {navigate("/staff_list")}}>Manage Staff</button>
+            </div>
+
+            <div>
+                <button onClick={(event) => {navigate("/restaurant_list")}}>Restaurant</button>
+            </div>
+
+            <div>
+                <button onClick={(event) => {navigate("/shifts_list")}}>Manage Shifts</button>
+            </div>
 
             <div>
                 <button onClick={handleSubmit}>Logout</button>

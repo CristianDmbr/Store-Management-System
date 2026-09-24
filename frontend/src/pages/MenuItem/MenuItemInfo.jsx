@@ -7,6 +7,7 @@ function MenuItemInfo() {
     const { menu_item_pk, restaurant_pk } = useParams();
 
     const [menu_item, setMenuItem] = useState();
+    const [role, setRole] = useState();
 
     const [restaurant, setRestaurant] = useState();
     const [price, setPrice] = useState();
@@ -33,6 +34,15 @@ function MenuItemInfo() {
                 setCalories(data.calories);
                 setIngredience(data.ingredience);
             });
+
+        fetch("http://localhost:8000/api/user_name",{
+            credentials : "include"
+        })
+            .then(request => request.json())
+            .then(data => (
+                setRole(data.role)
+            ))
+
     }, [menu_item_pk]);
 
     if (!menu_item) {
@@ -97,7 +107,9 @@ function MenuItemInfo() {
             </div>
 
             <button onClick={(event) => navigate(`/menu_items_per_restaurant/${restaurant_pk}`) }> Back to Menu </button>
-            <button onClick={(event) => navigate(`/menu_item_update/${menu_item_pk}/${restaurant_pk}`)}><strong>Update</strong></button>
+            {role == "Owner" && (
+                <button onClick={(event) => navigate(`/menu_item_update/${menu_item_pk}/${restaurant_pk}`)}><strong>Update</strong></button>
+            )}
 
         </div>
     );

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
   
 function ShiftList(){
 
-    const navigate = useNavigate();
+    const navigate = useNavigate("");
 
     const [all_shifts, setAllShifts] = useState([]);
     const [role, setRole] = useState("");
@@ -29,6 +29,15 @@ function ShiftList(){
         return group
     },{})
 
+    function HandleRedirects(event) {
+        if (role == "Owner"){
+            navigate("/owner_dashboard")
+        }
+        else if (role == "Supervisor"){
+            navigate("/supervisor_dashboard")
+        }
+    }
+
     return (
         <div>
             <h1>Shift List</h1>
@@ -40,16 +49,25 @@ function ShiftList(){
                     <div key = {employeePK}>
                         <h2>{employee.employee_name_display} {employee.employee_surname_display}</h2>
                         {shifts.map((shift) => (
-                            <p key = {shift.pk}>
-                                {shift.start_time_display} : {shift.end_time_display} <small>{shift.status_display}</small>
-                            </p>
-            ))}
+                            <>
+                            <p key={shift.pk}> {shift.start_time_display} : {shift.end_time_display}{" "} <small>{shift.status_display}</small></p>
+                            {role === "Supervisor" && (
+                                <button onClick={() => navigate(`/shift_info/${shift.pk}`)}> View </button> 
+                )}
+            </>
+        ))}
                     </div>
                 )
             })}
 
+            {role == "Supervisor" && (
+                <div>
+                    <button onClick={(event) => {navigate("/shift_add")}}>Schedule Shift</button>
+                </div>
+            )}
+
             <div>
-                <button onClick = {(event) => {navigate("/owner_dashboard")}}>Back</button>
+                <button onClick = {HandleRedirects}>Back</button>
             </div>
 
         </div>
