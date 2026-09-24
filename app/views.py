@@ -2778,7 +2778,11 @@ class DetailShiftAPI(APIView):
         serializer = ShiftSerialiser(shift)
 
         return Response(
-            serializer.data,
+            {
+                "serialized_data" : serializer.data,
+                "duration_hours" : shift.duration_hours,
+                "earnings" : shift.earnings
+            },
             status = status.HTTP_200_OK
         )
 

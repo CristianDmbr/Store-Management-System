@@ -28,6 +28,7 @@ import UpdateMenuItem from "./pages/MenuItem/MenuItemUpdate";
 import ShiftList from "./pages/Shift/ShiftList";
 import AddShift from "./pages/Shift/ShiftAdd";
 import InfoShift from "./pages/Shift/ShiftInfo";
+import DeleteShift from "./pages/Shift/ShiftDelete";
 
 
 
@@ -155,6 +156,11 @@ function App() {
         <Route
           path = "/shift_info/:shift_pk"
           element = {<InfoShift/>}
+        />
+
+        <Route
+          path = "/shift_delete/:shift_pk"
+          element = {<DeleteShift/>}
         />
 
 

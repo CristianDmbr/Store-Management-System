@@ -49,6 +49,23 @@ function AddShift(){
                 "status" : status
             })
         })
+        .then(response => {
+
+            if (!response.ok) {
+
+                return response.json().then(data => {
+
+                    console.log("Django error:", data);
+
+                    throw new Error(`HTTP ${response.status}`);
+
+                });
+
+            }
+
+            return response.json();
+
+        })
             .then(() => navigate("/shifts_list"))
             .catch((error) => {
                 console.log(error)
@@ -64,6 +81,7 @@ function AddShift(){
                 <div>
                     <label>Staff : </label>
                     <select value={employee} onChange = {(event) => {setEmployee(event.target.value)}}>
+                        <option value="" disabled>Choose a Staff Member</option>
                         {all_employees.map((employee) => (
                             <option key = {employee.pk} value = {employee.pk}>{employee.name} {employee.surname}</option>
                         ))}

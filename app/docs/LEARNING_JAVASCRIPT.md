@@ -1087,7 +1087,26 @@ SQLite is a database engine. Its lightweight and doesn't require a seperate data
 # Where does SQL Come into this?
 <MenuItems.objects.create(...)> This isn't SQL but its Django's ORM translates your Python into SQL
 
-# Add Shift management (delete, info (Continue), update)
+# React.Fragment
+I tried to have a map <p> object have two buttons each and React does not allow this.
+React.Fragment is used to say that "All of these things belong together as one thing"
+What is Fragment?
+An invisible wrapper
+e.g. :
+<React.Fragment>
+    <p>Hello</p>
+    <button>View</button>
+    <button>Delete</button>
+</React.Fragment>
+"Treat these elements as one group"
+
+# Difference between React.Fragment and <> </>
+Both group elements in one group. Fragment is used when we can add it a key e.g. shift.pk. <> </> does the same thing but when we don't require a key e.g. buttons grouped together.
+
+# When modidying the database it does not affect the useCase.
+
+
+# Add Shift management (update)
 # Add Reservation management
 # Add Order management
 
