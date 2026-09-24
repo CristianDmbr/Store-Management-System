@@ -51,6 +51,10 @@ function SupervisorDashboard() {
             </div>
 
             <div>
+                <button onClick={(event) => {navigate("/reservation_list")}}>Manager Reservations</button>
+            </div>
+
+            <div>
                 <button onClick={handleSubmit}>Logout</button>
             </div>
 

@@ -1105,8 +1105,6 @@ Both group elements in one group. Fragment is used when we can add it a key e.g.
 
 # When modidying the database it does not affect the useCase.
 
-
-# Add Shift management (update)
 # Add Reservation management
 # Add Order management
 

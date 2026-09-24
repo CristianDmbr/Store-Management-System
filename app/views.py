@@ -2857,7 +2857,7 @@ class CollectionReservationAPI(APIView):
             )
         
         all_reservations = Reservation.objects.filter(restaurant__supervisor = request.user)
-        serializer = ReservationSerialiser(all_reservations, many = True, supervisor = request.user)
+        serializer = ReservationSerialiser(all_reservations, many = True)
 
         return Response(
             serializer.data,
@@ -2871,7 +2871,7 @@ class CollectionReservationAPI(APIView):
                 status = status.HTTP_403_FORBIDDEN
             )
         
-        serializer = ReservationSerialiser(data = request.data, supervisor = request.user)
+        serializer = ReservationSerialiser(data = request.data)
 
         if serializer.is_valid():
             serializer.save()

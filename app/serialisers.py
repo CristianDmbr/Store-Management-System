@@ -97,9 +97,20 @@ class RestaurantSerializer(serializers.ModelSerializer):
         return attrs
     
 class ReservationSerialiser(serializers.ModelSerializer):
+
+  restaurant_name_display = serializers.CharField(
+    source = "restaurant.restaurant_name",
+    read_only = True
+  )
+
+  reservation_date_time_display = serializers.SerializerMethodField()
+
   class Meta:
     model = Reservation
-    fields = ["pk","name_of_reservation","restaurant","is_active","kids","teens","adults","reservation_date_time","phone_number","created_at"]
+    fields = ["pk","name_of_reservation","restaurant","restaurant_name_display","is_active","kids","teens","adults","reservation_date_time","reservation_date_time_display","phone_number","created_at"]
+  
+  def get_reservation_date_time_display(self, obj):
+   return obj.reservation_date_time.astimezone().strftime("%d/%m/%Y %H:%M")
 
   def validate(self, attrs):
     name_of_reservation = attrs.get("name_of_reservation")
@@ -107,12 +118,6 @@ class ReservationSerialiser(serializers.ModelSerializer):
 
     validate_unique_restaurant_name_reservation(restaurant, name_of_reservation, self.instance)
     return attrs
-
-  def __init__(self, *args, supervisor = None, **kwargs):
-    super().__init__(*args, **kwargs)
-
-    if supervisor:
-      self.fields["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
 
 # Used by owners 
 class StaffSerialiser(serializers.ModelSerializer):
