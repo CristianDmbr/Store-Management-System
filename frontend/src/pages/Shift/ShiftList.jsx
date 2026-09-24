@@ -90,8 +90,8 @@ function ShiftList(){
 
                                 {role === "Supervisor" && (
                                     <>
-                                        <button onClick={() => navigate(`/shift_info/${shift.pk}`)}> View </button>
-
+                                        <button onClick={() => navigate(`/shift_info/${shift.pk}`)}>View </button>
+                                        <button onClick={() => navigate(`/shift_update/${shift.pk}`)}>Update</button>
                                         <button onClick={() => HandleDeleteshift(shift.pk)}>Remove</button>
                                     </>
                                 )}
