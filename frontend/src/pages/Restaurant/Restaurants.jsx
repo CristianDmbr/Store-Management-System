@@ -70,7 +70,7 @@ function RestaurantsList() {
             )}
 
             <div>
-                <button onClick={HandleRouting} >Dashboard</button>
+                <button onClick={HandleRouting}>Dashboard</button>
             </div>
 
         </div>

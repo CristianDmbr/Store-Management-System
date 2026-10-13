@@ -1,7 +1,6 @@
 import UserGreetings from "../components/Greetings";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
  
 function OwnerDashboard() {
 

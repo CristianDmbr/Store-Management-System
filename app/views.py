@@ -2898,7 +2898,7 @@ class DetailReservationAPI(APIView):
             )
         
         reservation = get_object_or_404(Reservation, pk = reservation_pk)
-        serializer = ReservationSerialiser(reservation, supervisor = request.user)
+        serializer = ReservationSerialiser(reservation)
 
         return Response(
             serializer.data,

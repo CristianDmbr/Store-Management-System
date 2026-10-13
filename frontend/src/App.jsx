@@ -32,8 +32,6 @@ import DeleteShift from "./pages/Shift/ShiftDelete";
 import UpdateShift from "./pages/Shift/ShiftUpdate";
 
 import ReservationList from "./pages/Reservation/ReservationList";
-import InfoReservation from "./pages/Reservation/ReservationInfo";
-
 
 function App() {
   return (
@@ -174,11 +172,6 @@ function App() {
         <Route
           path = "/reservation_list"
           element = {<ReservationList/>}
-        />
-
-        <Route
-          path = "/reservation_info/:reservation_pk"
-          element = {<InfoReservation/>}
         />
 
       </Routes>

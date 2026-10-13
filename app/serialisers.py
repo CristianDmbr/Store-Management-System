@@ -253,7 +253,7 @@ class OrderSerializer(serializers.ModelSerializer):
       self.fields["restaurant"].queryset = Restaurant.objects.filter(who_works_here__user = staff)
       self.fields["staff"].read_only = True
     elif supervisor:
-      self.fields["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
+      self.fiel ["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
       self.fields["staff"].queryset = Staff.objects.filter(restaurant__supervisor = supervisor)
     
 class OrderItemSerializer(serializers.ModelSerializer):

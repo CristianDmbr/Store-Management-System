@@ -1105,7 +1105,7 @@ Both group elements in one group. Fragment is used when we can add it a key e.g.
 
 # When modidying the database it does not affect the useCase.
 
-# Add Reservation management
-# Add Order management
-
-# Independent Shift List
+# Understand the whole () {} or (() => {})
+# Underrstand when to use () or {} for code 
+# Understand the Synchronous vs asynchronous programming
+# Start Reservation Management
