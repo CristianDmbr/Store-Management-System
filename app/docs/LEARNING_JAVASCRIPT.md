@@ -1106,6 +1106,38 @@ Both group elements in one group. Fragment is used when we can add it a key e.g.
 # When modidying the database it does not affect the useCase.
 
 # Understand the whole () {} or (() => {})
-# Underrstand when to use () or {} for code 
+1. Regular Function Syntax:
+<
+        function greet(name) {
+                console.log("Hello" + name)
+        }
+>
+2. Arrow Function:
+<
+        const greet = (name) => {
+                console.log("Hello !" + name)
+        }
+>
+
+Both do the same and can be called the same : < greet("Cristian") >
+
 # Understand the Synchronous vs asynchronous programming
-# Start Reservation Management
+Synchronours : Doing things in order
+
+Asynchronous : You can start a task and continue doing other things while waiting for it to finish.
+<
+        console.log("1");
+
+        fetch("http://localhost:8000/api/reservations")
+                .then(response => response.json())
+                .then(console.lot("2))
+        
+        console.log("3")
+>
+Output would be 1,3,2
+
+# Multiple useEffect
+We can have multiple useEffects in a Page (Each has its own responsibilites)
+They are processed in the other they are declared
+
+# Finish Reservation Add
