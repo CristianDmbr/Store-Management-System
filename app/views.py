@@ -2927,7 +2927,7 @@ class DetailReservationAPI(APIView):
             )
         
         reservation = get_object_or_404(Reservation, pk = reservation_pk)
-        serializer = ReservationSerialiser(reservation, data = request.data, supervisor = request.user)
+        serializer = ReservationSerialiser(reservation, data = request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -2949,7 +2949,7 @@ class DetailReservationAPI(APIView):
             )
         
         reservation = get_object_or_404(Reservation, pk = reservation_pk)
-        serializer = ReservationSerialiser(reservation, data = request.data, partial = True, supervisor = request.user)
+        serializer = ReservationSerialiser(reservation, data = request.data, partial = True)
 
         if serializer.is_valid():
             serializer.save()

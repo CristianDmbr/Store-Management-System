@@ -35,6 +35,7 @@ import ReservationList from "./pages/Reservation/ReservationList";
 import ReservationInfo from "./pages/Reservation/ReservationInfo";
 import ReservationDelete from "./pages/Reservation/ReservationDelete";
 import ReservationAdd from "./pages/Reservation/ReservationAdd";
+import ReservationUpate from "./pages/Reservation/ReservationUpdate";
 
 function App() {
   return (
@@ -191,6 +192,11 @@ function App() {
           path = "/reservation_add"
           element = {<ReservationAdd/>}
         />
+
+        <Route
+          path = "/reservation_update/:reservation_pk"
+          element = {<ReservationUpate/>}
+          />
 
       </Routes>
     </BrowserRouter>

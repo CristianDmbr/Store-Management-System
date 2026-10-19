@@ -1148,4 +1148,10 @@ Similar to a Python dictionary {} / JavaScript object = {} but still needs to be
 1. When receiving it as a body we use request.json() to get the json and easily access them
 2. When sending data over we need to specify the content_type and convert the JavaScript into a JSON
 
+# ISO time
+Standerdises the time so doesn't matter of the local time. 
+2026-10-20T18:30:00Z  -> Its the Z
+
+# .slice(0,16) cuts a string from index 0 and till 15 (16 is not included)
+
 # Finish Reservation Add (Display all Restaurants )

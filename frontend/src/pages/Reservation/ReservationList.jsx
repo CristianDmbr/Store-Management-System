@@ -26,6 +26,7 @@ function ReservationList(){
                         <h2> {reservation.name_of_reservation} ({reservation.restaurant_name_display}) : {reservation.reservation_date_time_display}</h2>
                             <button onClick={(event) => {navigate(`/reservation_info/${reservation.pk}`)}}><small>info</small></button>
                             <button onClick={(event) => {navigate(`/reservation_delete/${reservation.pk}`)}}><strong>Delete</strong></button>
+                            <button onClick={(event) => {navigate(`/reservation_update/${reservation.pk}`)}}><strong>Update</strong></button>
                     </div>
                 ))}
             </div>

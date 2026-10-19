@@ -103,14 +103,19 @@ class ReservationSerialiser(serializers.ModelSerializer):
     read_only = True
   )
 
+  # Fields made by Python
   reservation_date_time_display = serializers.SerializerMethodField()
+  created_at_display = serializers.SerializerMethodField()
 
   class Meta:
     model = Reservation
-    fields = ["pk","name_of_reservation","restaurant","restaurant_name_display","is_active","kids","teens","adults","reservation_date_time","reservation_date_time_display","phone_number","created_at"]
+    fields = ["pk","name_of_reservation","restaurant","restaurant_name_display","is_active","kids","teens","adults","reservation_date_time","reservation_date_time_display","phone_number","created_at","created_at_display"]
   
   def get_reservation_date_time_display(self, obj):
    return obj.reservation_date_time.astimezone().strftime("%d/%m/%Y %H:%M")
+  
+  def get_created_at_display(self, obj):
+    return obj.created_at.astimezone().strftime("%d/%m/%Y %H:%M")
 
   def validate(self, attrs):
     name_of_reservation = attrs.get("name_of_reservation")

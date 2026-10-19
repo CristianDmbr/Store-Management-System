@@ -57,7 +57,7 @@ function ReservationInfo(){
             </p>
 
             <p>
-                <label>Created At</label> : {reservation.created_at}
+                <label>Created At</label> : {reservation.created_at_display}
             </p>
 
             <p>
