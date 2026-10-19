@@ -1,7 +1,7 @@
 // The Reservation model has "created_at" field which does not need to be pushed here since its set to a default value
 // in the models.py page.
 // We still mention it inside of the serializer to be able to display it for reservation info page.
-
+// Test
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
