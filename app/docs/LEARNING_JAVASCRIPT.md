@@ -1140,4 +1140,12 @@ Output would be 1,3,2
 We can have multiple useEffects in a Page (Each has its own responsibilites)
 They are processed in the other they are declared
 
-# Finish Reservation Add
+# What is JSON
+The structure used to pass data from backend to front end.
+Similar to a Python dictionary {} / JavaScript object = {} but still needs to be converted using JSON.stringify.
+
+# Flow of JSON
+1. When receiving it as a body we use request.json() to get the json and easily access them
+2. When sending data over we need to specify the content_type and convert the JavaScript into a JSON
+
+# Finish Reservation Add (Display all Restaurants )

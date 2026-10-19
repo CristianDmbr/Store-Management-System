@@ -14,7 +14,6 @@ function ReservationList(){
             .then(data => {
                 setReservations(data)
             })
-            .then(console.log(all_reservations))
     },[]);
 
     return(
