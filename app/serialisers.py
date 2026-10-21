@@ -247,19 +247,20 @@ class MenuItemSerialiser(serializers.ModelSerializer):
     return attrs
   
 class OrderSerializer(serializers.ModelSerializer):
+
+  restaurant_name = serializers.CharField(
+    source = "restaurant.restaurant_name",
+    read_only = True
+  )
+
+  order_status_display = serializers.CharField(
+    source = "get_status_display",
+    read_only = True
+  )
+
   class Meta:
     model = Order
-    fields = ["pk","reservation","restaurant","staff","date_time_of_order","table_number","status","note"]
-  
-  def __init__(self, *args, staff = None, supervisor = None, **kwargs):
-    super().__init__(*args,**kwargs)
-
-    if staff:
-      self.fields["restaurant"].queryset = Restaurant.objects.filter(who_works_here__user = staff)
-      self.fields["staff"].read_only = True
-    elif supervisor:
-      self.fiel ["restaurant"].queryset = Restaurant.objects.filter(supervisor = supervisor)
-      self.fields["staff"].queryset = Staff.objects.filter(restaurant__supervisor = supervisor)
+    fields = ["pk","reservation","restaurant","restaurant_name","staff","date_time_of_order","table_number","status","order_status_display","note"]
     
 class OrderItemSerializer(serializers.ModelSerializer):
   class Meta:

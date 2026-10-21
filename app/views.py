@@ -2987,7 +2987,10 @@ class CollectionOrderAPI(APIView):
             serializer = OrderSerializer(all_orders, many = True)
 
             return Response(
-                serializer.data,
+                {
+                    "orders" : serializer.data,
+                    "role" : "supervisor"
+                },
                 status = status.HTTP_200_OK
             )
         elif is_staff:
@@ -2996,7 +2999,10 @@ class CollectionOrderAPI(APIView):
             serializer = OrderSerializer(all_orders, many = True)
 
             return Response(
-                serializer.data,
+                {
+                    "orders" : serializer.data,
+                    "role" : "staff"
+                },
                 status = status.HTTP_200_OK
             )
     def post(self, request):
