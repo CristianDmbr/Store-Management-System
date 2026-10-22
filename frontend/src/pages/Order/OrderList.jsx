@@ -19,21 +19,26 @@ function OrderList(){
             })
     },[]);
 
-    const orders_by_restaurants_status = all_orders.reduce((groups, order) => {
-        const restaurant = order.restaurant_name;
+    const restaurant_orders_by_status = all_orders.reduce((groups,order) => {
+        const restaurant_pk = order.restaurant;
+        const restaurant_name = order.restaurant_name;
         const status = order.order_status_display;
 
-        if (!groups[restaurant]){
-            groups[restaurant] = {}
-        }
+        if (!groups[restaurant_pk]) {
+            groups[restaurant_pk] = {
+                "restaurant_name" : restaurant_name,
+                "orders_by_status" : {}
+            }
+        };
 
-        if (!groups[restaurant][status]){
-            groups[restaurant][status] = []
-        }
+        if (!groups[restaurant_pk].orders_by_status[status]){
+            groups[restaurant_pk].orders_by_status[status] = []
+        };
 
-        groups[restaurant][status].push(order);
+        groups[restaurant_pk].orders_by_status[status].push(order);
 
         return groups;
+
     },{});
 
     return (
@@ -41,22 +46,24 @@ function OrderList(){
             <h1>Order List</h1>
 
             <div>
-                {Object.entries(orders_by_restaurants_status).map(([restaurant,orders_by_status]) => (
-                    <div key = {restaurant}>
-                        <h2>{restaurant}</h2>
+                {Object.entries(restaurant_orders_by_status).map(([restaurant, restaurant_data]) => (
+                    <div key={restaurant}>
+                        <h2>{restaurant_data.restaurant_name}</h2>
 
-                        {!orders_by_status && (
-                            <h2>No Order</h2>
+                        {!restaurant_data.orders_by_status && (
+                            <h3>No Orders</h3>
                         )}
 
-                        {Object.entries(orders_by_status).map(([status,orders]) => (
+                        {Object.entries(restaurant_data.orders_by_status).map(([status,orders]) => (
                             <div key={status}>
-                                <h3>{status}</h3>
                                 {orders.map((order) => (
-                                    <p key={order.pk}>Table Number : {order.table_number}</p>
+                                <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : "Reservation"})</p>     
                                 ))}
                             </div>
                         ))}
+                        <div>
+                            <button onClick={(event) => {navigate(`/order_add/${restaurant}`)}}>Start Order</button>
+                        </div>
                     </div>
                 ))}
             </div>

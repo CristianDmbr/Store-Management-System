@@ -2177,13 +2177,17 @@ class RestaurantDetailAPI(APIView):
 
     def get(self, request, restaurant_pk):
 
-        if not request.user.groups.filter(name = "Owner").exists():
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
             return Response(
                 {"detail" : "You do not have permission to view a Restaurant"},
                 status = status.HTTP_403_FORBIDDEN
             )
         
-        restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+        if request.user.groups.filter(name = "Supervisor").exists():
+            restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, supervisor = request.user)
+        elif request.user.groups.filter(name = "Owner").exists():
+            restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
+
 
         serializer = RestaurantSerializer(restaurant)
 
