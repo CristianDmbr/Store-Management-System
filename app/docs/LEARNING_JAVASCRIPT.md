@@ -1159,6 +1159,26 @@ Say we have a div and inside there we want a
 <h1> and <button>. We cannot do that because React wants them individually.
 So we can wrap these two around in another div
 
-# Start Order add page
+# Generate DropDown automatically 
+<
+{Array.from( { length : numberOfTablesForRestaurant } , (_, index) => index + 1 ).map((table) => (
+                        <option key={table} value ={table}>Table {table}</option>
+                    ))} >
+
+
+<Array.from()> : can be used to create a new array from something that it can iterate over or that has a length and indexed elements.
+e.g. <Array.from("hello")> => ["h", "e", "l", "l", "o"]
+It can also accept a mapping function
+e.g. Array.from([10, 20, 30], (number) => number * 2); -> [20, 40, 60]
+
+Generate dropdown based on a length:
+{ length : numberOfTablesForRestaurant } e.g. { length : 5 } => [undefined, undefined, undefined, undefined, undefined] (Its undefined because we didn't specify what values to put in them)
+{ (value, index) => index + 1 } : Arrow function 
+- Value : represents the actual item stored in the array
+- Index : Position of the item in the array from 0
+
+# If we generate the array do we generate the entire array first or we first generate a number and map it to an option? -> First we generate the entire array then map
+
+# For notes text use a <textarea> has rows : {num}, cols : {num}  
 
 # Start orders List 

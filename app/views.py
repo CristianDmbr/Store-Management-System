@@ -3021,7 +3021,7 @@ class CollectionOrderAPI(APIView):
 
         if is_supervisor:
 
-            serializer = OrderSerializer(data = request.data, supervisor = request.user)
+            serializer = OrderSerializer(data = request.data)
 
             if serializer.is_valid():
                 serializer.save()
@@ -3036,7 +3036,7 @@ class CollectionOrderAPI(APIView):
                 )
         elif is_staff:
 
-            serializer = OrderSerializer(data = request.data, staff = request.user)
+            serializer = OrderSerializer(data = request.data)
 
             if serializer.is_valid():
                 serializer.save()
@@ -3184,7 +3184,7 @@ class CollectionOrderItemAPI(APIView):
 
         if is_supervisor:
 
-            serializer = OrderItemSerializer(data = request.data, supervisor = request.user)
+            serializer = OrderItemSerializer(data = request.data)
 
             if serializer.is_valid():
                 serializer.save()
@@ -3199,7 +3199,7 @@ class CollectionOrderItemAPI(APIView):
                 )
         elif is_staff:
 
-            serializer = OrderItemSerializer(data = request.data, staff = request.user)
+            serializer = OrderItemSerializer(data = request.data)
 
             if serializer.is_valid():
                 serializer.save()
