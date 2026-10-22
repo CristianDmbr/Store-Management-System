@@ -45,7 +45,7 @@ function OrderList(){
         <div>
             <h1>Order List</h1>
 
-            <div>
+            <div >
                 {Object.entries(restaurant_orders_by_status).map(([restaurant, restaurant_data]) => (
                     <div key={restaurant}>
                         <h2>{restaurant_data.restaurant_name}</h2>
@@ -57,7 +57,15 @@ function OrderList(){
                         {Object.entries(restaurant_data.orders_by_status).map(([status,orders]) => (
                             <div key={status}>
                                 {orders.map((order) => (
-                                <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : "Reservation"})</p>     
+                                    <div style={{
+                                        display : "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}>
+                                        <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : "Reservation"})</p>  
+                                        <button onClick = {(event) => {navigate(`/order_delete/${order.pk}`)}}><strong>Delete</strong></button> 
+                                        <button><small>info</small></button>
+                                    </div>
                                 ))}
                             </div>
                         ))}

@@ -3065,9 +3065,9 @@ class DetailOrderAPI(APIView):
         
         order = get_object_or_404(Order, pk = order_pk)
         if is_supervisor:
-            serializer = OrderSerializer(order, supervisor = request.user)
+            serializer = OrderSerializer(order)
         elif is_staff:
-            serializer = OrderSerializer(order, staff = request.user)
+            serializer = OrderSerializer(order)
 
         return Response(
             serializer.data,
