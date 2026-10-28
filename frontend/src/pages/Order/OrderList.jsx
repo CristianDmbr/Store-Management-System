@@ -55,9 +55,11 @@ function OrderList(){
                         )}
 
                         {Object.entries(restaurant_data.orders_by_status).map(([status,orders]) => (
+                            
                             <div key={status}>
-                                {orders.map((order) => (
-                                    <div style={{
+                                <h3>{status}</h3>
+                                {orders.map((order) => ( 
+                                    <div key={order.pk} style={{
                                         display : "flex",
                                         alignItems: "center",
                                         justifyContent: "center",

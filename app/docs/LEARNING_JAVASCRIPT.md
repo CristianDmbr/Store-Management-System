@@ -1181,4 +1181,5 @@ Generate dropdown based on a length:
 
 # For notes text use a <textarea> has rows : {num}, cols : {num}  
 
-# Order the orders based on the status 
+# Order the orders based on the status from not served -> Waiting -> Complete
+# Order info page 
