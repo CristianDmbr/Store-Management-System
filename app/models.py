@@ -433,7 +433,7 @@ class OrderItem(models.Model):
     )
 
     quantity = models.PositiveIntegerField(default=1)
-    price_sold_at = models.DecimalField( max_digits = 8, decimal_places = 2)
+    price_sold_at = models.DecimalField( max_digits = 8, decimal_places = 2, null = True, blank = True)
 
     def save(self,*args,**kwargs):
         if not self.price_sold_at:
