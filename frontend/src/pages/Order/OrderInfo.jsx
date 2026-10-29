@@ -89,7 +89,19 @@ function OrderInfo(){
             <h2>Order List</h2>
 
             <div>
-                {Object.entries(orderItemSortedByCategory).map(([category, orders]) => (
+                {Object.entries(orderItemSortedByCategory)
+                .sort((a,b) => {
+                    const menuItemPriority = {
+                        "Main" : 1,
+                        "Starter" : 2,
+                        "Snack" : 3,
+                        "Desert" : 4,
+                        "Drink" : 5
+                    };
+
+                    return menuItemPriority[a[0]] - menuItemPriority[b[0]];
+                })
+                .map(([category, orders]) => (
                     <div key={category}>
                         <h3>{category}</h3>
                         {orders.map((order_item) => 

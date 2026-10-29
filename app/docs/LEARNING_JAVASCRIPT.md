@@ -1212,4 +1212,6 @@ If a - b is positive that means b is smaller so sort b first.
 </h3>
 <new Date> since the API returns a regular ISO data time, Java Script has a Date object that represents data and time so its a constructor
 <toLocaleString> Converts into readable UK time.
-# Order info page 
+
+
+# Add a complete button that changes the state of the order to compelte and navigates to order list.
