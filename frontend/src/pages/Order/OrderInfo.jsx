@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 function OrderInfo(){
 
     const navigate = useNavigate();
+    const [csrfToken, setCSRFToken] = useState("");
+
     const {order_pk} = useParams();
     const [orderObject, setOrderObject] = useState(null);
     const [allOrderItems, setAllOrderItems] = useState([]);
@@ -26,6 +28,15 @@ function OrderInfo(){
             .then(data => {
                 setAllOrderItems(data);
             })
+        
+        fetch("http://localhost:8000/api/csrf",{
+            credentials : "include"
+        })
+            .then(request => request.json())
+            .then(data => {
+                setCSRFToken(data.csrfToken)
+            })
+
     },[order_pk]);
 
     const orderItemSortedByCategory = allOrderItems.reduce((groups,order_item) => {
@@ -40,6 +51,52 @@ function OrderInfo(){
         return groups;
 
     },{});
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    async function handleDeleteOrderItem(order_item_pk) {
+        try {
+            const response = await fetch(
+                `http://localhost:8000/api/order_menu_item_decrease/${order_item_pk}`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    }
+                }
+            );
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Failed to update order item:", errorData);
+                return;
+            }
+    
+            // Fetch the latest order items from Django
+            const updatedResponse = await fetch(
+                `http://localhost:8000/api/order_items_per_order/${order_pk}`,
+                {
+                    credentials: "include"
+                }
+            );
+    
+            if (!updatedResponse.ok) {
+                throw new Error("Failed to refresh order items.");
+            }
+    
+            const updatedItems = await updatedResponse.json();
+    
+            // Update React state with the latest database records
+            setAllOrderItems(updatedItems);
+    
+        } catch (error) {
+            console.error("Error deleting order item:", error);
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     
     if (!orderObject){
         return(<div><h1>Loading</h1></div>)
@@ -106,9 +163,12 @@ function OrderInfo(){
                         <h3>{category}</h3>
                         {orders.map((order_item) => 
                             Array.from({length : order_item.quantity}, (_, index) => (
-                                <p key={`${order_item.pk} - ${index}`}>
+                                <div key={`${order_item.pk} - ${index}`}>
+                                    <p key={`${order_item.pk} - ${index}`}>
                                     {order_item.menu_item_name_display} - £{order_item.price_sold_at}
-                                </p>
+                                    </p>
+                                    <button onClick={() => handleDeleteOrderItem(order_item.pk)}>Delete</button>
+                                </div>
                             ))
                         )}
                     </div>

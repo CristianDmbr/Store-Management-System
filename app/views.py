@@ -3332,7 +3332,42 @@ class OrderItemsOrderBased(APIView):
             serialized.data,
             status = status.HTTP_200_OK
         )
-    
+
+class DecreaseOrderItemQuantity(APIView):
+
+    def delete(self,request, order_item_pk):
+
+        if not request.user.groups.filter(name = "Supervisor") and not request.user.groups.filter(name = "Staff"):
+            return Response(
+                {"data" : "You do not have the permission to decrease the quantity of order items"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        order_item_object = get_object_or_404(OrderItem, pk = order_item_pk)
+
+        if order_item_object.quantity > 1 :
+            order_item_object.quantity -= 1
+            order_item_object.save(update_fields = ["quantity"])
+
+            return Response(
+                {
+                    "message" : "Quantity decreased successfully",
+                    "quantity" : order_item_object.quantity
+                },
+                status = status.HTTP_200_OK 
+            )
+        else:
+            order_item_object.delete()
+
+            return Response(
+                {
+                    "message" : "Order has been removed successfully",
+                    "quantity" : 0
+                },
+                status = status.HTTP_200_OK
+            )
+
+
 ########################################################################################## Other
 
 # Indicates what role the user is.

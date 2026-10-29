@@ -138,6 +138,8 @@ urlpatterns = [
     path("api/detail_order_item/<int:order_item_pk>",views.DetailOrderItemAPI.as_view(),name="order_item_detail"),
     # Order items in a Order
     path("api/order_items_per_order/<int:order_pk>",views.OrderItemsOrderBased.as_view(), name = "order_items_for_order"),
+    # Decrease Order Item quantity
+    path("api/order_menu_item_decrease/<int:order_item_pk>", views.DecreaseOrderItemQuantity.as_view(), name = "decrease_order_menu_item"),
 
     # Other
     # Gets username of logged in user
