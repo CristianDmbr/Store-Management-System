@@ -273,9 +273,20 @@ class OrderSerializer(serializers.ModelSerializer):
     fields = ["pk","reservation","reservation_display_name","restaurant","restaurant_name","staff","staff_display_name","date_time_of_order","table_number","status","order_status_display","note"]
     
 class OrderItemSerializer(serializers.ModelSerializer):
+
+  menu_item_category_display = serializers.CharField(
+    source = "menu_item.get_category_display",
+    read_only = True
+  )
+
+  menu_item_name_display = serializers.CharField(
+    source = "menu_item.name",
+    read_only = True
+  )
+
   class Meta:
     model = OrderItem
-    fields = ["pk","menu_item","quantity","order","price_sold_at"]
+    fields = ["pk","menu_item","menu_item_name_display","menu_item_category_display","quantity","order","price_sold_at"]
     read_only_fields = ["pk"]
 
   def __init__(self, *args, supervisor = None, staff = None, **kwargs):

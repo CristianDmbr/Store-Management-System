@@ -42,6 +42,8 @@ import OrderAdd from "./pages/Order/OrderAdd";
 import OrderDelete from "./pages/Order/OrderDelete";
 import OrderInfo from "./pages/Order/OrderInfo";
 
+import OrderItemAdd from "./pages/OrderItem/OrderItemAdd";
+
 function App() {
   return (
     <BrowserRouter>
@@ -221,6 +223,11 @@ function App() {
         <Route
           path = "/order_info/:order_pk"
           element = {<OrderInfo/>}
+        />
+
+        <Route
+          path = "/order_menu_item_add/:order_pk/:restaurant_pk"
+          element = {<OrderItemAdd/>}
         />
 
       </Routes>

@@ -74,7 +74,7 @@ function OrderList(){
                                         alignItems: "center",
                                         justifyContent: "center",
                                     }}>
-                                        <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : "Reservation"})</p>  
+                                        <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : order.reservation_display_name}) ({new Date(order.date_time_of_order).toLocaleString("en-GB")})</p> 
                                         <button onClick = {(event) => {navigate(`/order_delete/${order.pk}`)}}><strong>Delete</strong></button> 
                                         <button onClick={(event) => {navigate(`/order_info/${order.pk}`)}}>View</button>
                                     </div>

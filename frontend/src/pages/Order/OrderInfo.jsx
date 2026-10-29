@@ -7,6 +7,7 @@ function OrderInfo(){
     const {order_pk} = useParams();
     const [orderObject, setOrderObject] = useState(null);
     const [allOrderItems, setAllOrderItems] = useState([]);
+    const [restaurant_pk, setRestaurantPk] = useState();
 
     useEffect(() => {
         fetch(`http://localhost:8000/api/detail_order/${order_pk}`,{
@@ -14,7 +15,8 @@ function OrderInfo(){
         })
             .then(request => request.json())
             .then(data => {
-                setOrderObject(data)
+                setOrderObject(data);
+                setRestaurantPk(data.restaurant);
             })
         
         fetch(`http://localhost:8000/api/order_items_per_order/${order_pk}`,{
@@ -22,11 +24,23 @@ function OrderInfo(){
         })
             .then(request => request.json())
             .then(data => {
-                setAllOrderItems(data)
-                console.log(allOrderItems)
+                setAllOrderItems(data);
             })
     },[order_pk]);
 
+    const orderItemSortedByCategory = allOrderItems.reduce((groups,order_item) => {
+        const order_category = order_item.menu_item_category_display
+
+        if (!groups[order_category]){
+            groups[order_category] = []
+        };
+
+        groups[order_category].push(order_item);
+
+        return groups;
+
+    },{});
+    
     if (!orderObject){
         return(<div><h1>Loading</h1></div>)
     }
@@ -71,6 +85,25 @@ function OrderInfo(){
             )}
 
             <hr/>
+
+            <h2>Order List</h2>
+
+            <div>
+                {Object.entries(orderItemSortedByCategory).map(([category, orders]) => (
+                    <div key={category}>
+                        <h3>{category}</h3>
+                        {orders.map((order_item) => 
+                            Array.from({length : order_item.quantity}, (_, index) => (
+                                <p key={`${order_item.pk} - ${index}`}>
+                                    {order_item.menu_item_name_display} - £{order_item.price_sold_at}
+                                </p>
+                            ))
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <button onClick={(event) => {navigate(`/order_menu_item_add/${order_pk}/${restaurant_pk}`)}}> Add menu Item </button>
                 
 
             <div>
