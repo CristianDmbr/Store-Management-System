@@ -3312,7 +3312,26 @@ class DetailOrderItemAPI(APIView):
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
-            )    
+            )   
+
+class OrderItemsOrderBased(APIView):
+
+    def get(self,request, order_pk):
+
+        if not request.user.groups.filter(name = "Supervisor") and not request.user.groups.filter(name = "Staff"):
+            return Response(
+                {"data" : "You do not have the permission to get all of the menu items for a order"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        all_items_ordered = OrderItem.objects.filter(order = order_pk)
+
+        serialized = OrderItemSerializer(all_items_ordered, many = True)
+
+        return Response(
+            serialized.data,
+            status = status.HTTP_200_OK
+        )
     
 ########################################################################################## Other
 

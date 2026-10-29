@@ -258,9 +258,19 @@ class OrderSerializer(serializers.ModelSerializer):
     read_only = True
   )
 
+  reservation_display_name = serializers.CharField(
+    source = "reservation.name_of_reservation",
+    read_only = True
+  )
+
+  staff_display_name = serializers.CharField(
+    source = "staff.name",
+    read_only = True
+  )
+
   class Meta:
     model = Order
-    fields = ["pk","reservation","restaurant","restaurant_name","staff","date_time_of_order","table_number","status","order_status_display","note"]
+    fields = ["pk","reservation","reservation_display_name","restaurant","restaurant_name","staff","staff_display_name","date_time_of_order","table_number","status","order_status_display","note"]
     
 class OrderItemSerializer(serializers.ModelSerializer):
   class Meta:
@@ -279,4 +289,3 @@ class OrderItemSerializer(serializers.ModelSerializer):
         restaurant = staff_user.restaurant
         self.fields["menu_item"].queryset = MenuItem.objects.filter(restaurant = restaurant)
         self.fields["order"].queryset = Order.objects.filter(restaurant = restaurant)
-  

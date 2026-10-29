@@ -40,6 +40,7 @@ import ReservationUpate from "./pages/Reservation/ReservationUpdate";
 import OrderList from "./pages/Order/OrderList";
 import OrderAdd from "./pages/Order/OrderAdd";
 import OrderDelete from "./pages/Order/OrderDelete";
+import OrderInfo from "./pages/Order/OrderInfo";
 
 function App() {
   return (
@@ -215,6 +216,11 @@ function App() {
         <Route
           path = "/order_delete/:order_pk"
           element = {<OrderDelete/>}
+        />
+
+        <Route
+          path = "/order_info/:order_pk"
+          element = {<OrderInfo/>}
         />
 
       </Routes>

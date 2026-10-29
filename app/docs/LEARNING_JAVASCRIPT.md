@@ -1181,5 +1181,35 @@ Generate dropdown based on a length:
 
 # For notes text use a <textarea> has rows : {num}, cols : {num}  
 
-# Order the orders based on the status from not served -> Waiting -> Complete
+
+# Understanding sorting out dictionary of status : [orders]
+{Object.entries(restaurant_data.orders_by_status).sort(
+        (a,b) => {
+                const statusOrder = {
+                        "Not served" : 1,
+                        "Waiting" : 2,
+                        "Complete" : 3                                
+                };
+        return statusOrder[a[0]] - statusOrder[b[0]];
+# Object.entries() : returns an array of arrays e.g. [
+   ["Not served", [order1,order2]], ["Waiting",[order3]]
+ ] so each array contains elements key (index 0) : value (index 1)
+# .sort() :
+Takes an array and rearranges its elements.
+# (a,b)
+Default representation of the two random elements we want JavaScript to use to compare.
+# const statusOrder
+Defined structure of priority.
+# return statusOrder[a[0]] - statusOrder[b[0]]
+Using the statusOrder we take the first element in the array and based on the values we sort from smallest to biggest.
+# Logic
+If a - b is negative that means a is smaller than b so sort a first
+If a - b is positive that means b is smaller so sort b first.
+
+# Convert an ISO date time into readable
+<h3>
+        {new Date(orderObject.date_time_of_order).toLocaleString("en-GB")}
+</h3>
+<new Date> since the API returns a regular ISO data time, Java Script has a Date object that represents data and time so its a constructor
+<toLocaleString> Converts into readable UK time.
 # Order info page 

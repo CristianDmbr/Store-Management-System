@@ -34,6 +34,7 @@ function OrderList(){
         if (!groups[restaurant_pk].orders_by_status[status]){
             groups[restaurant_pk].orders_by_status[status] = []
         };
+        
 
         groups[restaurant_pk].orders_by_status[status].push(order);
 
@@ -53,8 +54,17 @@ function OrderList(){
                         {!restaurant_data.orders_by_status && (
                             <h3>No Orders</h3>
                         )}
-
-                        {Object.entries(restaurant_data.orders_by_status).map(([status,orders]) => (
+                        
+                        
+                        {Object.entries(restaurant_data.orders_by_status).sort(
+                            (a,b) => {
+                                const statusOrder = {
+                                    "Not served" : 1,
+                                    "Waiting" : 2,
+                                    "Complete" : 3                                
+                            };
+                            return statusOrder[a[0]] - statusOrder[b[0]];
+                        }).map(([status,orders]) => (
                             
                             <div key={status}>
                                 <h3>{status}</h3>
@@ -66,7 +76,7 @@ function OrderList(){
                                     }}>
                                         <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : "Reservation"})</p>  
                                         <button onClick = {(event) => {navigate(`/order_delete/${order.pk}`)}}><strong>Delete</strong></button> 
-                                        <button><small>info</small></button>
+                                        <button onClick={(event) => {navigate(`/order_info/${order.pk}`)}}>View</button>
                                     </div>
                                 ))}
                             </div>
