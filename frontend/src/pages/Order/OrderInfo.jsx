@@ -5,6 +5,7 @@ function OrderInfo(){
 
     const navigate = useNavigate();
     const [csrfToken, setCSRFToken] = useState("");
+    const [role, setRole] = useState("");
 
     const {order_pk} = useParams();
     const [orderObject, setOrderObject] = useState(null);
@@ -36,6 +37,14 @@ function OrderInfo(){
             .then(data => {
                 setCSRFToken(data.csrfToken)
             })
+        
+            fetch("http://localhost:8000/api/user_name",{
+                credentials : "include"
+            })
+                .then(request => request.json())
+                .then(data => {
+                    setRole(data.role)
+                })
 
     },[order_pk]);
 
@@ -235,8 +244,15 @@ function OrderInfo(){
             </div>
 
             <br />
+            
+            
+            {( role === "Owner" || role === "Supervisor") && (
+                <button onClick={(event) => {navigate(`/order_menu_item_add/${order_pk}/${restaurant_pk}`)}}> Add menu Item </button>
+            )}
 
-            <button onClick={(event) => {navigate(`/order_menu_item_add/${order_pk}/${restaurant_pk}`)}}> Add menu Item </button>
+            {role === "Staff" && (
+                <button onClick={(event) => {navigate(`/order_add_for_staff/${order_pk}`)}}>Add Menu Item</button>
+            )}
 
             <br />
             

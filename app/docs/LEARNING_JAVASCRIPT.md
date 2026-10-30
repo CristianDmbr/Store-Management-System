@@ -1229,4 +1229,5 @@ console.log("Second");
 -> Uncaught Error: Something went wrong
 Thats it
 
-# Staff Shift List
+# Individual Staff Add menu item to order
+# Let Staff start orders

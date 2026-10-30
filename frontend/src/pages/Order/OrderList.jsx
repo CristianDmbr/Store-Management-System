@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { resolvePath, useNavigate } from "react-router-dom";
 
 function OrderList(){
 
@@ -75,14 +75,16 @@ function OrderList(){
                                         justifyContent: "center",
                                     }}>
                                         <p key={order.pk}> Table Number : {order.table_number} ({order.reservation === null ? "Walk-In" : order.reservation_display_name}) ({new Date(order.date_time_of_order).toLocaleString("en-GB")})</p> 
-                                        <button onClick = {(event) => {navigate(`/order_delete/${order.pk}`)}}><strong>Delete</strong></button> 
+                                        {role === "supervisor" && (
+                                            <button onClick = {(event) => {navigate(`/order_delete/${order.pk}`)}}><strong>Delete</strong></button> 
+                                        )}
                                         <button onClick={(event) => {navigate(`/order_info/${order.pk}`)}}>View</button>
                                     </div>
                                 ))}
                             </div>
                         ))}
                         <div>
-                            <button onClick={(event) => {navigate(`/order_add/${restaurant}`)}}>Start Order</button>
+                            {role === "Supervisor" && (<button onClick={(event) => {navigate(`/order_add/${restaurant}`)}}>Start Order</button>)}
                         </div>
                     </div>
                 ))}

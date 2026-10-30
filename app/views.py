@@ -3077,7 +3077,7 @@ class DetailOrderAPI(APIView):
         )
     
     def delete(self, request, order_pk):
-        if not request.user.groups.filter(name = "Supervisor").exists():
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
             return Response(
                 {"data" : "You do not have the permission to delete an order."},
                 status = status.HTTP_403_FORBIDDEN
@@ -3161,7 +3161,7 @@ class UpdateOrderStatusToWaiting(APIView):
     
     def patch(self,request,order_pk):
         
-        if not request.user.groups.filter(name = "Supervisor").exists() and not request.use.groups.filter(name = "Staff").exists():
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
             return Response(
                 {"data" : "You do not have the permission to update order status to waiting"},
                 status = status.HTTP_403_FORBIDDEN
@@ -3258,8 +3258,7 @@ class DetailOrderItemAPI(APIView):
 
     def get(self, request, order_item_pk):
 
-        if not request.user.groups.filter(name="Supervisor").exists() and \
-           not request.user.groups.filter(name="Staff").exists():
+        if not request.user.groups.filter(name="Supervisor").exists() and  not request.user.groups.filter(name= "Staff").exists():
             return Response(
                 {"data": "You do not have permission to view this order item."},
                 status=status.HTTP_403_FORBIDDEN

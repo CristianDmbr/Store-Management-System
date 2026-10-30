@@ -43,6 +43,7 @@ import OrderList from "./pages/Order/OrderList";
 import OrderAdd from "./pages/Order/OrderAdd";
 import OrderDelete from "./pages/Order/OrderDelete";
 import OrderInfo from "./pages/Order/OrderInfo";
+import OrderAddForStaff from "./pages/Order/OrderAddForStaff";
 
 import OrderItemAdd from "./pages/OrderItem/OrderItemAdd";
 
@@ -241,6 +242,11 @@ function App() {
           path = "/shift_list_for_staff"
           element = {<ShiftListStaff/>}
         />
+      
+      <Route
+        path = "/order_add_for_staff/:order_pk"
+        element = {<OrderAddForStaff/>}
+      />
 
       </Routes>
     </BrowserRouter>

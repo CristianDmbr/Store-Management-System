@@ -95,7 +95,7 @@ function OrderAdd(){
             </div>
         )
     }
-    
+
     return (
         <div>
             <h1>Start Order at {restaurantObject.restaurant_name}</h1>

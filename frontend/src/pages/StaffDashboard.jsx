@@ -46,6 +46,10 @@ function StaffDashboard(){
             </div>
 
             <div>
+                <button onClick={(event) => {navigate("/order_list")}} >Manage Order</button>
+            </div>
+
+            <div>
                 <button onClick={handleSubmit}>Logout</button>
             </div>
         </div>
