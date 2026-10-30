@@ -1213,5 +1213,21 @@ If a - b is positive that means b is smaller so sort b first.
 <new Date> since the API returns a regular ISO data time, Java Script has a Date object that represents data and time so its a constructor
 <toLocaleString> Converts into readable UK time.
 
+# Difference between console.log() and console.error()
+Both are used to display information in the browser's developer console.
+- < console.log > used for general information, debuggin and inspecting variables.
+- < console.error > used specifically for errors, used to display the message and marks it as an error.
 
+# <throw>
+Its used to prevent the regular execution of code
+<
+console.log("First");
+throw new Error("Something went wrong");
+console.log("Second");
+>
+-> First
+-> Uncaught Error: Something went wrong
+Thats it
+
+# Underrstand the handleDeleteOrderItem
 # Add a complete button that changes the state of the order to compelte and navigates to order list.

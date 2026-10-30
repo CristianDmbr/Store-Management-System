@@ -52,10 +52,17 @@ function OrderInfo(){
 
     },{});
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // < async > because we do not want to freeze the whole React app while we wait for the response from this function
 
+    // There are two functions to handle errors
+    // 1. Fetch the error, displays it and then interrupts the flow.
+    // 2. Creates a new error object which gets passed to the catch and but also interrupts the flow
     async function handleDeleteOrderItem(order_item_pk) {
+        // < try > is part of JavaScript's error handling mechanism. It allows to execute code that might produce an error and handle that error if it occurs. 
+        // < catch(error) > is the handle function incase there is an error inside of the try.
         try {
+            // < await > means wait for this request to finish before we continue with what's under this fetch request.
+            // This does mean that other functions outside of the handleDeleteOrderItem can still run tho.
             const response = await fetch(
                 `http://localhost:8000/api/order_menu_item_decrease/${order_item_pk}`,
                 {
@@ -66,14 +73,19 @@ function OrderInfo(){
                     }
                 }
             );
-    
+            
+            // Incase the response is not okay get the error message from the response body
+            // Retries the error message and display it.
+            // return exits the function.
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Failed to update order item:", errorData);
                 return;
             }
     
-            // Fetch the latest order items from Django
+            // Fetch the latest order items from Django once we done delete an order item.
+            // We use await again to prevent running of outher code under the fetch.
+            // Just means wait for the updated list of order items before running the code underneath
             const updatedResponse = await fetch(
                 `http://localhost:8000/api/order_items_per_order/${order_pk}`,
                 {
@@ -82,6 +94,8 @@ function OrderInfo(){
             );
     
             if (!updatedResponse.ok) {
+                // Throw generates an error and interupts the normal execution of the code
+                // This error get's passed to the catch (error)
                 throw new Error("Failed to refresh order items.");
             }
     
@@ -94,9 +108,6 @@ function OrderInfo(){
             console.error("Error deleting order item:", error);
         }
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
     
     if (!orderObject){
         return(<div><h1>Loading</h1></div>)
