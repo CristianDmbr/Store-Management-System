@@ -2772,17 +2772,19 @@ class DetailShiftAPI(APIView):
 
     def get(self, request, shift_pk):
 
-        if not request.user.groups.filter(name = "Supervisor").exists():
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
             return Response(
                 {"data" : "You do not have the permission to access a shift"},
                 status = status.HTTP_400_BAD_REQUEST
             )
         
+        role = "Supervisor" if request.user.groups.filter(name = "Supervisor") else "Staff"
         shift = get_object_or_404(Shift, pk = shift_pk)
         serializer = ShiftSerialiser(shift)
 
         return Response(
             {
+                "role" : role,
                 "serialized_data" : serializer.data,
                 "duration_hours" : shift.duration_hours,
                 "earnings" : shift.earnings

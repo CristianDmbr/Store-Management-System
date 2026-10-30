@@ -6,6 +6,8 @@ function InfoShift(){
     const navigate = useNavigate();
 
     const { shift_pk } = useParams();
+
+    const [role, setRole] = useState();
     
     // From Shift Serializer
     const [employee_name_display, setEmployeeName] = useState("");
@@ -24,14 +26,15 @@ function InfoShift(){
         })
             .then(request => request.json())
             .then(data => {
-                setEmployeeName(data.serialized_data.employee_name_display)
-                setEmployeeSurname(data.serialized_data.employee_surname_display)
-                setStartTimeDisplay(data.serialized_data.start_time_display)
-                setEndTimeDisplay(data.serialized_data.end_time_display)
-                setStatusDisplay(data.serialized_data.status_display)
-                setRestaurantName(data.serialized_data.display_restaurant)
-                setDurationHours(data.duration_hours)
-                setEarnings(data.earnings)
+                setEmployeeName(data.serialized_data.employee_name_display);
+                setEmployeeSurname(data.serialized_data.employee_surname_display);
+                setStartTimeDisplay(data.serialized_data.start_time_display);
+                setEndTimeDisplay(data.serialized_data.end_time_display);
+                setStatusDisplay(data.serialized_data.status_display);
+                setRestaurantName(data.serialized_data.display_restaurant);
+                setDurationHours(data.duration_hours);
+                setEarnings(data.earnings);
+                setRole(data.role);
             })
     })
 
@@ -81,7 +84,12 @@ function InfoShift(){
             </div>
 
             <div>
-                <button onClick={(event) => {navigate("/shifts_list")}}>Back</button>
+                {role === "Supervisor" && (
+                    <button onClick={(event) => {navigate("/shifts_list")}}>Back</button>
+                )}
+                {role === "Staff" && (
+                    <button onClick={(event) => {navigate("/shift_list_for_staff")}}>Back</button>
+                )}
             </div>
 
         </div>

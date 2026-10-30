@@ -30,6 +30,7 @@ import AddShift from "./pages/Shift/ShiftAdd";
 import InfoShift from "./pages/Shift/ShiftInfo";
 import DeleteShift from "./pages/Shift/ShiftDelete";
 import UpdateShift from "./pages/Shift/ShiftUpdate";
+import ShiftListStaff from "./pages/Shift/ShiftListStaff";
 
 import ReservationList from "./pages/Reservation/ReservationList";
 import ReservationInfo from "./pages/Reservation/ReservationInfo";
@@ -228,6 +229,11 @@ function App() {
         <Route
           path = "/order_menu_item_add/:order_pk/:restaurant_pk"
           element = {<OrderItemAdd/>}
+        />
+
+        <Route
+          path = "/shift_list_for_staff"
+          element = {<ShiftListStaff/>}
         />
 
       </Routes>

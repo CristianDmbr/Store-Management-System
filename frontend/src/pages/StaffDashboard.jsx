@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useEffect, useCase } from "react";
 import { useNavigate } from "react-router-dom";
 
+import UserGreetings from "../components/Greetings";
+
 function StaffDashboard(){
 
     const navigate = useNavigate();
@@ -33,6 +35,11 @@ function StaffDashboard(){
     return (
         <div>
             <h1>Staff Dashboard</h1>
+            <UserGreetings></UserGreetings>
+
+            <div>
+                <button onClick={(event) => {navigate("/shift_list_for_staff")}}>View Shifts</button>
+            </div>
 
             <div>
                 <button onClick={handleSubmit}>Logout</button>

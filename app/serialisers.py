@@ -202,7 +202,7 @@ class ShiftSerialiser(serializers.ModelSerializer):
 
   class Meta:
     model = Shift
-    fields = ["pk","employee","employee_name_display","employee_surname_display","start_time","end_time","status","status_display", "start_time_display","end_time_display","display_restaurant"]
+    fields = ["pk","employee","employee_name_display","employee_surname_display","start_time","end_time","status","status_display", "start_time_display","end_time_display","display_restaurant","duration_hours"]
   
   def get_start_time_display(self, obj):
     return obj.start_time.astimezone().strftime("%d/%m/%Y %H:%M")
