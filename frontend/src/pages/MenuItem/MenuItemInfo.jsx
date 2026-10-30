@@ -86,7 +86,7 @@ function MenuItemInfo() {
                 <h2>Nutrition</h2>
 
                 <p>
-                    <strong>Calories:</strong> {calories}
+                    <strong>Calories:</strong> {calories} <small>kcal</small>
                 </p>
             </div>
 
@@ -106,8 +106,15 @@ function MenuItemInfo() {
                 </p>
             </div>
 
-            <button onClick={(event) => navigate(`/menu_items_per_restaurant/${restaurant_pk}`) }> Back to Menu </button>
-            {role == "Owner" && (
+            <br />
+            
+            {(role === "Owner" || role == "Supervisor") && (
+                <button onClick={(event) => navigate(`/menu_items_per_restaurant/${restaurant_pk}`) }> Back to Menu </button>
+            ) }
+            {role === "Staff" && (
+                <button onClick={(event) => {navigate("/menu_list_for_staff")}}>Back</button>
+            )}
+            {role ===  "Owner" && (
                 <button onClick={(event) => navigate(`/menu_item_update/${menu_item_pk}/${restaurant_pk}`)}><strong>Update</strong></button>
             )}
 

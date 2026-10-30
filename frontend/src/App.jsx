@@ -24,6 +24,7 @@ import MenuItemInfo from "./pages/MenuItem/MenuItemInfo";
 import DeleteMenuItem from "./pages/MenuItem/MenuItemDelete";
 import MenuItemAdd from "./pages/MenuItem/MenuItemAdd";
 import UpdateMenuItem from "./pages/MenuItem/MenuItemUpdate";
+import MenuItemListForStaff from "./pages/MenuItem/MenuItemListForStaff";
 
 import ShiftList from "./pages/Shift/ShiftList";
 import AddShift from "./pages/Shift/ShiftAdd";
@@ -151,6 +152,11 @@ function App() {
         <Route
           path = "/menu_item_update/:menu_item_pk/:restaurant_pk"
           element = {<UpdateMenuItem/>}
+        />
+
+        <Route
+          path="/menu_list_for_staff"
+          element = {<MenuItemListForStaff/>}
         />
 
 

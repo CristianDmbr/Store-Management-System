@@ -40,6 +40,10 @@ function StaffDashboard(){
             <div>
                 <button onClick={(event) => {navigate("/shift_list_for_staff")}}>View Shifts</button>
             </div>
+            
+            <div>
+                <button onClick={(event) => {navigate("/menu_list_for_staff")}}>Menu Items</button>
+            </div>
 
             <div>
                 <button onClick={handleSubmit}>Logout</button>

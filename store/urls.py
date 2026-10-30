@@ -160,4 +160,6 @@ urlpatterns = [
     path("api/time_greetings",views.GetTime.as_view(),name = "time_greetings"),
     # Gather all Supervisors
     path("api/get_supervisors",views.GetAllSupervisors.as_view(),name = "all_supervisors"),
+    # Get the restaurant pk / restaurant name for a staff member
+    path("api/get_staff_restaurant", views.GetStaffRestaurant.as_view(), name = "staff_restaurant"),
     ]

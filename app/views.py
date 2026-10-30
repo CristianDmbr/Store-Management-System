@@ -3557,3 +3557,22 @@ class GetAllSupervisors(APIView):
             data,
             status = status.HTTP_200_OK
         )
+    
+class GetStaffRestaurant(APIView):
+    def get(self,request):
+        if not request.user.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data" : "You do not have the permission to access the restaurant of the staff."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        staff_object = get_object_or_404(Staff, user = request.user)
+        restaurant_pk = staff_object.restaurant
+        restaurant_display_name = staff_object.restaurant.restaurant_name
+
+        return Response( {
+            "restaurant_pk" : restaurant_pk,
+            "restaurant_display_name" : restaurant_display_name,
+        },
+            status = status.HTTP_200_OK
+        )
