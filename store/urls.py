@@ -132,6 +132,10 @@ urlpatterns = [
     # Order
     path("api/order_list",views.CollectionOrderAPI.as_view(), name = "order_list"),
     path("api/detail_order/<int:order_pk>", views.DetailOrderAPI.as_view(), name = "order_detail"),
+    # Update Order status to Complete
+    path("api/order_update_to_complete/<int:order_pk>",views.UpdateOrderStatusToComplete.as_view(), name = "update_order_status_to_complete"),
+    # Update Order status to Waiting
+    path("api/order_update_to_waiting/<int:order_pk>",views.UpdateOrderStatusToWaiting.as_view(), name = "update_order_status_to_waiting"),
 
     # Order Item
     path("api/order_item", views.CollectionOrderItemAPI.as_view(),name = "order_item_collection"),

@@ -107,11 +107,59 @@ function OrderInfo(){
         } catch (error) {
             console.error("Error deleting order item:", error);
         }
+    };
+
+    async function handleStatusUpdateToComplete(order_pk) {
+        try {
+            const response = await fetch(`http://localhost:8000/api/order_update_to_complete/${order_pk}`,{
+                credentials : "include",
+                method : "PATCH",
+                headers : {
+                    "X-CSRFToken" : csrfToken,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok){
+                const errorData = await response.json();
+                console.error("Error when updating the Order status to Complete ", errorData);
+                return;
+            }
+
+            navigate("/order_list");
+
+        } catch (error) {
+            console.error("Error updating order status to Complete", error);
+        }
+    };
+
+    async function handleStatusUpdateToWaiting(order_pk){
+        try {
+            const response = await fetch(`http://localhost:8000/api/order_update_to_waiting/${order_pk}`,{
+                credentials : "include",
+                method : "PATCH",
+                headers : {
+                    "X-CSRFToken" : csrfToken,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok){
+                const errorMessage = await response.json();
+                console.error("Error when updating the Order status to Waiting ", errorMessage);
+                return;
+            }
+
+            navigate("/order_list");
+
+        } catch (error) {
+            console.error("Error updating order status to Waiting ")
+        }
     }
     
     if (!orderObject){
         return(<div><h1>Loading</h1></div>)
-    }
+    };
     
     return (
         <div>
@@ -186,8 +234,22 @@ function OrderInfo(){
                 ))}
             </div>
 
+            <br />
+
             <button onClick={(event) => {navigate(`/order_menu_item_add/${order_pk}/${restaurant_pk}`)}}> Add menu Item </button>
-                
+
+            <br />
+            
+            <div>
+                {(orderObject.status === "not_been_served") && (
+                    <button onClick={() => {handleStatusUpdateToWaiting(order_pk)}}>Update Order Status to Waiting</button>
+                )}
+                {(orderObject.status === "waiting") && (
+                    <button onClick={() => {handleStatusUpdateToComplete(order_pk)}}>Complete Order</button>
+                )}
+            </div>
+
+            <br />
 
             <div>
                 <button onClick={(event) => {navigate("/order_list")}}>Back</button>

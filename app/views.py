@@ -3134,7 +3134,46 @@ class DetailOrderAPI(APIView):
                 status = status.HTTP_400_BAD_REQUEST
             )
 
-### All Items in a order
+# Updates the order status to complete
+class UpdateOrderStatusToComplete(APIView):
+    
+    def patch(self, request, order_pk):
+
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data" : "You do not have the permission to update the status of an order to Complete."},
+                status = status.HTTP_403_FORBIDDEN
+            )
+        
+        order_objects = get_object_or_404(Order, pk = order_pk)
+
+        order_objects.status = "complete"
+        order_objects.save(update_fields = ["status"])
+
+        return Response(
+            {"data" : "Sucessfully updated status to Complete"},
+            status = status.HTTP_200_OK
+        )
+
+class UpdateOrderStatusToWaiting(APIView):
+    
+    def patch(self,request,order_pk):
+        
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.use.groups.filter(name = "Staff").exists():
+            return Response(
+                {"data" : "You do not have the permission to update order status to waiting"},
+                status = status.HTTP_403_FORBIDDEN
+            )
+
+        order_object = get_object_or_404(Order, pk = order_pk )
+        order_object.status = "waiting"
+        order_object.save(update_fields = ["status"])
+
+        return Response(
+            {"data" : "Sucessfully updated status to waiting"},
+            status = status.HTTP_200_OK
+        )
+
 
 ########################################################################################## Order Items
 
