@@ -84,7 +84,10 @@ function OrderList(){
                             </div>
                         ))}
                         <div>
-                            {role === "Supervisor" && (<button onClick={(event) => {navigate(`/order_add/${restaurant}`)}}>Start Order</button>)}
+                            {role === "supervisor" && (<button onClick={(event) => {navigate(`/order_add/${restaurant}`)}}>Start Order</button>)}
+                        </div>
+                        <div>
+                            <button onClick={(event) => {navigate("/order_add_for_staff")}}>Start Order</button>
                         </div>
                     </div>
                 ))}

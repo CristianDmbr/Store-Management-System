@@ -2177,7 +2177,7 @@ class RestaurantDetailAPI(APIView):
 
     def get(self, request, restaurant_pk):
 
-        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
             return Response(
                 {"detail" : "You do not have permission to view a Restaurant"},
                 status = status.HTTP_403_FORBIDDEN
@@ -2187,7 +2187,8 @@ class RestaurantDetailAPI(APIView):
             restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, supervisor = request.user)
         elif request.user.groups.filter(name = "Owner").exists():
             restaurant = get_object_or_404(Restaurant, pk = restaurant_pk, owner = request.user)
-
+        elif request.user.groups.filter(name = "Staff").exists():
+            restaurant = get_object_or_404(Restaurant, pk = restaurant_pk)
 
         serializer = RestaurantSerializer(restaurant)
 
@@ -2856,19 +2857,35 @@ class DetailShiftAPI(APIView):
 class CollectionReservationAPI(APIView):
 
     def get(self, request):
-        if not request.user.groups.filter(name = "Supervisor").exists():
+        if not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
             return Response(
                 {"data" : "You do not have the permission to view all the reservations"},
                 status = status.HTTP_403_FORBIDDEN
             )
         
-        all_reservations = Reservation.objects.filter(restaurant__supervisor = request.user)
-        serializer = ReservationSerialiser(all_reservations, many = True)
+        is_supervisor = request.user.groups.filter(name = "Supervisor").exists()
+        is_staff = request.user.groups.filter(name = "Staff").exists()
+        
+        if is_supervisor:
+            all_reservations = Reservation.objects.filter(restaurant__supervisor = request.user)
+            serializer = ReservationSerialiser(all_reservations, many = True)
 
-        return Response(
-            serializer.data,
-            status = status.HTTP_200_OK
-        )
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
+        elif is_staff:
+            
+            staff_object = get_object_or_404(Staff, user = request.user)
+            restaurant_pk = staff_object.restaurant.pk
+            all_reservations = Reservation.objects.filter(restaurant = restaurant_pk)
+
+            serializer = ReservationSerialiser(all_reservations,many = True)
+
+            return Response(
+                serializer.data,
+                status = status.HTTP_200_OK
+            )
     
     def post(self, request):
         if not request.user.groups.filter(name = "Supervisor").exists():
@@ -3558,20 +3575,37 @@ class GetAllSupervisors(APIView):
         )
     
 class GetStaffRestaurant(APIView):
-    def get(self,request):
+
+    def get(self, request):
+
         if not request.user.groups.filter(name = "Staff").exists():
-            return Response(
-                {"data" : "You do not have the permission to access the restaurant of the staff."},
-                status = status.HTTP_403_FORBIDDEN
+            return Response (
+                {"data" : "You do not have the permission to access a staff's restaurant"},
+                status.HTTP_403_FORBIDDEN
             )
         
         staff_object = get_object_or_404(Staff, user = request.user)
-        restaurant_pk = staff_object.restaurant
-        restaurant_display_name = staff_object.restaurant.restaurant_name
+        restaurant_object = staff_object.restaurant
 
-        return Response( {
-            "restaurant_pk" : restaurant_pk,
-            "restaurant_display_name" : restaurant_display_name,
-        },
+        return Response(
+            {
+                "restaurant_pk" : restaurant_object.pk,
+                "restaurant_display_name" : restaurant_object.restaurant_name
+            },
+            status.HTTP_200_OK
+        )
+    
+# Gets the Staff Object when the user is Staff.
+# Used for starting orders as a Staff.
+class GetStaffUser(APIView):
+    def get(self,request):
+
+        staff_object = get_object_or_404(Staff, user = request.user)
+
+        serialized_staff_object = StaffSerialiser(staff_object)
+
+        return Response(
+            {"staff_object" : serialized_staff_object.data,
+             "staff_object_pk" : staff_object.pk},
             status = status.HTTP_200_OK
         )

@@ -161,5 +161,7 @@ urlpatterns = [
     # Gather all Supervisors
     path("api/get_supervisors",views.GetAllSupervisors.as_view(),name = "all_supervisors"),
     # Get the restaurant pk / restaurant name for a staff member
-    path("api/get_staff_restaurant", views.GetStaffRestaurant.as_view(), name = "staff_restaurant"),
+    path("api/get_staff_restaurant/", views.GetStaffRestaurant.as_view(), name = "staff_restaurant"),
+    # Get the staff Object and pk of a Staff user
+    path("api/get_staff_logged_in",views.GetStaffUser.as_view(), name = "get_staff_logged_in"),
     ]

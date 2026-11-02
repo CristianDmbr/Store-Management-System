@@ -244,7 +244,7 @@ function App() {
         />
       
       <Route
-        path = "/order_add_for_staff/:order_pk"
+        path = "/order_add_for_staff"
         element = {<OrderAddForStaff/>}
       />
 
