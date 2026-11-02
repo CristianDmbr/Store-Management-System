@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-
 import LoginPage from "./pages/LoginPage";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import SupervisorDashboard from "./pages/SupervisorDashboard";
@@ -46,6 +45,7 @@ import OrderInfo from "./pages/Order/OrderInfo";
 import OrderAddForStaff from "./pages/Order/OrderAddForStaff";
 
 import OrderItemAdd from "./pages/OrderItem/OrderItemAdd";
+import OrderAddItemForStaff from "./pages/OrderItem/OrderItemAddStaff";
 
 function App() {
   return (
@@ -246,6 +246,11 @@ function App() {
       <Route
         path = "/order_add_for_staff"
         element = {<OrderAddForStaff/>}
+      />
+
+      <Route
+        path = "/order_add_item_as_staff/:order_pk/:restaurant_pk"
+        element = {<OrderAddItemForStaff/>}
       />
 
       </Routes>

@@ -104,7 +104,7 @@ function OrderItemAdd(){
                         }}
                         required
                     />
-                    </div>
+                </div>
 
 
                 <button type="submit">Add</button>

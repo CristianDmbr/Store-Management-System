@@ -2525,7 +2525,7 @@ class StaffDetailAPI(APIView):
 class CollectionMenuItempPerRestaurantAPI(APIView):
 
     def get(self,request, restaurant_pk):
-        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists():
+        if not request.user.groups.filter(name = "Owner").exists() and not request.user.groups.filter(name = "Supervisor").exists() and not request.user.groups.filter(name = "Staff").exists():
             return Response(
                 {"data" : "You do not have the permission to acess restaurant menu items"},
                 status = status.HTTP_403_FORBIDDEN

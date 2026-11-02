@@ -250,6 +250,10 @@ function OrderInfo(){
                 <button onClick={(event) => {navigate(`/order_menu_item_add/${order_pk}/${restaurant_pk}`)}}> Add menu Item </button>
             )}
 
+            { role === "Staff" && (
+                <button onClick={(event) => {navigate(`/order_add_item_as_staff/${order_pk}/${restaurant_pk}`)}}>Add Item to Order</button>
+            )}
+
             <br />
             
             <div>
