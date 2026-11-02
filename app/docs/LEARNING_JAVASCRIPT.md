@@ -1229,5 +1229,3 @@ console.log("Second");
 -> Uncaught Error: Something went wrong
 Thats it
 
-# Individual Staff Add menu item to order
-# Let Staff start orders
