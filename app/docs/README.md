@@ -774,4 +774,4 @@ primary key. - **Response:** Staff object and its primary key. -
 ------------------------------------------------------------------------
 
 ## Future Improvements :
-- Holiday requests from Staff, Superviosrs can approve or reject the holidays.
+- Holiday requests from Staff, Superviosrs can approve or reject the holidays. (README.md 5 Nov 2026)
