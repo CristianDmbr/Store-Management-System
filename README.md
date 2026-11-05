@@ -9,33 +9,33 @@
 
 ## screenshots :
 ### 1. Authentication & Dashboards
-![Login Page](screenshots/login.png)
-![Owner Dashboard](screenshots/owner_dashboard.png)
-![Supervisor Dashboard](screenshots/supervisor_dashboard.png)
-![Staff Dashboard](screenshots/staff_dashboard.png)
+![Login Page](app/docs/screenshots/login.png)
+![Owner Dashboard](app/docs/screenshots/owner_dashboard.png)
+![Supervisor Dashboard](app/docs/screenshots/supervisor_dashboard.png)
+![Staff Dashboard](app/docs/screenshots/staff_dashboard.png)
 
 ### 2. Owner Functionality
 The owner can manage restaurants and oversee their operations.
-![Restaurant List](screenshots/owner_restaurant_list.png)
-![Restaurant Information](screenshots/restaurant_stat_1.png)
-![Restaurant Information](screenshots/restaurant_stat_2.png)
-![Restaurant Information](screenshots/restaurant_stat_3.png)
-![Add Staff](screenshots/add_staff.png)
+![Restaurant List](app/docs/screenshots/owner_restaurant_list.png)
+![Restaurant Information](app/docs/screenshots/restaurant_stat_1.png)
+![Restaurant Information](app/docs/screenshots/restaurant_stat_2.png)
+![Restaurant Information](app/docs/screenshots/restaurant_stat_3.png)
+![Add Staff](app/docs/screenshots/add_staff.png)
 
 ### 3. Supervisor Functionality
 Supervisors can manage restaurant staff and coordinate employee shifts.
-![Staff List](screenshots/staff_list.png)
-![Shift Management](screenshots/shift_list_supervisor.png)
-![Add Shift](screenshots/add_shift.png)
+![Staff List](app/docs/screenshots/staff_list.png)
+![Shift Management](app/docs/screenshots/shift_list_supervisor.png)
+![Add Shift](app/docs/screenshots/add_shift.png)
 
 ### 4. Staff Functionality
 Staff members can view menus, manage orders and access their shift information.
-![Menu List](screenshots/menu_list_staff.png)
-![Menu Item Information](screenshots/menu_item_info.png)
-![Orders List](screenshots/order_list.png)
-![Start Order](screenshots/start_order.png)
-![Shift List](screenshots/shift_list.png)
-![Shift Information](screenshots/shift_info.png)
+![Menu List](app/docs/screenshots/menu_list_staff.png)
+![Menu Item Information](app/docs/screenshots/menu_item_info.png)
+![Orders List](app/docs/screenshots/order_list.png)
+![Start Order](app/docs/screenshots/start_order.png)
+![Shift List](app/docs/screenshots/shift_list.png)
+![Shift Information](app/docs/screenshots/shift_info.png)
 
 ---
 
@@ -774,4 +774,4 @@ primary key. - **Response:** Staff object and its primary key. -
 ------------------------------------------------------------------------
 
 ## Future Improvements :
-- Holiday requests from Staff, Superviosrs can approve or reject the holidays. (README.md 5 Nov 2026)
+- Holiday requests from Staff, Superviosrs can approve or reject the holidays. (README.md 5 Nov 2026) Test
