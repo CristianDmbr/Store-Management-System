@@ -1,4 +1,4 @@
-import UserGreetings from "../components/Greetings";
+import UserGreetings from "./Greetings";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
  

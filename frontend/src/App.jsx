@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import LoginPage from "./pages/LoginPage";
-import OwnerDashboard from "./pages/OwnerDashboard";
-import SupervisorDashboard from "./pages/SupervisorDashboard";
-import StaffDashboard from "./pages/StaffDashboard";
-import RegisterPage from "./pages/Restaurant/RegisterPage";
+import LoginPage from "./pages/Sesssion Related/LoginPage";
+import OwnerDashboard from "./pages/Sesssion Related/OwnerDashboard";
+import SupervisorDashboard from "./pages/Sesssion Related/SupervisorDashboard";
+import StaffDashboard from "./pages/Sesssion Related/StaffDashboard";
+import RegisterPage from "./pages/Sesssion Related/RegisterPage";
 
 import RestaurantsList from "./pages/Restaurant/Restaurants";
 import RestaurantInfo from "./pages/Restaurant/RestaurantInfo";

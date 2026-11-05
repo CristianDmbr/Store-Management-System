@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import UserGreetings from "../components/Greetings";
+import UserGreetings from "./Greetings";
 
 
 function SupervisorDashboard() { 
@@ -66,4 +66,4 @@ function SupervisorDashboard() {
     );
 };
 
-export default SupervisorDashboard
+export default SupervisorDashboard;
