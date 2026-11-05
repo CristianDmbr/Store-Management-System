@@ -1,6 +1,9 @@
 # TODO
 
-# Remove Dead Code
-# Organise files
-# Look Into Bootstrap
 # Create a README
+# Look Into Bootstrap
+
+Cristian, Cristi22 SupUser 
+Molea, Cristi22 Owner
+Kevin, Cristi22 Supervisor
+Steff, Cristi22 Staff
