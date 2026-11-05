@@ -34,7 +34,7 @@ Staff members can view menus, manage orders and access their shift information.
 ![Menu Item Information](app/docs/screenshots/menu_item_info.png)
 ![Orders List](app/docs/screenshots/order_list.png)
 ![Start Order](app/docs/screenshots/start_order.png)
-![Shift List](app/docs/screenshots/shift_list.png)
+![Shift List](app/docs/scPlereenshots/shift_list.png)
 ![Shift Information](app/docs/screenshots/shift_info.png)
 
 ---
